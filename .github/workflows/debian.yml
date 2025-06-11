@@ -3,6 +3,7 @@ name: Debian
 on:
   push:
     paths: ['docker/debian/Dockerfile']
+  workflow_dispatch:
 
 env:
   DOCKER_REGISTRY: ghcr.io

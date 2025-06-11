@@ -3,6 +3,7 @@ name: Ubuntu
 on:
   push:
     paths: ['docker/ubuntu/Dockerfile']
+    workflow_dispatch:
 
 env:
   DOCKER_REGISTRY: ghcr.io
