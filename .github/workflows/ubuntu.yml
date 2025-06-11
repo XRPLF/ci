@@ -3,6 +3,11 @@ name: Ubuntu
 on:
   push:
 
+defaults:
+  run:
+    shell: bash
+    working-directory: ./docker/ubuntu
+
 env:
   DOCKER_REGISTRY: ghcr.io
 
