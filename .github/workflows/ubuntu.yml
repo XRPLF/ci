@@ -2,7 +2,7 @@ name: Ubuntu
 
 on:
   push:
-    paths: ['docker/ubuntu/**']
+    paths: ['docker/ubuntu/Dockerfile']
 
 env:
   DOCKER_REGISTRY: ghcr.io
