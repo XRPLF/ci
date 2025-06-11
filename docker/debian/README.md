@@ -1,6 +1,6 @@
-## Ubuntu: A Docker image used to build and test rippled
+## Debian: A Docker image used to build and test rippled
 
-The code in this repository creates a locked-down Ubuntu image for building and
+The code in this repository creates a locked-down Debuan image for building and
 testing rippled in the GitHub CI pipelines.
 
 Although the images will be built by a CI pipeline in this repository, if
@@ -24,8 +24,8 @@ docker login ${DOCKER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 ### Building and pushing the Docker image
 
-The same Dockerfile can be used to build an image for Ubuntu 22.04 and 24.04 by
-specifying the `UBUNTU_VERSION` build argument. There are additional arguments
+The same Dockerfile can be used to build an image for Debian Bookworm by
+specifying the `DEBIAN_VERSION` build argument. There are additional arguments
 to specify as well, namely `GCC_VERSION` for the GCC flavor and `CLANG_VERSION`
 for the Clang flavor.
 
@@ -37,14 +37,14 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-UBUNTU_VERSION=noble
-GCC_VERSION=14
-DOCKER_IMAGE=xrplf/ci/${UBUNTU_VERSION}:gcc${GCC_VERSION}
+DEBIAN_VERSION=bookworm
+GCC_VERSION=12
+DOCKER_IMAGE=xrplf/ci/${DEBIAN_VERSION}:gcc${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target gcc \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
+  --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
@@ -58,14 +58,14 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-UBUNTU_VERSION=noble
-CLANG_VERSION=18
-DOCKER_IMAGE=xrplf/ci/${UBUNTU_VERSION}:clang${CLANG_VERSION}
+DEBIAN_VERSION=bookworm
+CLANG_VERSION=16
+DOCKER_IMAGE=xrplf/ci/${DEBIAN_VERSION}:clang${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target clang \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
+  --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
   --tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64

@@ -1,0 +1,69 @@
+name: Debian
+
+on: push
+
+env:
+  DOCKER_REGISTRY: ghcr.io
+
+jobs:
+  # Build the Docker image for Debian using different versions of GCC.
+  gcc:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version:
+          - os: bookworm
+            gcc: 12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+      - name: Determine the Docker image name.
+        run: |
+          # Convert the repository name to lowercase as the organization name is
+          # uppercase, which is not permitted by the Docker registry.
+          DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
+          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
+      - name: Build the Docker image
+        working-directory: docker/ubuntu
+        run: |
+          DOCKER_BUILDKIT=1 docker build . \
+          --target gcc \
+          --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
+          --build-arg DEBIAN_VERSION=${{ matrix.version.os }} \
+          --build-arg GCC_VERSION=${{ matrix.version.gcc }} \
+          --tag ${{ env.DOCKER_IMAGE }}
+      - name: Push the Docker image
+        run: docker push ${{ env.DOCKER_IMAGE }}
+
+  # Build the Docker image for Debian using different versions of Clang.
+  clang:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version:
+          - os: bookworm
+            clang: 16
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+      - name: Determine the Docker image name.
+        run: |
+          # Convert the repository name to lowercase as the organization name is
+          # uppercase, which is not permitted by the Docker registry.
+          DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
+          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
+      - name: Build the Docker image
+        working-directory: docker/ubuntu
+        run: |
+          DOCKER_BUILDKIT=1 docker build . \
+          --target clang \
+          --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
+          --build-arg DEBIAN_VERSION=${{ matrix.version.os }} \
+          --build-arg CLANG_VERSION=${{ matrix.version.clang }} \
+          --tag ${{ env.DOCKER_IMAGE }}
+      - name: Push the Docker image
+        run: docker push ${{ env.DOCKER_IMAGE }}

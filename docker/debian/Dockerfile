@@ -1,6 +1,6 @@
 # ====================== BASE IMAGE ======================
-ARG UBUNTU_VERSION=jammy
-FROM ubuntu:${UBUNTU_VERSION} AS base
+ARG DEBIAN_VERSION=bookworm
+FROM debian:${DEBIAN_VERSION} AS base
 
 # Associate the image with the repository.
 ARG GITHUB_REPO=XRPLF/ci
