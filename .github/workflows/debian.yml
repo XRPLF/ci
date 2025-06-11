@@ -1,6 +1,8 @@
 name: Debian
 
-on: push
+on:
+  push:
+    paths: ['docker/debian/**']
 
 env:
   DOCKER_REGISTRY: ghcr.io
@@ -45,6 +47,8 @@ jobs:
         version:
           - os: bookworm
             clang: 16
+          - os: bookworm
+            clang: 19
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
