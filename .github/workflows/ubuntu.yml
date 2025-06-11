@@ -3,11 +3,6 @@ name: Ubuntu
 on:
   push:
 
-defaults:
-  run:
-    shell: bash
-    working-directory: ./docker/ubuntu
-
 env:
   DOCKER_REGISTRY: ghcr.io
 
@@ -26,6 +21,7 @@ jobs:
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} --password-stdin
       - name: Build the Docker image
+        working-directory: docker/ubuntu
         run: |
           DOCKER_BUILDKIT=1 docker build . \
           --target gcc \
@@ -48,6 +44,7 @@ jobs:
         run: |
           run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} --password-stdin
       - name: Build the Docker image
+        working-directory: docker/ubuntu
         run: |
           DOCKER_BUILDKIT=1 docker build . \
           --target clang \
