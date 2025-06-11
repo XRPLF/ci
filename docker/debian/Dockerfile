@@ -57,9 +57,12 @@ WORKDIR /home/${NONROOT_USER}
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
-# Install Clang. Use the LLVM apt repository to access the latest versions.
+# Install Clang. Use the LLVM apt repository to access the latest versions. We
+# must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
+# base image.
+ARG DEBIAN_VERSION
 ARG CLANG_VERSION=16
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg && \
+RUN curl --no-progress-meter https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg && \
     printf "%s\n%s\n" \
       "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
       "deb-src [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
