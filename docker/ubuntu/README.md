@@ -24,10 +24,10 @@ docker login ${DOCKER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 ### Building and pushing the Docker image
 
-The same Dockerfile can be used to build an image for Ubuntu 22.04 and 24.04 by
-specifying the `UBUNTU_VERSION` build argument. There are additional arguments
-to specify as well, namely `GCC_VERSION` for the GCC flavor and `CLANG_VERSION`
-for the Clang flavor.
+The same Dockerfile can be used to build an image for Ubuntu 22.04 and 24.04 or
+future versions by specifying the `UBUNTU_VERSION` build argument. There are
+additional arguments to specify as well, namely `GCC_VERSION` for the GCC flavor
+and `CLANG_VERSION` for the Clang flavor.
 
 Run the commands below from the current directory containing the Dockerfile.
 
