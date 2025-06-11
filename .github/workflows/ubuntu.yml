@@ -45,8 +45,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
-        run: |
-          run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} --password-stdin
       - name: Build the Docker image
         working-directory: docker/ubuntu
         run: |
