@@ -1,0 +1,7 @@
+# IDEs.
+.idea
+.vscode
+settings.json
+
+# OS.
+.DS_Store
