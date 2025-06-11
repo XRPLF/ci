@@ -18,6 +18,8 @@ jobs:
           - os: noble
             gcc: 14
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} --password-stdin
       - name: Build the Docker image
@@ -40,6 +42,8 @@ jobs:
           - os: noble
             clang: 19
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
         run: |
           run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} --password-stdin
