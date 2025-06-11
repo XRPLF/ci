@@ -53,4 +53,4 @@ jobs:
           --target clang \
           --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \
           --build-arg CLANG_VERSION=${{ matrix.version.clang }} \
-          --tag ${{ github.event.repository.name }}/${{ matrix.version.os }}:clang{{ matrix.version.clang }}
+          --tag ${{ github.event.repository.name }}/${{ matrix.version.os }}:clang${{ matrix.version.clang }}
