@@ -29,9 +29,9 @@ jobs:
           --target gcc \
           --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \
           --build-arg GCC_VERSION=${{ matrix.version.gcc }} \
-          --tag ${{ github.event.repository.name }}/${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}
+          --tag ${DOCKER_REGISTRY}/${{ github.repository }}/${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}
       - name: Push the Docker image
-        run: docker push ${{ github.event.repository.name }}/${{ matrix.version.os }}:gcc{{ matrix.version.gcc }}
+        run: docker push ${DOCKER_REGISTRY}/${{ github.repository }}/${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}
 
   # Build the Docker image for Ubuntu using different versions of Clang.
   clang:
@@ -55,6 +55,6 @@ jobs:
           --target clang \
           --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \
           --build-arg CLANG_VERSION=${{ matrix.version.clang }} \
-          --tag ${{ github.event.repository.name }}/${{ matrix.version.os }}:clang${{ matrix.version.clang }}
+          --tag ${DOCKER_REGISTRY}/${{ github.repository }}/${{ matrix.version.os }}:clang${{ matrix.version.clang }}
       - name: Push the Docker image
-        run: docker push ${{ github.event.repository.name }}/${{ matrix.version.os }}:clang${{ matrix.version.clang }}
+        run: docker push ${DOCKER_REGISTRY}/${{ github.repository }}/${{ matrix.version.os }}:clang${{ matrix.version.clang }}
