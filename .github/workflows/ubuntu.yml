@@ -34,6 +34,7 @@ jobs:
         run: |
           DOCKER_BUILDKIT=1 docker build . \
           --target gcc \
+          --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
           --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \
           --build-arg GCC_VERSION=${{ matrix.version.gcc }} \
           --tag ${{ env.DOCKER_IMAGE }}
@@ -70,6 +71,7 @@ jobs:
         run: |
           DOCKER_BUILDKIT=1 docker build . \
           --target clang \
+          --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
           --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \
           --build-arg CLANG_VERSION=${{ matrix.version.clang }} \
           --tag ${{ env.DOCKER_IMAGE }}
