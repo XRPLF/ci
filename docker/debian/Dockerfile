@@ -32,7 +32,7 @@ RUN PIPX_HOME=/opt/pipx \
          PIPX_BIN_DIR=/usr/bin \
          PIPX_MAN_DIR=/usr/share/man \
          pipx install conan
-RUN apt remove -y pipx && apt autoremove -y
+RUN apt purge -y pipx
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci
@@ -46,7 +46,9 @@ ARG GCC_VERSION=12
 RUN apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
 ENV CC=/usr/bin/gcc-${GCC_VERSION}
 ENV CXX=/usr/bin/gcc-${GCC_VERSION}
-RUN rm -rf /var/lib/apt/lists/*
+
+# Clean up unnecessary files to reduce image size.
+RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
@@ -55,12 +57,20 @@ WORKDIR /home/${NONROOT_USER}
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
-# Install Clang.
+# Install Clang. Use the LLVM apt repository to access the latest versions.
 ARG CLANG_VERSION=16
-RUN apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg && \
+    printf "%s\n%s\n" \
+      "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
+      "deb-src [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
+      | tee /etc/apt/sources.list.d/llvm.list && \
+    apt-get update && \
+    apt-get install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
-RUN rm -rf /var/lib/apt/lists/*
+
+# Clean up unnecessary files to reduce image size.
+RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}

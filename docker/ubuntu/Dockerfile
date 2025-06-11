@@ -32,7 +32,7 @@ RUN PIPX_HOME=/opt/pipx \
          PIPX_BIN_DIR=/usr/bin \
          PIPX_MAN_DIR=/usr/share/man \
          pipx install conan
-RUN apt remove -y pipx && apt autoremove -y
+RUN apt purge -y pipx
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci
@@ -46,7 +46,9 @@ ARG GCC_VERSION=12
 RUN apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
 ENV CC=/usr/bin/gcc-${GCC_VERSION}
 ENV CXX=/usr/bin/gcc-${GCC_VERSION}
-RUN rm -rf /var/lib/apt/lists/*
+
+# Clean up unnecessary files to reduce image size.
+RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
@@ -60,7 +62,9 @@ ARG CLANG_VERSION=16
 RUN apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
-RUN rm -rf /var/lib/apt/lists/*
+
+# Clean up unnecessary files to reduce image size.
+RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
