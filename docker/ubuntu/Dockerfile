@@ -32,7 +32,7 @@ RUN PIPX_HOME=/opt/pipx \
          PIPX_BIN_DIR=/usr/bin \
          PIPX_MAN_DIR=/usr/share/man \
          pipx install conan
-RUN apt purge -y pipx
+RUN apt purge -y pipx && apt autoremove -y
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci

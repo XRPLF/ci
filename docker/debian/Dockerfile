@@ -32,7 +32,7 @@ RUN PIPX_HOME=/opt/pipx \
          PIPX_BIN_DIR=/usr/bin \
          PIPX_MAN_DIR=/usr/share/man \
          pipx install conan
-RUN apt purge -y pipx
+RUN apt purge -y pipx && apt autoremove -y
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci
@@ -64,8 +64,8 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc
       "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
       "deb-src [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
       | tee /etc/apt/sources.list.d/llvm.list && \
-    apt-get update && \
-    apt-get install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+    apt update && \
+    apt install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
 
