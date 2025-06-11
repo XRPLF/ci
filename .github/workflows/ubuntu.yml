@@ -15,6 +15,8 @@ jobs:
           - os: jammy
             gcc: 12
           - os: noble
+            gcc: 13
+          - os: noble
             gcc: 14
     steps:
       - name: Checkout repository
@@ -44,6 +46,10 @@ jobs:
     strategy:
       matrix:
         version:
+          - os: noble
+            clang: 16
+          - os: noble
+            clang: 17
           - os: noble
             clang: 18
           - os: noble
