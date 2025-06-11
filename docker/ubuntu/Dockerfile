@@ -57,8 +57,8 @@ FROM base AS clang
 # Install Clang.
 ARG CLANG_VERSION=16
 RUN apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
-ENV CC=clang-${CLANG_VERSION}
-ENV CXX=clang++-${CLANG_VERSION}
+ENV CC=/usr/bin/clang-${CLANG_VERSION}
+ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
 RUN rm -rf /var/lib/apt/lists/*
 
 # Switch to the non-root user.
