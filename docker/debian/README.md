@@ -59,7 +59,7 @@ registry.
 
 ```shell
 DEBIAN_VERSION=bookworm
-CLANG_VERSION=16
+CLANG_VERSION=17
 DOCKER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
@@ -97,8 +97,9 @@ conan install . --build missing --settings build_type=${BUILD_TYPE} \
 cd build
 cmake -DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake \
       -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
-# Build rippled.
-cmake --build . -j $(nproc)
-# Run the tests.
-./rippled --unittest --unittest-jobs $(nproc)
+# Build and test rippled. Setting the parallelism too high, e.g. to $(nproc),
+# can result in an error like "gmake[2]: ...... Killed".
+PARALLELISM=4
+cmake --build . -j ${PARALLELISM}
+./rippled --unittest --unittest-jobs ${PARALLELISM}
 ```
