@@ -32,7 +32,7 @@ jobs:
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/ubuntu
         run: |
@@ -69,7 +69,7 @@ jobs:
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/ubuntu
         run: |
