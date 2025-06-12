@@ -2,7 +2,9 @@ name: Debian
 
 on:
   push:
-    paths: ['docker/debian/Dockerfile']
+    paths:
+      - .github/workflows/debian.yml
+      - docker/debian/Dockerfile
 
 env:
   DOCKER_REGISTRY: ghcr.io

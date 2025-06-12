@@ -2,7 +2,9 @@ name: Ubuntu
 
 on:
   push:
-    paths: ['docker/ubuntu/Dockerfile']
+    paths:
+      - .github/workflows/ubuntu.yml
+      - docker/ubuntu/Dockerfile
 
 env:
   DOCKER_REGISTRY: ghcr.io
