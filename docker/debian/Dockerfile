@@ -1,5 +1,11 @@
-# ====================== BASE IMAGE ======================
+# Define the source image from which we will copy GCC. This is needed because
+# the `COPY --from XXX` command used in a stage below does not allow `XXX` to
+# contain dynamic values supplied via an argument.
 ARG DEBIAN_VERSION=bookworm
+ARG GCC_VERSION=12
+FROM gcc:${GCC_VERSION}-${DEBIAN_VERSION} AS gcc-src
+
+# ====================== BASE IMAGE ======================
 FROM debian:${DEBIAN_VERSION} AS base
 
 # Associate the image with the repository.
@@ -9,30 +15,30 @@ LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 # Ensure any packages installed directly or indirectly via dpkg do not require
 # manual interaction.
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt upgrade -y && \
-    ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
-    apt install tzdata && \
+RUN apt update && apt upgrade -y
+RUN set -ex ;\
+    ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime ;\
+    apt install tzdata ;\
     dpkg-reconfigure --frontend noninteractive tzdata
 
 # Install tools that are shared by all stages.
 RUN apt install -y build-essential \
-                        ca-certificates \
-                        cmake \
-                        curl \
-                        git \
-                        gpg \
-                        libssl-dev \
-                        libprotobuf-dev \
-                        ninja-build \
-                        protobuf-compiler
+                   ca-certificates \
+                   cmake \
+                   curl \
+                   git \
+                   gpg \
+                   libssl-dev \
+                   libprotobuf-dev \
+                   ninja-build \
+                   protobuf-compiler
 
 # Install Conan.
 RUN apt install -y pipx
 RUN PIPX_HOME=/opt/pipx \
-         PIPX_BIN_DIR=/usr/bin \
-         PIPX_MAN_DIR=/usr/share/man \
-         pipx install conan
-RUN apt purge -y pipx && apt autoremove -y
+    PIPX_BIN_DIR=/usr/bin \
+    PIPX_MAN_DIR=/usr/share/man \
+    pipx install conan
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci
@@ -41,11 +47,28 @@ RUN useradd -ms /bin/bash ${NONROOT_USER}
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
-# Install GCC.
-ARG GCC_VERSION=12
-RUN apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
-ENV CC=/usr/bin/gcc-${GCC_VERSION}
-ENV CXX=/usr/bin/gcc-${GCC_VERSION}
+# Copy GCC from the source image, make the package manager aware of its
+# existence, and create the necessary symlinks.
+COPY --from=gcc-src /usr/local/ /usr/local/
+COPY --from=gcc-src /etc/ld.so.conf.d/*.conf /etc/ld.so.conf.d/
+RUN set -ex ;\
+    ldconfig -v ;\
+    dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc ;\
+    dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++ ;\
+    dpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran ;\
+    update-alternatives --install /usr/bin/cc cc /usr/local/bin/gcc 999 ;\
+    update-alternatives --install \
+      /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
+      --slave /usr/bin/g++ g++ /usr/local/bin/g++ \
+      --slave /usr/bin/gcc-ar gcc-ar /usr/local/bin/gcc-ar \
+      --slave /usr/bin/gcc-nm gcc-nm /usr/local/bin/gcc-nm \
+      --slave /usr/bin/gcc-ranlib gcc-ranlib /usr/local/bin/gcc-ranlib \
+      --slave /usr/bin/gcov gcov /usr/local/bin/gcov \
+      --slave /usr/bin/gcov-tool gcov-tool /usr/local/bin/gcov-tool \
+      --slave /usr/bin/gcov-dump gcov-dump /usr/local/bin/gcov-dump \
+      --slave /usr/bin/lto-dump lto-dump /usr/local/bin/lto-dump ;\
+    update-alternatives --auto cc ;\
+    update-alternatives --auto gcc
 
 # Clean up unnecessary files to reduce image size.
 RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
@@ -53,6 +76,9 @@ RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
 # Switch to the non-root user.
 USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
+
+# Create a default Conan profile.
+RUN conan profile detect
 
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
@@ -78,3 +104,6 @@ RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
 # Switch to the non-root user.
 USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
+
+# Create a default Conan profile.
+RUN conan profile detect

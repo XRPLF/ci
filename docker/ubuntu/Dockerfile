@@ -9,30 +9,30 @@ LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 # Ensure any packages installed directly or indirectly via dpkg do not require
 # manual interaction.
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt upgrade -y && \
-    ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
-    apt install tzdata && \
+RUN apt update && apt upgrade -y
+RUN set -ex ;\
+    ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime ;\
+    apt install tzdata ;\
     dpkg-reconfigure --frontend noninteractive tzdata
 
 # Install tools that are shared by all stages.
 RUN apt install -y build-essential \
-                        ca-certificates \
-                        cmake \
-                        curl \
-                        git \
-                        gpg \
-                        libssl-dev \
-                        libprotobuf-dev \
-                        ninja-build \
-                        protobuf-compiler
+                   ca-certificates \
+                   cmake \
+                   curl \
+                   git \
+                   gpg \
+                   libssl-dev \
+                   libprotobuf-dev \
+                   ninja-build \
+                   protobuf-compiler
 
 # Install Conan.
 RUN apt install -y pipx
 RUN PIPX_HOME=/opt/pipx \
-         PIPX_BIN_DIR=/usr/bin \
-         PIPX_MAN_DIR=/usr/share/man \
-         pipx install conan
-RUN apt purge -y pipx && apt autoremove -y
+    PIPX_BIN_DIR=/usr/bin \
+    PIPX_MAN_DIR=/usr/share/man \
+    pipx install conan
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci

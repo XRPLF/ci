@@ -1,6 +1,6 @@
 ## Debian: A Docker image used to build and test rippled
 
-The code in this repository creates a locked-down Debuan image for building and
+The code in this repository creates a locked-down Debian image for building and
 testing rippled in the GitHub CI pipelines.
 
 Although the images will be built by a CI pipeline in this repository, if
@@ -39,7 +39,7 @@ registry.
 ```shell
 DEBIAN_VERSION=bookworm
 GCC_VERSION=12
-DOCKER_IMAGE=xrplf/ci/${DEBIAN_VERSION}:gcc${GCC_VERSION}
+DOCKER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target gcc \
@@ -60,7 +60,7 @@ registry.
 ```shell
 DEBIAN_VERSION=bookworm
 CLANG_VERSION=16
-DOCKER_IMAGE=xrplf/ci/${DEBIAN_VERSION}:clang${CLANG_VERSION}
+DOCKER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target clang \
@@ -71,4 +71,34 @@ DOCKER_BUILDKIT=1 docker build . \
   --platform linux/amd64
 
 docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}
+```
+
+#### Running the Docker image
+
+If you want to run the image locally using a cloned `rippled` repository, you
+can do so with the following command:
+
+```shell
+CODEBASE=<path to the rippled repository>
+docker run --rm -it -v ${CODEBASE}:/rippled ${DOCKER_REGISTRY}/${DOCKER_IMAGE}
+```
+
+Once inside the container you can run the following commands to build `rippled`:
+
+```shell
+BUILD_TYPE=Debug
+cd /rippled
+# Remove any existing data from previous builds on the host machine.
+rm -rf CMakeCache.txt CMakeFiles build || true
+# Install dependencies via Conan.
+conan install . --build missing --settings build_type=${BUILD_TYPE} \
+  -o xrpld=True -o tests=True -o unity=True
+# Configure the build with CMake.
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake \
+      -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+# Build rippled.
+cmake --build . -j $(nproc)
+# Run the tests.
+./rippled --unittest --unittest-jobs $(nproc)
 ```
