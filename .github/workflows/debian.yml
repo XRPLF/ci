@@ -21,6 +21,10 @@ jobs:
         version:
           - os: bookworm
             gcc: 12
+          - os: bookworm
+            gcc: 13
+          - os: bookworm
+            gcc: 14
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
