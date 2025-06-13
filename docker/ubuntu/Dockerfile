@@ -28,11 +28,12 @@ RUN apt install -y build-essential \
                    protobuf-compiler
 
 # Install Conan.
+ARG CONAN_VERSION=2.17.0
 RUN apt install -y pipx
 RUN PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man \
-    pipx install conan
+    pipx install conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci
@@ -48,7 +49,7 @@ ENV CC=/usr/bin/gcc-${GCC_VERSION}
 ENV CXX=/usr/bin/gcc-${GCC_VERSION}
 
 # Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
+RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
@@ -64,7 +65,7 @@ ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
 
 # Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
+RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}

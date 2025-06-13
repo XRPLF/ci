@@ -39,6 +39,7 @@ registry.
 ```shell
 DEBIAN_VERSION=bookworm
 GCC_VERSION=12
+CONAN_VERSION=2.17.0
 DOCKER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
@@ -46,6 +47,7 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 
@@ -60,6 +62,7 @@ registry.
 ```shell
 DEBIAN_VERSION=bookworm
 CLANG_VERSION=17
+CONAN_VERSION=2.17.0
 DOCKER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
@@ -67,6 +70,7 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 

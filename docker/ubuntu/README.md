@@ -39,6 +39,7 @@ registry.
 ```shell
 UBUNTU_VERSION=noble
 GCC_VERSION=14
+CONAN_VERSION=2.17.0
 DOCKER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
@@ -46,6 +47,7 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 
@@ -60,6 +62,7 @@ registry.
 ```shell
 UBUNTU_VERSION=noble
 CLANG_VERSION=18
+CONAN_VERSION=2.17.0
 DOCKER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
@@ -67,6 +70,7 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 

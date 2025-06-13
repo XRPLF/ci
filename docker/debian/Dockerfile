@@ -1,6 +1,9 @@
 # Define the source image from which we will copy GCC. This is needed because
 # the `COPY --from XXX` command used in a stage below does not allow `XXX` to
-# contain dynamic values supplied via an argument.
+# contain dynamic values supplied via an argument. We are using GCC image rather
+# than the official Debian package to access the latest versions, built by the
+# GCC team specifically for this Debian release. For build images using official
+# distribution packages, see Ubuntu.
 ARG DEBIAN_VERSION=bookworm
 ARG GCC_VERSION=12
 FROM gcc:${GCC_VERSION}-${DEBIAN_VERSION} AS gcc-src
@@ -34,11 +37,12 @@ RUN apt install -y build-essential \
                    protobuf-compiler
 
 # Install Conan.
+ARG CONAN_VERSION=2.17.0
 RUN apt install -y pipx
 RUN PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man \
-    pipx install conan
+    pipx install conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci
@@ -51,12 +55,13 @@ FROM base AS gcc
 # existence, and create the necessary symlinks.
 COPY --from=gcc-src /usr/local/ /usr/local/
 COPY --from=gcc-src /etc/ld.so.conf.d/*.conf /etc/ld.so.conf.d/
-RUN set -ex ;\
-    ldconfig -v ;\
-    dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc ;\
-    dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++ ;\
-    dpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran ;\
-    update-alternatives --install /usr/bin/cc cc /usr/local/bin/gcc 999 ;\
+RUN <<EOF
+    set -ex
+    ldconfig -v
+    dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc
+    dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++
+    dpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran
+    update-alternatives --install /usr/bin/cc cc /usr/local/bin/gcc 999
     update-alternatives --install \
       /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
       --slave /usr/bin/g++ g++ /usr/local/bin/g++ \
@@ -66,12 +71,13 @@ RUN set -ex ;\
       --slave /usr/bin/gcov gcov /usr/local/bin/gcov \
       --slave /usr/bin/gcov-tool gcov-tool /usr/local/bin/gcov-tool \
       --slave /usr/bin/gcov-dump gcov-dump /usr/local/bin/gcov-dump \
-      --slave /usr/bin/lto-dump lto-dump /usr/local/bin/lto-dump ;\
-    update-alternatives --auto cc ;\
+      --slave /usr/bin/lto-dump lto-dump /usr/local/bin/lto-dump
+    update-alternatives --auto cc
     update-alternatives --auto gcc
+EOF
 
 # Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
+RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
@@ -99,7 +105,7 @@ ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
 
 # Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt autoremove -y && apt clean
+RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
