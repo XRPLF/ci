@@ -21,7 +21,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt upgrade -y
 RUN set -ex ;\
     ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime ;\
-    apt install tzdata ;\
+    apt install -y tzdata ;\
     dpkg-reconfigure --frontend noninteractive tzdata
 
 # Install tools that are shared by all stages.
