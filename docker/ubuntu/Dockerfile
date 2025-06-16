@@ -16,16 +16,18 @@ RUN set -ex ;\
     dpkg-reconfigure --frontend noninteractive tzdata
 
 # Install tools that are shared by all stages.
-RUN apt install -y build-essential \
-                   ca-certificates \
-                   cmake \
-                   curl \
-                   git \
-                   gpg \
-                   libssl-dev \
-                   libprotobuf-dev \
-                   ninja-build \
-                   protobuf-compiler
+RUN <<EOF
+  pkgs=()
+  pkgs+=(build-essential) # Required build tools.
+  pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+  pkgs+=(cmake)           # Required build tool.
+  pkgs+=(curl)            # Dependency for tools requiring downloading data.
+  pkgs+=(git)             # Required build tool.
+  pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
+  pkgs+=(jq)              # Pretty printing.
+  pkgs+=(ninja-build)     # Required build tool.
+  apt install -y "${pkgs[@]}"
+EOF
 
 # Install Conan.
 ARG CONAN_VERSION=2.17.0
