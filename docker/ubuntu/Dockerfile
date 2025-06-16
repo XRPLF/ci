@@ -2,6 +2,9 @@
 ARG UBUNTU_VERSION=jammy
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
+# Use Bash as the default shell for RUN commands.
+SHELL ["/bin/bash", "-c"]
+
 # Associate the image with the repository.
 ARG GITHUB_REPO=XRPLF/ci
 LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
@@ -17,21 +20,21 @@ RUN set -ex ;\
 
 # Install tools that are shared by all stages.
 RUN <<EOF
-  pkgs=()
-  pkgs+=(build-essential) # Required build tools.
-  pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-  pkgs+=(cmake)           # Required build tool.
-  pkgs+=(curl)            # Dependency for tools requiring downloading data.
-  pkgs+=(git)             # Required build tool.
-  pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
-  pkgs+=(jq)              # Pretty printing.
-  pkgs+=(ninja-build)     # Required build tool.
-  apt install -y "${pkgs[@]}"
+    pkgs=()
+    pkgs+=(build-essential) # Required build tools.
+    pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+    pkgs+=(cmake)           # Required build tool.
+    pkgs+=(curl)            # Dependency for tools requiring downloading data.
+    pkgs+=(git)             # Required build tool.
+    pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
+    pkgs+=(jq)              # Pretty printing.
+    pkgs+=(ninja-build)     # Required build tool.
+    pkgs+=(pipx)            # Package manager for Python applications.
+    apt install -y "${pkgs[@]}"
 EOF
 
 # Install Conan.
 ARG CONAN_VERSION=2.17.0
-RUN apt install -y pipx
 RUN PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man \
