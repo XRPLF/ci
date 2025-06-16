@@ -1,6 +1,6 @@
 # Build Docker images for Debian with different versions of GCC and Clang and
 # push them to the GitHub Container Registry.
-# Note: Environment variables used in the workflow are defined in the repository
+# Note: Some environment variables used in the workflow are defined in the repo
 # settings at https://github.com/XRPLF/ci/settings/variables/actions.
 name: Debian
 
@@ -9,6 +9,10 @@ on:
     paths:
       - .github/workflows/debian.yml
       - docker/debian/Dockerfile
+
+env:
+  DOCKER_BUILDKIT: 1
+  BUILDKIT_PROGRESS: plain
 
 jobs:
   # Build the Docker image for Debian using different versions of GCC.
@@ -27,17 +31,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.DOCKER_REGISTRY }} -u ${{ github.repository_owner }} --password-stdin
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/debian-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${{ env.DOCKER_REGISTRY }}/${DOCKER_REPOSITORY}/debian-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/debian
         run: |
-          DOCKER_BUILDKIT=1 docker build . \
+          docker build . \
           --target gcc \
           --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
           --build-arg DEBIAN_VERSION=${{ matrix.version.os }} \
@@ -67,13 +71,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${DOCKER_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.DOCKER_REGISTRY }} -u ${{ github.repository_owner }} --password-stdin
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/debian-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${{ env.DOCKER_REGISTRY }}/${DOCKER_REPOSITORY}/debian-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/debian
         run: |
