@@ -55,6 +55,9 @@ RUN rm -rf /var/lib/apt/lists/* && apt clean
 USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
 
+# Create a default Conan profile.
+RUN conan profile detect
+
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
@@ -70,3 +73,6 @@ RUN rm -rf /var/lib/apt/lists/* && apt clean
 # Switch to the non-root user.
 USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
+
+# Create a default Conan profile.
+RUN conan profile detect
