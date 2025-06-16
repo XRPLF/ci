@@ -40,7 +40,7 @@ jobs:
       - name: Build the Docker image
         working-directory: docker/ubuntu
         run: |
-          DOCKER_BUILDKIT=1 docker build . \
+          docker build . \
           --target gcc \
           --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
           --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \

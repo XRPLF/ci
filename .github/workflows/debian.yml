@@ -39,7 +39,7 @@ jobs:
       - name: Build the Docker image
         working-directory: docker/debian
         run: |
-          DOCKER_BUILDKIT=1 docker build . \
+          docker build . \
           --target gcc \
           --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
           --build-arg DEBIAN_VERSION=${{ matrix.version.os }} \
