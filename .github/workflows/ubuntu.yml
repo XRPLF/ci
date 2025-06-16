@@ -1,3 +1,7 @@
+# Build Docker images for Ubuntu with different versions of GCC and Clang and
+# push them to the GitHub Container Registry.
+# Note: Environment variables used in the workflow are defined in the repository
+# settings at https://github.com/XRPLF/ci/settings/variables/actions.
 name: Ubuntu
 
 on:
@@ -6,14 +10,9 @@ on:
       - .github/workflows/ubuntu.yml
       - docker/ubuntu/Dockerfile
 
-env:
-  DOCKER_REGISTRY: ghcr.io
-  DOCKER_BUILDKIT: 1
-  BUILDKIT_PROGRESS: plain
-  CONAN_VERSION: 2.17.0
-
 jobs:
-  # Build the Docker image for Ubuntu using different versions of GCC.
+  # Build the Docker image for Ubuntu using different versions of GCC. See
+  # https://documentation.ubuntu.com/ubuntu-for-developers/reference/availability/gcc/.
   gcc:
     runs-on: ubuntu-latest
     strategy:
@@ -49,7 +48,8 @@ jobs:
       - name: Push the Docker image
         run: docker push ${{ env.DOCKER_IMAGE }}
 
-  # Build the Docker image for Ubuntu using different versions of Clang.
+  # Build the Docker image for Ubuntu using different versions of Clang. See
+  # https://documentation.ubuntu.com/ubuntu-for-developers/reference/availability/llvm/.
   clang:
     runs-on: ubuntu-latest
     strategy:

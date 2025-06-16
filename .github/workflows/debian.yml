@@ -1,3 +1,7 @@
+# Build Docker images for Debian with different versions of GCC and Clang and
+# push them to the GitHub Container Registry.
+# Note: Environment variables used in the workflow are defined in the repository
+# settings at https://github.com/XRPLF/ci/settings/variables/actions.
 name: Debian
 
 on:
@@ -5,12 +9,6 @@ on:
     paths:
       - .github/workflows/debian.yml
       - docker/debian/Dockerfile
-
-env:
-  DOCKER_REGISTRY: ghcr.io
-  DOCKER_BUILDKIT: 1
-  BUILDKIT_PROGRESS: plain
-  CONAN_VERSION: 2.17.0
 
 jobs:
   # Build the Docker image for Debian using different versions of GCC.
