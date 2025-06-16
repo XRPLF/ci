@@ -30,22 +30,24 @@ RUN set -ex ;\
 # Install tools that are shared by all stages.
 RUN <<EOF
     pkgs=()
-    pkgs+=(build-essential)   # Required build tools.
-    pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-    pkgs+=(cmake)             # Required build tool.
-    pkgs+=(curl)              # Dependency for tools requiring downloading data.
-    pkgs+=(git)               # Required build tool.
-    pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
-    pkgs+=(jq)                # Pretty printing.
-    pkgs+=(ninja-build)       # Required build tool.
-    pkgs+=(python3-pip)       # Dependency to install Conan.
-    pkgs+=(python-is-python3) # Make python point to python3.
+    pkgs+=(build-essential) # Required build tools.
+    pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+    pkgs+=(cmake)           # Required build tool.
+    pkgs+=(curl)            # Dependency for tools requiring downloading data.
+    pkgs+=(git)             # Required build tool.
+    pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
+    pkgs+=(jq)              # Pretty printing.
+    pkgs+=(ninja-build)     # Required build tool.
+    pkgs+=(pipx)            # Package manager for Python applications.
     apt install -y "${pkgs[@]}"
 EOF
 
 # Install Conan.
 ARG CONAN_VERSION=2.17.0
-RUN pip install conan==${CONAN_VERSION} --break-system-packages
+RUN PIPX_HOME=/opt/pipx \
+    PIPX_BIN_DIR=/usr/bin \
+    PIPX_MAN_DIR=/usr/share/man \
+    pipx install conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER=ci
