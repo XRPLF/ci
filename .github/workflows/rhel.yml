@@ -1,29 +1,29 @@
-name: Debian
+name: RHEL
 
 on:
   push:
     paths:
-      - .github/workflows/debian.yml
-      - docker/debian/Dockerfile
+      - .github/workflows/rhel.yml
+      - docker/rhel/Dockerfile
 
 env:
   GITHUB_REGISTRY: ghcr.io
+  REDHAT_REGISTRY: registry.redhat.io
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.17.0
 
 jobs:
-  # Build the Docker image for Debian using different versions of GCC.
+  # Build the Docker image for Red Hat Enterprise Linux using different versions
+  # of GCC.
   gcc:
-    runs-on: ubuntu-latest
+    runs-on: rhel-latest
     strategy:
       matrix:
         version:
-          - os: bookworm
-            gcc: 12
-          - os: bookworm
+          - os: 9.6
             gcc: 13
-          - os: bookworm
+          - os: 9.6
             gcc: 14
     steps:
       - name: Checkout repository
@@ -35,36 +35,29 @@ jobs:
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${GITHUB_REGISTRY}/${DOCKER_REPOSITORY}/debian-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${GITHUB_REGISTRY}/${DOCKER_REPOSITORY}/rhel-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
       - name: Build the Docker image
-        working-directory: docker/debian
+        working-directory: docker/rhel
         run: |
           docker build . \
           --target gcc \
           --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
-          --build-arg DEBIAN_VERSION=${{ matrix.version.os }} \
+          --build-arg RHEL_VERSION=${{ matrix.version.os }} \
           --build-arg GCC_VERSION=${{ matrix.version.gcc }} \
           --build-arg CONAN_VERSION=${{ env.CONAN_VERSION }} \
           --tag ${{ env.DOCKER_IMAGE }}
       - name: Push the Docker image
         run: docker push ${{ env.DOCKER_IMAGE }}
 
-  # Build the Docker image for Debian using different versions of Clang.
+  # Build the Docker image for Red Hat Enterprise Linux. As we use the free UBIs
+  # we cannot select specific versions of Clang and only get what is available
+  # in the package manager.
   clang:
-    runs-on: ubuntu-latest
+    runs-on: rhel-latest
     strategy:
       matrix:
         version:
-          - os: bookworm
-            clang: 16
-          - os: bookworm
-            clang: 17
-          - os: bookworm
-            clang: 18
-          - os: bookworm
-            clang: 19
-          - os: bookworm
-            clang: 20
+          - os: 9.6
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -75,15 +68,14 @@ jobs:
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${GITHUB_REGISTRY}/${DOCKER_REPOSITORY}/debian-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${GITHUB_REGISTRY}/${DOCKER_REPOSITORY}/rhel-${{ matrix.version.os }}:clang" >> $GITHUB_ENV
       - name: Build the Docker image
-        working-directory: docker/debian
+        working-directory: docker/rhel
         run: |
           docker build . \
           --target clang \
           --build-arg GITHUB_REPO=${GITHUB_REPOSITORY} \
-          --build-arg DEBIAN_VERSION=${{ matrix.version.os }} \
-          --build-arg CLANG_VERSION=${{ matrix.version.clang }} \
+          --build-arg RHEL_VERSION=${{ matrix.version.os }} \
           --build-arg CONAN_VERSION=${{ env.CONAN_VERSION }} \
           --tag ${{ env.DOCKER_IMAGE }}
       - name: Push the Docker image

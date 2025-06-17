@@ -1,16 +1,35 @@
-## Debian: A Docker image used to build and test rippled
+## RHEL: A Docker image used to build and test rippled
 
-The code in this repository creates a locked-down Debian image for building and
-testing rippled in the GitHub CI pipelines.
+The code in this repository creates a locked-down Red Hat Enterprise Linux
+(RHEL) image for building and testing rippled in the GitHub CI pipelines.
 
 Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
 below.
 
+### Logging into the Red Hat registry
+
+To be able to read the Universal Base Images from the Red Hat registry, a
+personal access  token is needed, which you can get by registering for a
+Developer account [here](https://developers.redhat.com) and then creating a
+service account [here](https://access.redhat.com/terms-based-registry).
+
+Once created, click on the service account to view its details, and then
+navigate to the "Docker Login" tab to get the username and password. A command
+is shown that will log you into the Red Hat registry, which looks like this:
+
+```shell
+REDHAT_REGISTRY=registry.redhat.io
+REDHAT_USER=<your-rhel-username>
+REDHAT_TOKEN=<your-rhel-password>
+echo ${REDHAT_TOKEN} | \
+docker login ${REDHAT_REGISTRY} -u "${REDHAT_USER}" --password-stdin
+```
+
 ### Logging into the GitHub registry
 
 To be able to push a Docker image to the GitHub registry, a personal access
-token is needed, see instructions [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
+token is needed, see instructions [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic). 
 In summary, if you do not have a suitable personal access token, generate one
 [here](https://github.com/settings/tokens/new?scopes=write:packages).
 
@@ -24,8 +43,8 @@ docker login ${GITHUB_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 ### Building and pushing the Docker image
 
-The same Dockerfile can be used to build an image for Debian Bookworm or future
-versions by specifying the `DEBIAN_VERSION` build argument. There are additional
+The same Dockerfile can be used to build an image for RHEL 9.6 or future
+versions by specifying the `RHEL_VERSION` build argument. There are additional
 arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 `CLANG_VERSION` for the Clang flavor.
 
@@ -37,15 +56,15 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-DEBIAN_VERSION=bookworm
-GCC_VERSION=12
+RHEL_VERSION=9.6
+GCC_VERSION=13
 CONAN_VERSION=2.17.0
-DOCKER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc${GCC_VERSION}
+DOCKER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target gcc \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
+  --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${GITHUB_REGISTRY}/${DOCKER_IMAGE} \
@@ -60,16 +79,14 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-DEBIAN_VERSION=bookworm
-CLANG_VERSION=17
+RHEL_VERSION=9.6
 CONAN_VERSION=2.17.0
-DOCKER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang${CLANG_VERSION}
+DOCKER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target clang \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
-  --build-arg CLANG_VERSION=${CLANG_VERSION} \
+  --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${GITHUB_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64

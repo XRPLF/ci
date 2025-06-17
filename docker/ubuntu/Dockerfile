@@ -2,8 +2,9 @@
 ARG UBUNTU_VERSION=jammy
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
-# Use Bash as the default shell for RUN commands.
+# Use Bash as the default shell for RUN commands and as the entrypoint.
 SHELL ["/bin/bash", "-c"]
+ENTRYPOINT ["/bin/bash"]
 
 # Associate the image with the repository.
 ARG GITHUB_REPO=XRPLF/ci
@@ -81,3 +82,13 @@ WORKDIR /home/${NONROOT_USER}
 
 # Create a default Conan profile.
 RUN conan profile detect
+# To ensure compatibility with a range of Clang compilers, we must add an extra
+# flag that applies to Clang 19 and later versions.
+RUN <<EOF
+if [[ "${CLANG_VERSION}" -ge 19 ]]; then
+    cat >>${CONAN_HOME}/profiles/default <<EOT
+[conf]
+tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
+EOT
+fi
+EOF
