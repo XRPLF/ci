@@ -9,6 +9,7 @@ on:
 env:
   GITHUB_REGISTRY: ghcr.io
   REDHAT_REGISTRY: registry.redhat.io
+  REDHAT_USER: 19221817|Docker
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.17.0
@@ -30,6 +31,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${GITHUB_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+      - name: Login to Red Hat Container Registry
+        run: echo "${{ secrets.REDHAT_TOKEN }}" | docker login ${REDHAT_REGISTRY} -u ${{ env.REDHAT_USER }} --password-stdin
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is
@@ -63,6 +66,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${GITHUB_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+      - name: Login to Red Hat Container Registry
+        run: echo "${{ secrets.REDHAT_TOKEN }}" | docker login ${REDHAT_REGISTRY} -u ${{ env.REDHAT_USER }} --password-stdin
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is

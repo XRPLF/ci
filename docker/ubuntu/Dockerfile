@@ -86,7 +86,7 @@ RUN conan profile detect
 # flag that applies to Clang 19 and later versions.
 RUN <<EOF
 if [[ "${CLANG_VERSION}" -ge 19 ]]; then
-    cat >>${CONAN_HOME}/profiles/default <<EOT
+    cat >>/home/${NONROOT_USER}/.conan2/profiles/default <<EOT
 [conf]
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
