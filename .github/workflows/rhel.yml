@@ -52,9 +52,9 @@ jobs:
       - name: Push the Docker image
         run: docker push ${{ env.DOCKER_IMAGE }}
 
-  # Build the Docker image for Red Hat Enterprise Linux. As we use the free UBIs
-  # we cannot select specific versions of Clang and only get what is available
-  # in the package manager.
+  # Build the Docker image for Red Hat Enterprise Linux using Clang. As we use
+  # the free UBIs we cannot select specific versions of Clang and only get what
+  # is available in the base image.
   clang:
     runs-on: ubuntu-latest
     strategy:
