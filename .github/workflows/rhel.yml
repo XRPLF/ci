@@ -26,7 +26,7 @@ jobs:
             gcc: 13
           - os: 9.6
             gcc: 14
-          - os: 10.0
+          - os: '10.0'
             gcc: 14
     steps:
       - name: Checkout repository
@@ -63,7 +63,7 @@ jobs:
       matrix:
         version:
           - os: 9.6
-          - os: 10.0
+          - os: '10.0'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
