@@ -52,7 +52,7 @@ ENV CONAN_HOME=/home/${NONROOT_USER}/.conan2
 # Create a default Conan profile.
 RUN conan profile detect
 # Fix the C++ dialect.
-RUN sed -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
@@ -75,6 +75,8 @@ ENV CONAN_HOME=/home/${NONROOT_USER}/.conan2
 
 # Create a default Conan profile.
 RUN conan profile detect
+# Fix the C++ dialect.
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
 # To ensure compatibility with a range of Clang compilers, we must add extra
 # flags that applies to certain versions of Clang.
 RUN <<EOF
@@ -89,7 +91,5 @@ tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
 fi
 EOF
-# Fix the C++ dialect.
-RUN sed -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
 # Print the Conan profile to verify the configuration.
 RUN conan profile show

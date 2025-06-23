@@ -64,7 +64,7 @@ WORKDIR /home/${NONROOT_USER}
 # Create a default Conan profile.
 RUN conan profile detect
 # Fix the C++ dialect.
-RUN sed -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
@@ -86,21 +86,21 @@ WORKDIR /home/${NONROOT_USER}
 
 # Create a default Conan profile.
 RUN conan profile detect
+# Fix the C++ dialect.
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # To ensure compatibility with a range of Clang compilers, we must add extra
 # flags that applies to certain versions of Clang.
 RUN <<EOF
-if [[ $(clang --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
-    cat >>${CONAN_HOME}/profiles/default <<EOT
+if [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
+    cat >>~/.conan2/profiles/default <<EOT
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw', '-Wno-deprecated-declarations']
 EOT
-elif [[ $(clang --version | head -1 | grep -Po 'version \K[0-9]{2}') -eq 19 ]]; then
-    cat >>${CONAN_HOME}/profiles/default <<EOT
+elif [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -eq 19 ]]; then
+    cat >>~/.conan2/profiles/default <<EOT
 [conf]
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
 fi
 EOF
-# Fix the C++ dialect.
-RUN sed -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
