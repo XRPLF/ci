@@ -61,7 +61,7 @@ GCC_VERSION=13
 CONAN_VERSION=2.17.0
 DOCKER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc${GCC_VERSION}
 
-DOCKER_BUILDKIT=1 docker build . \
+DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --target gcc \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
@@ -69,8 +69,6 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${GITHUB_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
-
-docker push ${GITHUB_REGISTRY}/${DOCKER_IMAGE}
 ```
 
 #### Building the Docker image for Clang.
@@ -83,15 +81,13 @@ RHEL_VERSION=9.6
 CONAN_VERSION=2.17.0
 DOCKER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang${CLANG_VERSION}
 
-DOCKER_BUILDKIT=1 docker build . \
+DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --target clang \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --tag ${GITHUB_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
-
-docker push ${GITHUB_REGISTRY}/${DOCKER_IMAGE}
 ```
 
 #### Running the Docker image
@@ -123,4 +119,13 @@ cmake -DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake \
 PARALLELISM=2
 cmake --build . -j ${PARALLELISM}
 ./rippled --unittest --unittest-jobs ${PARALLELISM}
+```
+
+#### Pushing the Docker image to the GitHub registry
+
+If you want to push the image to the GitHub registry, you can do so with the
+following command:
+
+```shell
+docker push ${GITHUB_REGISTRY}/${DOCKER_IMAGE}
 ```
