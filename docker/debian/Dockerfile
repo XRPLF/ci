@@ -23,24 +23,46 @@ LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 # manual interaction.
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt upgrade -y
-RUN set -ex ;\
-    ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime ;\
-    apt install -y tzdata ;\
-    dpkg-reconfigure --frontend noninteractive tzdata
+RUN <<EOF
+set -ex
+ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+apt install -y tzdata
+dpkg-reconfigure --frontend noninteractive tzdata
+EOF
 
 # Install tools that are shared by all stages.
 RUN <<EOF
-    pkgs=()
-    pkgs+=(build-essential) # Required build tools.
-    pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-    pkgs+=(cmake)           # Required build tool.
-    pkgs+=(curl)            # Dependency for tools requiring downloading data.
-    pkgs+=(git)             # Required build tool.
-    pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
-    pkgs+=(jq)              # Pretty printing.
-    pkgs+=(ninja-build)     # Required build tool.
-    pkgs+=(pipx)            # Package manager for Python applications.
-    apt install -y "${pkgs[@]}"
+pkgs=()
+pkgs+=(build-essential) # Required build tools.
+pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+pkgs+=(cmake)           # Required build tool.
+pkgs+=(curl)            # Dependency for tools requiring downloading data.
+pkgs+=(git)             # Required build tool.
+pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(jq)              # Pretty printing.
+pkgs+=(ninja-build)     # Required build tool.
+pkgs+=(pipx)            # Package manager for Python applications.
+apt install -y "${pkgs[@]}"
+EOF
+
+# Install Docker, see https://docs.docker.com/engine/install/debian.
+RUN <<EOF
+set -ex
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+     https://download.docker.com/linux/debian \
+     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+     tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt update
+pkgs=()
+pkgs+=(docker-ce)
+pkgs+=(docker-ce-cli)
+pkgs+=(containerd.io)
+pkgs+=(docker-buildx-plugin)
+pkgs+=(docker-compose-plugin)
+apt install -y "${pkgs[@]}"
 EOF
 
 # Install Conan.
@@ -126,7 +148,7 @@ RUN conan profile detect
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # To ensure compatibility with a range of Clang compilers, we must add extra
-# flags that applies to certain versions of Clang.
+# flags that apply to certain versions of Clang.
 RUN <<EOF
 if [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
     cat >>~/.conan2/profiles/default <<EOT

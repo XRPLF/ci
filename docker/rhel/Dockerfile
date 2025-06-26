@@ -15,15 +15,30 @@ LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 
 # Install tools that are shared by all stages.
 RUN <<EOF
-    pkgs=()
-    pkgs+=(ca-certificates)  # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-    pkgs+=(cmake)            # Required build tool.
-    pkgs+=(jq)               # Pretty printing.
-    pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
-    pkgs+=(ninja-build)      # Required build tool.
-    pkgs+=(perl-FindBin)     # Required to compile OpenSSL.
-    pkgs+=(python3-pip)      # Package manager for Python applications.
-    dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
+pkgs=()
+pkgs+=(ca-certificates)  # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+pkgs+=(cmake)            # Required build tool.
+pkgs+=(git)              # Required build tool.
+pkgs+=(gpg)              # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(jq)               # Pretty printing.
+pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
+pkgs+=(ninja-build)      # Required build tool.
+pkgs+=(perl-FindBin)     # Required to compile OpenSSL.
+pkgs+=(python3-pip)      # Package manager for Python applications.
+dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
+EOF
+
+# Install Docker, see https://docs.docker.com/engine/install/rhel.
+RUN <<EOF
+dnf -y install dnf-plugins-core
+dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+pkgs=()
+pkgs+=(docker-ce)
+pkgs+=(docker-ce-cli)
+pkgs+=(containerd.io)
+pkgs+=(docker-buildx-plugin)
+pkgs+=(docker-compose-plugin)
+dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
 EOF
 
 # Install Conan.
@@ -78,7 +93,7 @@ RUN conan profile detect
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
 # To ensure compatibility with a range of Clang compilers, we must add extra
-# flags that applies to certain versions of Clang.
+# flags that apply to certain versions of Clang.
 RUN <<EOF
 if [[ $(clang --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
     cat >>${CONAN_HOME}/profiles/default <<EOT
