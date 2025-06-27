@@ -28,19 +28,6 @@ pkgs+=(python3-pip)      # Package manager for Python applications.
 dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
 EOF
 
-# Install Docker, see https://docs.docker.com/engine/install/rhel.
-RUN <<EOF
-dnf -y install dnf-plugins-core
-dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
-pkgs=()
-pkgs+=(docker-ce)
-pkgs+=(docker-ce-cli)
-pkgs+=(containerd.io)
-pkgs+=(docker-buildx-plugin)
-pkgs+=(docker-compose-plugin)
-dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
-EOF
-
 # Install Conan.
 ARG CONAN_VERSION=2.17.0
 RUN pip install conan==${CONAN_VERSION}

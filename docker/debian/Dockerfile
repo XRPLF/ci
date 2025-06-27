@@ -45,26 +45,6 @@ pkgs+=(pipx)            # Package manager for Python applications.
 apt install -y "${pkgs[@]}"
 EOF
 
-# Install Docker, see https://docs.docker.com/engine/install/debian.
-RUN <<EOF
-set -ex
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-     https://download.docker.com/linux/debian \
-     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-     tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt update
-pkgs=()
-pkgs+=(docker-ce)
-pkgs+=(docker-ce-cli)
-pkgs+=(containerd.io)
-pkgs+=(docker-buildx-plugin)
-pkgs+=(docker-compose-plugin)
-apt install -y "${pkgs[@]}"
-EOF
-
 # Install Conan.
 ARG CONAN_VERSION=2.17.0
 RUN PIPX_HOME=/opt/pipx \
