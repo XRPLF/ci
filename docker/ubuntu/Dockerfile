@@ -1,5 +1,5 @@
 # ====================== BASE IMAGE ======================
-ARG UBUNTU_VERSION=jammy
+ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
 # Use Bash as the default shell for RUN commands and as the entrypoint.
@@ -7,7 +7,7 @@ SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
 # Associate the image with the repository.
-ARG GITHUB_REPO=XRPLF/ci
+ARG GITHUB_REPO
 LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 
 # Ensure any packages installed directly or indirectly via dpkg do not require
@@ -37,21 +37,21 @@ apt install -y "${pkgs[@]}"
 EOF
 
 # Install Conan.
-ARG CONAN_VERSION=2.17.0
+ARG CONAN_VERSION
 RUN PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man \
     pipx install conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
-ARG NONROOT_USER=ci
+ARG NONROOT_USER
 RUN useradd -ms /bin/bash ${NONROOT_USER}
 
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
 # Install GCC.
-ARG GCC_VERSION=12
+ARG GCC_VERSION
 RUN apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
 ENV CC=/usr/bin/gcc-${GCC_VERSION}
 ENV CXX=/usr/bin/gcc-${GCC_VERSION}
@@ -74,7 +74,7 @@ RUN conan profile show
 FROM base AS clang
 
 # Install Clang.
-ARG CLANG_VERSION=16
+ARG CLANG_VERSION
 RUN apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}

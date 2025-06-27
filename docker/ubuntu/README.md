@@ -37,6 +37,8 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
+GITHUB_REPO=XRPLF/ci
+NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 GCC_VERSION=14
 CONAN_VERSION=2.17.0
@@ -44,10 +46,13 @@ DOCKER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --target gcc \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
-  --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg GCC_VERSION=${GCC_VERSION} \
+  --build-arg GITHUB_REPO=${GITHUB_REPO} \
+  --build-arg NONROOT_USER=${NONROOT_USER} \
+  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 ```
@@ -58,6 +63,8 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
+GITHUB_REPO=XRPLF/ci
+NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 CLANG_VERSION=18
 CONAN_VERSION=2.17.0
@@ -65,10 +72,13 @@ DOCKER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --target clang \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg GITHUB_REPO=${GITHUB_REPO} \
+  --build-arg NONROOT_USER=${NONROOT_USER} \
+  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 ```

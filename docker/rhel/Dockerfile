@@ -1,5 +1,5 @@
 # ====================== GCC IMAGE ======================
-ARG RHEL_VERSION=9.6
+ARG RHEL_VERSION
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/s2i-base:${RHEL_VERSION} AS base
 
 # Change to the root user to install packages.
@@ -10,7 +10,7 @@ SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
 # Associate the image with the repository.
-ARG GITHUB_REPO=XRPLF/ci
+ARG GITHUB_REPO
 LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 
 # Install tools that are shared by all stages.
@@ -29,18 +29,18 @@ dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
 EOF
 
 # Install Conan.
-ARG CONAN_VERSION=2.17.0
+ARG CONAN_VERSION
 RUN pip install conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
-ARG NONROOT_USER=ci
+ARG NONROOT_USER
 RUN useradd -ms /bin/bash ${NONROOT_USER}
 
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
 # Install GCC.
-ARG GCC_VERSION=14
+ARG GCC_VERSION
 RUN dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
 
 # Switch to the non-root user.

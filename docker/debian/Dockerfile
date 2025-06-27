@@ -3,9 +3,11 @@
 # contain dynamic values supplied via an argument. We are using GCC image rather
 # than the official Debian package to access the latest versions, built by the
 # GCC team specifically for this Debian release. For build images using official
-# distribution packages, see Ubuntu.
-ARG DEBIAN_VERSION=bookworm
-ARG GCC_VERSION=12
+# distribution packages, see Ubuntu. We set the GCC version to "invalid" to
+# satisfy the syntax checker, as it checks if the `FROM` command has a valid
+# image, even though it is not used for Clang.
+ARG DEBIAN_VERSION
+ARG GCC_VERSION=invalid
 FROM gcc:${GCC_VERSION}-${DEBIAN_VERSION} AS gcc-src
 
 # ====================== BASE IMAGE ======================
@@ -16,7 +18,7 @@ SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
 # Associate the image with the repository.
-ARG GITHUB_REPO=XRPLF/ci
+ARG GITHUB_REPO
 LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 
 # Ensure any packages installed directly or indirectly via dpkg do not require
@@ -46,14 +48,14 @@ apt install -y "${pkgs[@]}"
 EOF
 
 # Install Conan.
-ARG CONAN_VERSION=2.17.0
+ARG CONAN_VERSION
 RUN PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man \
     pipx install conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
-ARG NONROOT_USER=ci
+ARG NONROOT_USER
 RUN useradd -ms /bin/bash ${NONROOT_USER}
 
 # ====================== GCC IMAGE ======================
@@ -105,7 +107,7 @@ FROM base AS clang
 # must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
 # base image.
 ARG DEBIAN_VERSION
-ARG CLANG_VERSION=16
+ARG CLANG_VERSION
 RUN curl --no-progress-meter https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg && \
     printf "%s\n%s\n" \
       "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
