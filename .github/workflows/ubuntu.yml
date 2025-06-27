@@ -7,7 +7,7 @@ on:
       - docker/ubuntu/Dockerfile
 
 env:
-  GITHUB_REGISTRY: ghcr.io
+  CONTAINER_REGISTRY: ghcr.io
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.17.0
@@ -30,13 +30,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Login to GitHub Registry
-        run: echo '${{ secrets.GITHUB_TOKEN }}' | docker login ${GITHUB_REGISTRY} -u '${{ github.repository_owner }}' --password-stdin
+        run: echo '${{ secrets.GITHUB_TOKEN }}' | docker login ${CONTAINER_REGISTRY} -u '${{ github.repository_owner }}' --password-stdin
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${GITHUB_REGISTRY}/${DOCKER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${CONTAINER_REGISTRY}/${DOCKER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/ubuntu
         run: |
@@ -69,13 +69,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${GITHUB_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
           DOCKER_REPOSITORY=${GITHUB_REPOSITORY,,}
-          echo "DOCKER_IMAGE=${GITHUB_REGISTRY}/${DOCKER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=${CONTAINER_REGISTRY}/${DOCKER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/ubuntu
         run: |

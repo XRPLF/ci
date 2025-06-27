@@ -34,11 +34,11 @@ In summary, if you do not have a suitable personal access token, generate one
 [here](https://github.com/settings/tokens/new?scopes=write:packages).
 
 ```shell
-GITHUB_REGISTRY=ghcr.io
+CONTAINER_REGISTRY=ghcr.io
 GITHUB_USER=<your-github-username>
 GITHUB_TOKEN=<your-github-personal-access-token>
 echo ${GITHUB_TOKEN} | \
-docker login ${GITHUB_REGISTRY} -u "${GITHUB_USER}" --password-stdin
+docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 ```
 
 ### Building and pushing the Docker image
@@ -67,7 +67,7 @@ DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
-  --tag ${GITHUB_REGISTRY}/${DOCKER_IMAGE} \
+  --tag ${CONTAINER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 ```
 
@@ -86,7 +86,7 @@ DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
-  --tag ${GITHUB_REGISTRY}/${DOCKER_IMAGE} \
+  --tag ${CONTAINER_REGISTRY}/${DOCKER_IMAGE} \
   --platform linux/amd64
 ```
 
@@ -97,7 +97,7 @@ can do so with the following command:
 
 ```shell
 CODEBASE=<path to the rippled repository>
-docker run --rm -it -v ${CODEBASE}:/rippled ${GITHUB_REGISTRY}/${DOCKER_IMAGE}
+docker run --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_REGISTRY}/${DOCKER_IMAGE}
 ```
 
 Once inside the container you can run the following commands to build `rippled`:
@@ -127,5 +127,5 @@ If you want to push the image to the GitHub registry, you can do so with the
 following command:
 
 ```shell
-docker push ${GITHUB_REGISTRY}/${DOCKER_IMAGE}
+docker push ${CONTAINER_REGISTRY}/${DOCKER_IMAGE}
 ```
