@@ -32,19 +32,21 @@ apt install -y tzdata
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
 
-# Install tools that are shared by all stages.
+# Install tools that are shared by all stages. Run `apt update` again before
+# installing the packages to ensure the package lists are up-to-date, which is
+# especially important when the image is built from a cached layer.
 RUN <<EOF
 pkgs=()
-pkgs+=(build-essential) # Required build tools.
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
+pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
-apt install -y "${pkgs[@]}"
+apt update && apt install -y "${pkgs[@]}"
 EOF
 
 # Install Conan.

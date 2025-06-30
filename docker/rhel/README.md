@@ -61,9 +61,9 @@ NONROOT_USER=${USER}
 RHEL_VERSION=9.6
 GCC_VERSION=13
 CONAN_VERSION=2.17.0
-DOCKER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc${GCC_VERSION}
+CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc${GCC_VERSION}
 
-DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
+DOCKER_BUILDKIT=1 docker build . \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
@@ -72,8 +72,7 @@ DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --build-arg GITHUB_REPO=${GITHUB_REPO} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
-  --tag ${CONTAINER_REGISTRY}/${DOCKER_IMAGE} \
-  --platform linux/amd64
+  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
 #### Building the Docker image for Clang.
@@ -86,9 +85,9 @@ GITHUB_REPO=XRPLF/ci
 NONROOT_USER=${USER}
 RHEL_VERSION=9.6
 CONAN_VERSION=2.17.0
-DOCKER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang${CLANG_VERSION}
+CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang${CLANG_VERSION}
 
-DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
+DOCKER_BUILDKIT=1 docker build . \
   --target clang \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
@@ -96,8 +95,7 @@ DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build . \
   --build-arg GITHUB_REPO=${GITHUB_REPO} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
-  --tag ${CONTAINER_REGISTRY}/${DOCKER_IMAGE} \
-  --platform linux/amd64
+  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
 #### Running the Docker image
@@ -107,7 +105,7 @@ can do so with the following command:
 
 ```shell
 CODEBASE=<path to the rippled repository>
-docker run --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_REGISTRY}/${DOCKER_IMAGE}
+docker run --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
 Once inside the container you can run the following commands to build `rippled`:
@@ -137,5 +135,5 @@ If you want to push the image to the GitHub registry, you can do so with the
 following command:
 
 ```shell
-docker push ${CONTAINER_REGISTRY}/${DOCKER_IMAGE}
+docker push ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
