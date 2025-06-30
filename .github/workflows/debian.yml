@@ -30,13 +30,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Login to GitHub Registry
-        run: echo '${{ secrets.GITHUB_TOKEN }}' | docker login ${CONTAINER_REGISTRY} -u '${{ github.repository_owner }}' --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
-          REPO=${{ github.repository }}
-          CONTAINER_REPOSITORY=${REPO@L}
+          GITHUB_REPO=${{ github.repository }}
+          CONTAINER_REPOSITORY=${GITHUB_REPO@L}
           echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/debian-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/debian
@@ -73,14 +77,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${CONTAINER_REGISTRY} -u ${{ github.repository_owner }} --password-stdin
+      - name: Login to GitHub Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
       - name: Determine the Docker image name.
         run: |
           # Convert the repository name to lowercase as the organization name is
           # uppercase, which is not permitted by the Docker registry.
-          REPO=${{ github.repository }}
-          CONTAINER_REPOSITORY=${REPO@L}
+          GITHUB_REPO=${{ github.repository }}
+          CONTAINER_REPOSITORY=${GITHUB_REPO@L}
           echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/debian-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
       - name: Build the Docker image
         working-directory: docker/debian
