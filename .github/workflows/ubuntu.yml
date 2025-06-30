@@ -14,19 +14,37 @@ env:
   NONROOT_USER: ci
 
 jobs:
-  # Build the Docker image for Ubuntu using different versions of GCC. See
-  # https://documentation.ubuntu.com/ubuntu-for-developers/reference/availability/gcc/.
+  # Build the Docker image for Ubuntu using different versions of GCC and Clang.
+  # See https://documentation.ubuntu.com/ubuntu-for-developers/reference/availability/gcc/.
   gcc:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        version:
+        platform:
           - os: jammy
-            gcc: 12
+            compiler: gcc
+            version: 12
           - os: noble
-            gcc: 13
+            compiler: gcc
+            version: 13
           - os: noble
-            gcc: 14
+            compiler: gcc
+            version: 14
+          - os: noble
+            compiler: clang
+            version: 16
+          - os: noble
+            compiler: clang
+            version: 17
+          - os: noble
+            compiler: clang
+            version: 18
+          - os: noble
+            compiler: clang
+            version: 19
+        architecture:
+          - linux/amd64
+          - linux/arm64
+    runs-on: ubuntu-24.04${{ matrix.architecture == 'linux/arm64' && '-arm' || '' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,72 +64,24 @@ jobs:
           # uppercase, which is not permitted by the Docker registry.
           GITHUB_REPO=${{ github.repository }}
           CONTAINER_REPOSITORY=${GITHUB_REPO@L}
-          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
+          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/ubuntu-${{ matrix.platform.os }}:${{ matrix.platform.compiler }}${{ matrix.platform.version }}" >> $GITHUB_ENV
       - name: Build and push the Docker image
         uses: docker/build-push-action@v6
         with:
           build-args: |
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
             BUILDKIT_INLINE_CACHE=1
+            CLANG_VERSION=${{ matrix.platform.compiler == 'clang' && matrix.platform.version || '' }}
             CONAN_VERSION=${{ env.CONAN_VERSION }}
-            GCC_VERSION=${{ matrix.version.gcc }}
+            GCC_VERSION=${{ matrix.platform.compiler == 'gcc' && matrix.platform.version || '' }}
             GITHUB_REPO=${{ github.repository }}
             NONROOT_USER=${{ env.NONROOT_USER }}
-            UBUNTU_VERSION=${{ matrix.version.os }}
+            UBUNTU_VERSION=${{ matrix.platform.os }}
           context: docker/ubuntu
-          platforms: linux/amd64,linux/arm64
+          outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          platforms: ${{ matrix.architecture }}
+          provenance: mode=max
           push: true
+          sbom: true
           tags: ${{ env.CONTAINER_IMAGE }}
-          target: gcc
-
-  # Build the Docker image for Ubuntu using different versions of Clang. See
-  # https://documentation.ubuntu.com/ubuntu-for-developers/reference/availability/llvm/.
-  clang:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        version:
-          - os: noble
-            clang: 16
-          - os: noble
-            clang: 17
-          - os: noble
-            clang: 18
-          - os: noble
-            clang: 19
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to GitHub Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.CONTAINER_REGISTRY }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN  }}
-      - name: Determine the Docker image name.
-        run: |
-          # Convert the repository name to lowercase as the organization name is
-          # uppercase, which is not permitted by the Docker registry.
-          GITHUB_REPO=${{ github.repository }}
-          CONTAINER_REPOSITORY=${GITHUB_REPO@L}
-          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
-      - name: Build and push the Docker image
-        uses: docker/build-push-action@v6
-        with:
-          build-args: |
-            BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
-            BUILDKIT_INLINE_CACHE=1
-            CLANG_VERSION=${{ matrix.version.clang }}
-            CONAN_VERSION=${{ env.CONAN_VERSION }}
-            GITHUB_REPO=${{ github.repository }}
-            NONROOT_USER=${{ env.NONROOT_USER }}
-            UBUNTU_VERSION=${{ matrix.version.os }}
-          context: docker/ubuntu
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ env.CONTAINER_IMAGE }}
-          target: clang
+          target: ${{ matrix.platform.compiler }}
