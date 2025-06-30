@@ -30,6 +30,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Registry
         uses: docker/login-action@v3
         with:
@@ -43,21 +47,22 @@ jobs:
           GITHUB_REPO=${{ github.repository }}
           CONTAINER_REPOSITORY=${GITHUB_REPO@L}
           echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:gcc${{ matrix.version.gcc }}" >> $GITHUB_ENV
-      - name: Build the Docker image
-        working-directory: docker/ubuntu
-        run: |
-          docker build . \
-          --target gcc \
-          --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
-          --build-arg BUILDKIT_INLINE_CACHE=1 \
-          --build-arg CONAN_VERSION=${{ env.CONAN_VERSION }} \
-          --build-arg GCC_VERSION=${{ matrix.version.gcc }} \
-          --build-arg GITHUB_REPO=${{ github.repository }} \
-          --build-arg NONROOT_USER=${{ env.NONROOT_USER }} \
-          --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \
-          --tag ${{ env.CONTAINER_IMAGE }}
-      - name: Push the Docker image
-        run: docker push ${{ env.CONTAINER_IMAGE }}
+      - name: Build and push the Docker image
+        uses: docker/build-push-action@v6
+        with:
+          build-args: |
+            BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
+            BUILDKIT_INLINE_CACHE=1
+            CONAN_VERSION=${{ env.CONAN_VERSION }}
+            GCC_VERSION=${{ matrix.version.gcc }}
+            GITHUB_REPO=${{ github.repository }}
+            NONROOT_USER=${{ env.NONROOT_USER }}
+            UBUNTU_VERSION=${{ matrix.version.os }}
+          context: docker/ubuntu
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.CONTAINER_IMAGE }}
+          target: gcc
 
   # Build the Docker image for Ubuntu using different versions of Clang. See
   # https://documentation.ubuntu.com/ubuntu-for-developers/reference/availability/llvm/.
@@ -77,6 +82,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Registry
         uses: docker/login-action@v3
         with:
@@ -90,18 +99,19 @@ jobs:
           GITHUB_REPO=${{ github.repository }}
           CONTAINER_REPOSITORY=${GITHUB_REPO@L}
           echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/ubuntu-${{ matrix.version.os }}:clang${{ matrix.version.clang }}" >> $GITHUB_ENV
-      - name: Build the Docker image
-        working-directory: docker/ubuntu
-        run: |
-          docker build . \
-          --target clang \
-          --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
-          --build-arg BUILDKIT_INLINE_CACHE=1 \
-          --build-arg CLANG_VERSION=${{ matrix.version.clang }} \
-          --build-arg CONAN_VERSION=${{ env.CONAN_VERSION }} \
-          --build-arg GITHUB_REPO=${{ github.repository }} \
-          --build-arg NONROOT_USER=${{ env.NONROOT_USER }} \
-          --build-arg UBUNTU_VERSION=${{ matrix.version.os }} \
-          --tag ${{ env.CONTAINER_IMAGE }}
-      - name: Push the Docker image
-        run: docker push ${{ env.CONTAINER_IMAGE }}
+      - name: Build and push the Docker image
+        uses: docker/build-push-action@v6
+        with:
+          build-args: |
+            BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
+            BUILDKIT_INLINE_CACHE=1
+            CLANG_VERSION=${{ matrix.version.clang }}
+            CONAN_VERSION=${{ env.CONAN_VERSION }}
+            GITHUB_REPO=${{ github.repository }}
+            NONROOT_USER=${{ env.NONROOT_USER }}
+            UBUNTU_VERSION=${{ matrix.version.os }}
+          context: docker/ubuntu
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.CONTAINER_IMAGE }}
+          target: clang
