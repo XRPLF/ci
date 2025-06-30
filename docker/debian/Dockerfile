@@ -37,15 +37,18 @@ EOF
 # especially important when the image is built from a cached layer.
 RUN <<EOF
 pkgs=()
+pkgs+=(bison)           # Required build tool.
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
+pkgs+=(flex)            # Required build tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
+pkgs+=(wget)            # Required build tool.
 apt update && apt install -y "${pkgs[@]}"
 EOF
 
@@ -68,24 +71,24 @@ FROM base AS gcc
 COPY --from=gcc-src /usr/local/ /usr/local/
 COPY --from=gcc-src /etc/ld.so.conf.d/*.conf /etc/ld.so.conf.d/
 RUN <<EOF
-    set -ex
-    ldconfig -v
-    dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc
-    dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++
-    dpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran
-    update-alternatives --install /usr/bin/cc cc /usr/local/bin/gcc 999
-    update-alternatives --install \
-      /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
-      --slave /usr/bin/g++ g++ /usr/local/bin/g++ \
-      --slave /usr/bin/gcc-ar gcc-ar /usr/local/bin/gcc-ar \
-      --slave /usr/bin/gcc-nm gcc-nm /usr/local/bin/gcc-nm \
-      --slave /usr/bin/gcc-ranlib gcc-ranlib /usr/local/bin/gcc-ranlib \
-      --slave /usr/bin/gcov gcov /usr/local/bin/gcov \
-      --slave /usr/bin/gcov-tool gcov-tool /usr/local/bin/gcov-tool \
-      --slave /usr/bin/gcov-dump gcov-dump /usr/local/bin/gcov-dump \
-      --slave /usr/bin/lto-dump lto-dump /usr/local/bin/lto-dump
-    update-alternatives --auto cc
-    update-alternatives --auto gcc
+set -ex
+ldconfig -v
+dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc
+dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++
+dpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran
+update-alternatives --install /usr/bin/cc cc /usr/local/bin/gcc 999
+update-alternatives --install \
+  /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
+  --slave /usr/bin/g++ g++ /usr/local/bin/g++ \
+  --slave /usr/bin/gcc-ar gcc-ar /usr/local/bin/gcc-ar \
+  --slave /usr/bin/gcc-nm gcc-nm /usr/local/bin/gcc-nm \
+  --slave /usr/bin/gcc-ranlib gcc-ranlib /usr/local/bin/gcc-ranlib \
+  --slave /usr/bin/gcov gcov /usr/local/bin/gcov \
+  --slave /usr/bin/gcov-tool gcov-tool /usr/local/bin/gcov-tool \
+  --slave /usr/bin/gcov-dump gcov-dump /usr/local/bin/gcov-dump \
+  --slave /usr/bin/lto-dump lto-dump /usr/local/bin/lto-dump
+update-alternatives --auto cc
+update-alternatives --auto gcc
 EOF
 
 # Clean up unnecessary files to reduce image size.
@@ -110,13 +113,16 @@ FROM base AS clang
 # base image.
 ARG DEBIAN_VERSION
 ARG CLANG_VERSION
-RUN curl --no-progress-meter https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg && \
-    printf "%s\n%s\n" \
-      "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
-      "deb-src [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
-      | tee /etc/apt/sources.list.d/llvm.list && \
-    apt update && \
-    apt install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+RUN <<EOF
+set -ex
+curl --no-progress-meter https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg
+printf "%s\n%s\n" \
+  "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
+  "deb-src [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
+  | tee /etc/apt/sources.list.d/llvm.list
+apt update
+apt install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+EOF
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
 
@@ -133,6 +139,7 @@ RUN conan profile detect
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # To ensure compatibility with a range of Clang compilers, we must add extra
 # flags that apply to certain versions of Clang.
+# TODO: Move this into the rippled repository as a custom Conan profile.
 RUN <<EOF
 if [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
     cat >>~/.conan2/profiles/default <<EOT

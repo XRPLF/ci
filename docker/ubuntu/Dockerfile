@@ -26,15 +26,18 @@ EOF
 # especially important when the image is built from a cached layer.
 RUN <<EOF
 pkgs=()
+pkgs+=(bison)           # Required build tool.
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
+pkgs+=(flex)            # Required build tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
+pkgs+=(wget)            # Required build tool.
 apt update && apt install -y "${pkgs[@]}"
 EOF
 
@@ -94,6 +97,7 @@ RUN conan profile detect
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # To ensure compatibility with a range of Clang compilers, we must add extra
 # flags that apply to certain versions of Clang.
+# TODO: Move this into the rippled repository as a custom Conan profile.
 RUN <<EOF
 if [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
     cat >>~/.conan2/profiles/default <<EOT
