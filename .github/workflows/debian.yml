@@ -18,35 +18,37 @@ jobs:
   build:
     strategy:
       matrix:
-        platform:
-          - os: bookworm
-            compiler: gcc
-            version: 12
-          - os: bookworm
-            compiler: gcc
-            version: 13
-          - os: bookworm
-            compiler: gcc
-            version: 14
-          - os: bookworm
-            compiler: clang
-            version: 16
-          - os: bookworm
-            compiler: clang
-            version: 17
-          - os: bookworm
-            compiler: clang
-            version: 18
-          - os: bookworm
-            compiler: clang
-            version: 19
-          - os: bookworm
-            compiler: clang
-            version: 20
         architecture:
-          - linux/amd64
-          - linux/arm64
-    runs-on: ubuntu-24.04${{ matrix.architecture == 'linux/arm64' && '-arm' || '' }}
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+        os:
+          - distro: bookworm
+            compiler_name: gcc
+            compiler_version: 12
+          - distro: bookworm
+            compiler_name: gcc
+            compiler_version: 13
+          - distro: bookworm
+            compiler_name: gcc
+            compiler_version: 14
+          - distro: bookworm
+            compiler_name: clang
+            compiler_version: 16
+          - distro: bookworm
+            compiler_name: clang
+            compiler_version: 17
+          - distro: bookworm
+            compiler_name: clang
+            compiler_version: 18
+          - distro: bookworm
+            compiler_name: clang
+            compiler_version: 19
+          - distro: bookworm
+            compiler_name: clang
+            compiler_version: 20
+    runs-on: ${{ matrix.architecture.runner }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -66,24 +68,24 @@ jobs:
           # uppercase, which is not permitted by the Docker registry.
           GITHUB_REPO=${{ github.repository }}
           CONTAINER_REPOSITORY=${GITHUB_REPO@L}
-          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/debian-${{ matrix.platform.os }}:${{ matrix.platform.compiler }}${{ matrix.platform.version }}" >> $GITHUB_ENV
+          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPOSITORY}/debian-${{ matrix.os.distro }}:${{ matrix.os.compiler_name }}${{ matrix.os.compiler_version }}" >> $GITHUB_ENV
       - name: Build and push the Docker image
         uses: docker/build-push-action@v6
         with:
           build-args: |
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
             BUILDKIT_INLINE_CACHE=1
-            CLANG_VERSION=${{ matrix.platform.compiler == 'clang' && matrix.platform.version || '' }}
+            CLANG_VERSION=${{ matrix.os.compiler_name == 'clang' && matrix.os.compiler_version || '' }}
             CONAN_VERSION=${{ env.CONAN_VERSION }}
-            DEBIAN_VERSION=${{ matrix.platform.os }}
-            GCC_VERSION=${{ matrix.platform.compiler == 'gcc' && matrix.platform.version || '' }}
+            DEBIAN_VERSION=${{ matrix.os.distro }}
+            GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || '' }}
             GITHUB_REPO=${{ github.repository }}
             NONROOT_USER=${{ env.NONROOT_USER }}
           context: docker/debian
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          platforms: ${{ matrix.architecture }}
+          platforms: ${{ matrix.architecture.platform }}
           provenance: mode=max
           push: true
           sbom: true
           tags: ${{ env.CONTAINER_IMAGE }}
-          target: ${{ matrix.platform.compiler }}
+          target: ${{ matrix.os.compiler_name }}
