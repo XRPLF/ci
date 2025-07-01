@@ -12,6 +12,8 @@ env:
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.17.0
   NONROOT_USER: ci
+  FALLBACK_GCC: 12
+  FALLBACK_CLANG: 16
 
 jobs:
   # Build the Docker image for Debian using different versions of GCC and Clang.
@@ -92,12 +94,12 @@ jobs:
           build-args: |
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
             BUILDKIT_INLINE_CACHE=1
-            CLANG_VERSION=${{ matrix.os.compiler_name == 'clang' && matrix.os.compiler_version || '' }}
+            CLANG_VERSION=${{ matrix.os.compiler_name == 'clang' && matrix.os.compiler_version || env.FALLBACK_CLANG }}
+            GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || env.FALLBACK_GCC }}
             CONAN_VERSION=${{ env.CONAN_VERSION }}
-            DEBIAN_VERSION=${{ matrix.os.release }}
-            GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || '' }}
             GITHUB_REPO=${{ github.repository }}
             NONROOT_USER=${{ env.NONROOT_USER }}
+            DEBIAN_VERSION=${{ matrix.os.release }}
           context: docker/debian
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}

@@ -32,9 +32,6 @@ jobs:
           - release: 9.6
             compiler_name: gcc
             compiler_version: 14
-          - release: 9.6
-            compiler_name: clang
-            compiler_version: ''
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -86,7 +83,7 @@ jobs:
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
             BUILDKIT_INLINE_CACHE=1
             CONAN_VERSION=${{ env.CONAN_VERSION }}
-            GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || '' }}
+            GCC_VERSION=${{ matrix.os.compiler_version }}
             GITHUB_REPO=${{ github.repository }}
             NONROOT_USER=${{ env.NONROOT_USER }}
             RHEL_VERSION=${{ matrix.os.release }}
