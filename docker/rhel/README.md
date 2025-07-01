@@ -56,12 +56,11 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-GITHUB_REPO=XRPLF/ci
 NONROOT_USER=${USER}
 RHEL_VERSION=9.6
 GCC_VERSION=13
 CONAN_VERSION=2.17.0
-CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc${GCC_VERSION}
+CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc-${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target gcc \
@@ -69,7 +68,6 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GITHUB_REPO=${GITHUB_REPO} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
@@ -81,18 +79,16 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-GITHUB_REPO=XRPLF/ci
 NONROOT_USER=${USER}
 RHEL_VERSION=9.6
 CONAN_VERSION=2.17.0
-CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang${CLANG_VERSION}
+CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang-${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target clang \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
-  --build-arg GITHUB_REPO=${GITHUB_REPO} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}

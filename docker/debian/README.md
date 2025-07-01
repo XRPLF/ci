@@ -37,12 +37,11 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-GITHUB_REPO=XRPLF/ci
 NONROOT_USER=${USER}
 DEBIAN_VERSION=bookworm
 GCC_VERSION=12
 CONAN_VERSION=2.17.0
-CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc${GCC_VERSION}
+CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target gcc \
@@ -51,7 +50,6 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GITHUB_REPO=${GITHUB_REPO} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
@@ -62,12 +60,11 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-GITHUB_REPO=XRPLF/ci
 NONROOT_USER=${USER}
 DEBIAN_VERSION=bookworm
 CLANG_VERSION=17
 CONAN_VERSION=2.17.0
-CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang${CLANG_VERSION}
+CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang-${CLANG_VERSION}
 
 DOCKER_BUILDKIT=1 docker build . \
   --target clang \
@@ -76,7 +73,6 @@ DOCKER_BUILDKIT=1 docker build . \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
-  --build-arg GITHUB_REPO=${GITHUB_REPO} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```

@@ -6,10 +6,6 @@ FROM ubuntu:${UBUNTU_VERSION} AS base
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
-# Associate the image with the repository.
-ARG GITHUB_REPO
-LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
-
 # Ensure any packages installed directly or indirectly via dpkg do not require
 # manual interaction.
 ARG DEBIAN_FRONTEND=noninteractive

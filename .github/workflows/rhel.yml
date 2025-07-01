@@ -78,8 +78,8 @@ jobs:
             type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}
             type=sha,prefix=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-sha-
           labels: |
-            org.opencontainers.image.authors=For inquiries, please use https://github.com/XRPLF/ci/issues
-            org.opencontainers.image.documentation=https://github.com/XRPLF/ci
+            org.opencontainers.image.authors=For inquiries, please use https://${{ github.repository }}/issues
+            org.opencontainers.image.documentation=https://${{ github.repository }}
             org.opencontainers.image.vendor=XRPLF
             org.opencontainers.image.title=${{ env.CONTAINER_REPOSITORY }}
       - name: Build and push the Docker image
@@ -98,19 +98,19 @@ jobs:
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}
           provenance: mode=max
-          push: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
+          push: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
           sbom: true
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.os.compiler_name }}
       - name: Export digest
-        if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
+        if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
         shell: bash
         run: |
           mkdir -p /tmp/digests
           DIGEST="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${DIGEST#sha256:}"
       - name: Upload digest
-        if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
+        if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
         uses: actions/upload-artifact@v4
         with:
           name: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-${{ env.PLATFORM_PAIR }}
@@ -119,7 +119,7 @@ jobs:
           retention-days: 1
 
   merge:
-    if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
+    if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
     strategy:
       matrix:
         os:

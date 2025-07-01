@@ -17,10 +17,6 @@ FROM debian:${DEBIAN_VERSION} AS base
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
-# Associate the image with the repository.
-ARG GITHUB_REPO
-LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
-
 # Ensure any packages installed directly or indirectly via dpkg do not require
 # manual interaction.
 ARG DEBIAN_FRONTEND=noninteractive
@@ -118,7 +114,6 @@ set -ex
 curl --no-progress-meter https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg
 printf "%s\n%s\n" \
   "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
-  "deb-src [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
   | tee /etc/apt/sources.list.d/llvm.list
 apt update
 apt install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}

@@ -10,16 +10,9 @@ RUN dnf -y install bison flex
 # ====================== BASE IMAGE ======================
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/s2i-base:${RHEL_VERSION} AS base
 
-# Change to the root user to install packages.
-USER root
-
 # Use Bash as the default shell for RUN commands and as the entrypoint.
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash"]
-
-# Associate the image with the repository.
-ARG GITHUB_REPO
-LABEL org.opencontainers.image.source=https://github.com/${GITHUB_REPO}
 
 # Update the packages installed on the system.
 RUN dnf -y update-minimal --security --sec-severity=Important --sec-severity=Critical
