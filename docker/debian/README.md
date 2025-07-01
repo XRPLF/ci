@@ -43,7 +43,7 @@ GCC_VERSION=12
 CONAN_VERSION=2.17.0
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
-DOCKER_BUILDKIT=1 docker build . \
+docker buildx build . \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
@@ -66,7 +66,7 @@ CLANG_VERSION=17
 CONAN_VERSION=2.17.0
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang-${CLANG_VERSION}
 
-DOCKER_BUILDKIT=1 docker build . \
+docker buildx build . \
   --target clang \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \

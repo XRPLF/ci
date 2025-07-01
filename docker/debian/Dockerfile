@@ -20,10 +20,11 @@ ENTRYPOINT ["/bin/bash"]
 # Ensure any packages installed directly or indirectly via dpkg do not require
 # manual interaction.
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt upgrade -y
 RUN <<EOF
 set -ex
 ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+apt update
+apt upgrade -y
 apt install -y tzdata
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
@@ -45,7 +46,8 @@ pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
-apt update && apt install -y "${pkgs[@]}"
+apt update
+apt install -y "${pkgs[@]}"
 EOF
 
 # Install Conan.
@@ -86,6 +88,8 @@ update-alternatives --install \
 update-alternatives --auto cc
 update-alternatives --auto gcc
 EOF
+ENV CC=/usr/bin/gcc
+ENV CXX=/usr/bin/g++
 
 # Clean up unnecessary files to reduce image size.
 RUN rm -rf /var/lib/apt/lists/* && apt clean
@@ -98,6 +102,13 @@ WORKDIR /home/${NONROOT_USER}
 RUN conan profile detect
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
+# Explicitly set the compiler flags.
+RUN <<EOF
+cat >>~/.conan2/profiles/default <<EOT
+[conf]
+tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+EOT
+EOF
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
@@ -132,17 +143,21 @@ WORKDIR /home/${NONROOT_USER}
 RUN conan profile detect
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
-# To ensure compatibility with a range of Clang compilers, we must add extra
-# flags that apply to certain versions of Clang.
-# TODO: Move this into the rippled repository as a custom Conan profile.
+# Explicitly set the compiler flags. To ensure compatibility with a range of
+# Clang compilers, we must also add extra flags that apply to certain versions
+# of Clang.
+# TODO: Move extra flags into the rippled repository as a custom Conan profile.
 RUN <<EOF
+cat >>~/.conan2/profiles/default <<EOT
+[conf]
+tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+EOT
 if [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
     cat >>~/.conan2/profiles/default <<EOT
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw', '-Wno-deprecated-declarations']
 EOT
 elif [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -eq 19 ]]; then
     cat >>~/.conan2/profiles/default <<EOT
-[conf]
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
 fi

@@ -62,7 +62,7 @@ GCC_VERSION=13
 CONAN_VERSION=2.17.0
 CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc-${GCC_VERSION}
 
-DOCKER_BUILDKIT=1 docker build . \
+docker buildx build . \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
@@ -84,7 +84,7 @@ RHEL_VERSION=9.6
 CONAN_VERSION=2.17.0
 CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang-${CLANG_VERSION}
 
-DOCKER_BUILDKIT=1 docker build . \
+docker buildx build . \
   --target clang \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \

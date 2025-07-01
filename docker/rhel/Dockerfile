@@ -51,6 +51,8 @@ FROM base AS gcc
 # Install GCC.
 ARG GCC_VERSION
 RUN dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+ENV CC=/usr/bin/gcc
+ENV CXX=/usr/bin/g++
 
 # Clean up unnecessary files to reduce image size.
 RUN dnf -y clean all
@@ -67,6 +69,13 @@ ENV CONAN_HOME=/home/${NONROOT_USER}/.conan2
 RUN conan profile detect
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
+# Explicitly set the compiler flags.
+RUN <<EOF
+cat >>${CONAN_HOME}/profiles/default <<EOT
+[conf]
+tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+EOT
+EOF
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
@@ -94,17 +103,21 @@ ENV CONAN_HOME=/home/${NONROOT_USER}/.conan2
 RUN conan profile detect
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
-# To ensure compatibility with a range of Clang compilers, we must add extra
-# flags that apply to certain versions of Clang.
-# TODO: Move this into the rippled repository as a custom Conan profile.
+# Explicitly set the compiler flags. To ensure compatibility with a range of
+# Clang compilers, we must also add extra flags that apply to certain versions
+# of Clang.
+# TODO: Move extra flags into the rippled repository as a custom Conan profile.
 RUN <<EOF
+cat >>${CONAN_HOME}/profiles/default <<EOT
+[conf]
+tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+EOT
 if [[ $(clang --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
     cat >>${CONAN_HOME}/profiles/default <<EOT
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw', '-Wno-deprecated-declarations']
 EOT
 elif [[ $(clang --version | head -1 | grep -Po 'version \K[0-9]{2}') -eq 19 ]]; then
     cat >>${CONAN_HOME}/profiles/default <<EOT
-[conf]
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
 fi
