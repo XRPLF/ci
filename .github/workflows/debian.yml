@@ -190,6 +190,8 @@ jobs:
           tags: |
             type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}
             type=sha,prefix=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-sha-
+          annotations: |
+            org.opencontainers.image.description=Images for use by XRPLF CI pipelines.
       - name: Create manifest list and push
         working-directory: /tmp/digests
         shell: bash
