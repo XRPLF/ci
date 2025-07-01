@@ -79,6 +79,8 @@ jobs:
       - name: Prepare container metadata
         id: meta
         uses: docker/metadata-action@v5
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,manifest-descriptor
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
@@ -185,13 +187,13 @@ jobs:
       - name: Prepare container metadata
         id: meta
         uses: docker/metadata-action@v5
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
             type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}
             type=sha,prefix=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-sha-
-          annotations: |
-            org.opencontainers.image.description=Images for use by XRPLF CI pipelines.
       - name: Create manifest list and push
         working-directory: /tmp/digests
         shell: bash
