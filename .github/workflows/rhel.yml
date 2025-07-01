@@ -33,6 +33,9 @@ jobs:
           - release: 9.6
             compiler_name: gcc
             compiler_version: 14
+          - release: 9.6
+            compiler_name: clang
+            compiler_version: 'any'
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -126,6 +129,9 @@ jobs:
           - release: 9.6
             compiler_name: gcc
             compiler_version: 14
+          - release: 9.6
+            compiler_name: clang
+            compiler_version: 'any'
     runs-on: ubuntu-24.04
     needs:
       - build
