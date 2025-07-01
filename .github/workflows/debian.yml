@@ -198,8 +198,10 @@ jobs:
         working-directory: /tmp/digests
         shell: bash
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.CONTAINER_IMAGE }}@sha256:%s ' *)
+          eval "docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(jq -cr '.annotations | map("--annotation \"" + . + "\"") | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.CONTAINER_IMAGE }}@sha256:%s ' *)"
       - name: Inspect image
         shell: bash
         run: |
