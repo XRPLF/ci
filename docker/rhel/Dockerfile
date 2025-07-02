@@ -37,9 +37,14 @@ EOF
 COPY --from=rocky /usr/bin/bison /usr/bin/bison
 COPY --from=rocky /usr/bin/flex /usr/bin/flex
 
-# Install Conan.
-ARG CONAN_VERSION
-RUN pip install conan==${CONAN_VERSION}
+# Install Conan && gcovr.
+ARG CONAN_VERSION=2.18.0
+ARG GCOVR_VERSION=8.2
+ENV PIPX_HOME=/opt/pipx \
+    PIPX_BIN_DIR=/usr/bin \
+    PIPX_MAN_DIR=/usr/share/man
+RUN pipx install conan==${CONAN_VERSION} && \
+    pipx install gcovr==${GCOVR_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER

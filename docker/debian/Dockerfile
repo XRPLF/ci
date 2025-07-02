@@ -38,6 +38,8 @@ pkgs+=(bison)           # Required build tool.
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
+pkgs+=(dpkg-dev)        # Required packaging tool.
+pkgs+=(file)            # Required packaging tool.
 pkgs+=(flex)            # Required build tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -50,12 +52,14 @@ apt update
 apt install -y "${pkgs[@]}"
 EOF
 
-# Install Conan.
-ARG CONAN_VERSION
-RUN PIPX_HOME=/opt/pipx \
+# Install Conan && gcovr.
+ARG CONAN_VERSION=2.18.0
+ARG GCOVR_VERSION=8.2
+ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
-    PIPX_MAN_DIR=/usr/share/man \
-    pipx install conan==${CONAN_VERSION}
+    PIPX_MAN_DIR=/usr/share/man
+RUN pipx install conan==${CONAN_VERSION} && \
+    pipx install gcovr==${GCOVR_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER
