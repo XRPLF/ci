@@ -22,6 +22,7 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)  # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)            # Required build tool.
+pkgs+=(file)             # Required packaging tool.
 pkgs+=(git)              # Required build tool.
 pkgs+=(gpg)              # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)               # Pretty printing.
@@ -29,6 +30,8 @@ pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)      # Required build tool.
 pkgs+=(perl-FindBin)     # Required to compile OpenSSL.
 pkgs+=(python3-pip)      # Package manager for Python applications.
+pkgs+=(rpm-build)        # Required packaging tool.
+pkgs+=(rpmdevtools)      # Required packaging tool.
 pkgs+=(wget)             # Required build tool.
 dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
 EOF
@@ -37,14 +40,11 @@ EOF
 COPY --from=rocky /usr/bin/bison /usr/bin/bison
 COPY --from=rocky /usr/bin/flex /usr/bin/flex
 
-# Install Conan && gcovr.
-ARG CONAN_VERSION=2.18.0
-ARG GCOVR_VERSION=8.2
-ENV PIPX_HOME=/opt/pipx \
-    PIPX_BIN_DIR=/usr/bin \
-    PIPX_MAN_DIR=/usr/share/man
-RUN pipx install conan==${CONAN_VERSION} && \
-    pipx install gcovr==${GCOVR_VERSION}
+# Install Python-based tools.
+ARG CONAN_VERSION
+ARG GCOVR_VERSION
+RUN pip install conan==${CONAN_VERSION} && \
+    pip install gcovr==${GCOVR_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER

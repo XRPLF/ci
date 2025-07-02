@@ -52,9 +52,9 @@ apt update
 apt install -y --no-install-recommends "${pkgs[@]}"
 EOF
 
-# Install Conan && gcovr.
-ARG CONAN_VERSION=2.18.0
-ARG GCOVR_VERSION=8.2
+# Install Python-based tools.
+ARG CONAN_VERSION
+ARG GCOVR_VERSION
 ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man
