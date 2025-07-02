@@ -38,7 +38,7 @@ pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
 apt update
-apt install -y "${pkgs[@]}"
+apt install -y --no-install-recommends "${pkgs[@]}"
 EOF
 
 # Install Conan && gcovr.
