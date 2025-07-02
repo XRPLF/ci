@@ -34,6 +34,8 @@ pkgs+=(rpm-build)        # Required packaging tool.
 pkgs+=(rpmdevtools)      # Required packaging tool.
 pkgs+=(wget)             # Required build tool.
 dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
+dnf -y clean all
+rm -rf /var/cache/dnf/*
 EOF
 
 # Copy Bison and Flex from the Rocky Linux image.
