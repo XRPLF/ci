@@ -15,6 +15,7 @@ ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 apt update
 apt upgrade -y
 apt install -y tzdata
+rm -rf /var/lib/apt/lists/* && apt clean
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
 
@@ -39,6 +40,8 @@ pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
 apt update
 apt install -y --no-install-recommends "${pkgs[@]}"
+apt clean
+rm -rf /var/lib/apt/lists/*
 EOF
 
 # Install Python-based tools.
@@ -59,7 +62,11 @@ FROM base AS gcc
 
 # Install GCC.
 ARG GCC_VERSION
-RUN apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
+RUN <<EOF
+apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
+apt clean
+rm -rf /var/lib/apt/lists/*
+EOF
 ENV CC=/usr/bin/gcc-${GCC_VERSION}
 ENV CXX=/usr/bin/g++-${GCC_VERSION}
 
@@ -89,12 +96,13 @@ FROM base AS clang
 
 # Install Clang.
 ARG CLANG_VERSION
-RUN apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+RUN <<EOF
+apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+apt clean
+rm -rf /var/lib/apt/lists/*
+EOF
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
-
-# Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
