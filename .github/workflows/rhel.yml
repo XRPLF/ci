@@ -10,8 +10,6 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   REDHAT_REGISTRY: registry.redhat.io
   BUILDKIT_PROGRESS: plain
-  BUILDKIT_DOCKERFILE_CHECK: skip=InvalidDefaultArgInFrom
-  BUILDKIT_INLINE_CACHE: 1
   CONAN_VERSION: 2.18.0
   GCOVR_VERSION: 8.3
   NONROOT_USER: ci
@@ -89,6 +87,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           build-args: |
+            BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
+            BUILDKIT_INLINE_CACHE=1
             CONAN_VERSION=${{ env.CONAN_VERSION }}
             GCC_VERSION=${{ matrix.os.compiler_version }}
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
