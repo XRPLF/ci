@@ -13,7 +13,6 @@ env:
   CLANG_FORMAT_VERSION: 18.1.8
   NONROOT_USER: ci
   DEBIAN_VERSION: bookworm
-  GCC_VERSION: 12
 
 jobs:
   build:
@@ -72,9 +71,7 @@ jobs:
           build-args: |
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
             BUILDKIT_INLINE_CACHE=1
-            GCC_VERSION=${{ env.GCC_VERSION }}
             CONAN_VERSION=${{ env.CONAN_VERSION }}
-            GITHUB_REPO=${{ github.repository }}
             NONROOT_USER=${{ env.NONROOT_USER }}
             DEBIAN_VERSION=${{ env.DEBIAN_VERSION }}
             CLANG_FORMAT_VERSION=${{ env.CLANG_FORMAT_VERSION }}

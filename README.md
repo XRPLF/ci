@@ -17,5 +17,4 @@ Aside from build images, XRPLF projects also use container images with specializ
 to enforce code formatting, run sanitizers, run code coverage tools etc.
 The required images are created by workflows starting with `tools-` and ending
 with the project name e.g. `tools-rippled`, and are only meant to support specific projects.
-These images typically also contain a complete C++ build environment, but do not offer a selection
-of compiler versions or distributions.
+These images may also contain a complete C++ build environment, if needed.
