@@ -1,6 +1,6 @@
 # ====================== BASE IMAGE ======================
-ARG DEBIAN_VERSION
-FROM debian:${DEBIAN_VERSION} AS base
+ARG UBUNTU_VERSION
+FROM ubuntu:${UBUNTU_VERSION} AS base
 
 # Use Bash as the default shell for RUN commands and as the entrypoint.
 SHELL ["/bin/bash", "-c"]
@@ -15,7 +15,8 @@ ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 apt update
 apt upgrade -y
 apt install -y tzdata
-rm -rf /var/lib/apt/lists/* && apt clean
+apt clean
+rm -rf /var/lib/apt/lists/*
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
 
@@ -63,3 +64,39 @@ RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION}
 # Switch to the non-root user.
 USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
+
+# ====================== coverage IMAGE ======================
+
+FROM base AS coverage
+
+# Install gcovr.
+ARG GCOVR_VERSION
+RUN pipx install --pip-args='--no-cache' gcovr==${GCOVR_VERSION}
+
+# Install GCC.
+ARG GCC_VERSION
+RUN <<EOF
+apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
+apt clean
+rm -rf /var/lib/apt/lists/*
+EOF
+ENV CC=/usr/bin/gcc-${GCC_VERSION}
+ENV CXX=/usr/bin/g++-${GCC_VERSION}
+
+# Switch to the non-root user.
+USER ${NONROOT_USER}
+WORKDIR /home/${NONROOT_USER}
+
+# Create a default Conan profile.
+RUN conan profile detect
+# Fix the C++ dialect.
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
+# Explicitly set the compiler flags.
+RUN <<EOF
+cat >>~/.conan2/profiles/default <<EOT
+[conf]
+tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+EOT
+EOF
+# Print the Conan profile to verify the configuration.
+RUN conan profile show

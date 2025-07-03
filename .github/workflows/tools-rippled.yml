@@ -11,8 +11,10 @@ env:
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.17.0
   CLANG_FORMAT_VERSION: 18.1.8
+  GCOVR_VERSION: 8.3
+  GCC_VERSION: 14
   NONROOT_USER: ci
-  DEBIAN_VERSION: bookworm
+  UBUNTU_VERSION: noble
 
 jobs:
   build:
@@ -25,6 +27,7 @@ jobs:
             runner: ubuntu-24.04-arm
         tool:
           - clang-format
+          - coverage
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -73,8 +76,10 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
             CONAN_VERSION=${{ env.CONAN_VERSION }}
             NONROOT_USER=${{ env.NONROOT_USER }}
-            DEBIAN_VERSION=${{ env.DEBIAN_VERSION }}
+            UBUNTU_VERSION=${{ env.UBUNTU_VERSION }}
             CLANG_FORMAT_VERSION=${{ env.CLANG_FORMAT_VERSION }}
+            GCOVR_VERSION=${{ env.GCOVR_VERSION }}
+            GCC_VERSION=${{ env.GCC_VERSION }}
           context: docker/tools-rippled
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}
@@ -105,6 +110,7 @@ jobs:
       matrix:
         tool:
           - clang-format
+          - coverage
     runs-on: ubuntu-24.04
     needs:
       - build
