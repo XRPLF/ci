@@ -15,7 +15,8 @@ ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 apt update
 apt upgrade -y
 apt install -y tzdata
-rm -rf /var/lib/apt/lists/* && apt clean
+apt clean
+rm -rf /var/lib/apt/lists/*
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
 
@@ -69,9 +70,6 @@ rm -rf /var/lib/apt/lists/*
 EOF
 ENV CC=/usr/bin/gcc-${GCC_VERSION}
 ENV CXX=/usr/bin/g++-${GCC_VERSION}
-
-# Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
