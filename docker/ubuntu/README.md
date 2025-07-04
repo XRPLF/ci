@@ -41,7 +41,6 @@ NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 GCC_VERSION=14
 CONAN_VERSION=2.18.0
-GCOVR_VERSION=8.3
 CONTAINER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -50,7 +49,6 @@ docker buildx build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
@@ -66,7 +64,6 @@ NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 CLANG_VERSION=18
 CONAN_VERSION=2.18.0
-GCOVR_VERSION=8.3
 CONTAINER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \
@@ -75,7 +72,6 @@ docker buildx build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}

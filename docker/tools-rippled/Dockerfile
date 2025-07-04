@@ -36,7 +36,7 @@ pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
 apt update
-apt install -y "${pkgs[@]}"
+apt install -y --no-install-recommends "${pkgs[@]}"
 apt clean
 rm -rf /var/lib/apt/lists/*
 EOF
@@ -51,19 +51,6 @@ RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION}
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER
 RUN useradd -ms /bin/bash ${NONROOT_USER}
-
-# ====================== clang-format IMAGE ======================
-# Note, we do not install a compiler here.
-
-FROM base AS clang-format
-
-# Install clang-format.
-ARG CLANG_FORMAT_VERSION
-RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION}
-
-# Switch to the non-root user.
-USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
 
 # ====================== coverage IMAGE ======================
 
@@ -100,3 +87,16 @@ EOT
 EOF
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
+
+# ====================== clang-format IMAGE ======================
+# Note, we do not install a compiler here.
+
+FROM base AS clang-format
+
+# Install clang-format.
+ARG CLANG_FORMAT_VERSION
+RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION}
+
+# Switch to the non-root user.
+USER ${NONROOT_USER}
+WORKDIR /home/${NONROOT_USER}

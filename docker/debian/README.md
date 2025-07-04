@@ -41,7 +41,6 @@ NONROOT_USER=${USER}
 DEBIAN_VERSION=bookworm
 GCC_VERSION=12
 CONAN_VERSION=2.18.0
-GCOVR_VERSION=8.3
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -51,7 +50,6 @@ docker buildx build . \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
@@ -66,7 +64,6 @@ NONROOT_USER=${USER}
 DEBIAN_VERSION=bookworm
 CLANG_VERSION=17
 CONAN_VERSION=2.18.0
-GCOVR_VERSION=8.3
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \
@@ -76,7 +73,6 @@ docker buildx build . \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```

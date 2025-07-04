@@ -10,7 +10,6 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.18.0
-  GCOVR_VERSION: 8.3
   NONROOT_USER: ci
   FALLBACK_GCC: 12
   FALLBACK_CLANG: 16
@@ -99,7 +98,6 @@ jobs:
             CLANG_VERSION=${{ matrix.os.compiler_name == 'clang' && matrix.os.compiler_version || env.FALLBACK_CLANG }}
             CONAN_VERSION=${{ env.CONAN_VERSION }}
             GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || env.FALLBACK_GCC }}
-            GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             NONROOT_USER=${{ env.NONROOT_USER }}
             UBUNTU_VERSION=${{ matrix.os.release }}
           context: docker/ubuntu

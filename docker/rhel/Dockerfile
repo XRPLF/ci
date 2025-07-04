@@ -44,8 +44,7 @@ COPY --from=rocky /usr/bin/flex /usr/bin/flex
 
 # Install Python-based tools.
 ARG CONAN_VERSION
-ARG GCOVR_VERSION
-RUN pip install --no-cache conan==${CONAN_VERSION} gcovr==${GCOVR_VERSION}
+RUN pip install --no-cache conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER
