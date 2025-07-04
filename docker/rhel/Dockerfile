@@ -22,6 +22,7 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)  # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)            # Required build tool.
+pkgs+=(file)             # Required packaging tool.
 pkgs+=(git)              # Required build tool.
 pkgs+=(gpg)              # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)               # Pretty printing.
@@ -29,17 +30,22 @@ pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)      # Required build tool.
 pkgs+=(perl-FindBin)     # Required to compile OpenSSL.
 pkgs+=(python3-pip)      # Package manager for Python applications.
+pkgs+=(rpm-build)        # Required packaging tool.
+pkgs+=(rpmdevtools)      # Required packaging tool.
 pkgs+=(wget)             # Required build tool.
 dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
+dnf -y clean all
+rm -rf /var/cache/dnf/*
 EOF
 
 # Copy Bison and Flex from the Rocky Linux image.
 COPY --from=rocky /usr/bin/bison /usr/bin/bison
 COPY --from=rocky /usr/bin/flex /usr/bin/flex
 
-# Install Conan.
+# Install Python-based tools.
 ARG CONAN_VERSION
-RUN pip install conan==${CONAN_VERSION}
+ARG GCOVR_VERSION
+RUN pip install --no-cache conan==${CONAN_VERSION} gcovr==${GCOVR_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER
@@ -50,12 +56,13 @@ FROM base AS gcc
 
 # Install GCC.
 ARG GCC_VERSION
-RUN dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+RUN <<EOF
+dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+dnf -y clean all
+rm -rf /var/cache/dnf/*
+EOF
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
-
-# Clean up unnecessary files to reduce image size.
-RUN dnf -y clean all
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
@@ -84,12 +91,13 @@ FROM base AS clang
 
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available.
-RUN dnf install -y --setopt=tsflags=nodocs clang llvm
+RUN <<EOF
+dnf install -y --setopt=tsflags=nodocs clang llvm
+dnf -y clean all
+rm -rf /var/cache/dnf/*
+EOF
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
-
-# Clean up unnecessary files to reduce image size.
-RUN dnf -y clean all
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}

@@ -15,6 +15,8 @@ ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 apt update
 apt upgrade -y
 apt install -y tzdata
+apt clean
+rm -rf /var/lib/apt/lists/*
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
 
@@ -27,6 +29,8 @@ pkgs+=(bison)           # Required build tool.
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
+pkgs+=(dpkg-dev)        # Required packaging tool.
+pkgs+=(file)            # Required packaging tool.
 pkgs+=(flex)            # Required build tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -36,15 +40,19 @@ pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
 apt update
-apt install -y "${pkgs[@]}"
+apt install -y --no-install-recommends "${pkgs[@]}"
+apt clean
+rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install Conan.
+# Install Python-based tools.
 ARG CONAN_VERSION
-RUN PIPX_HOME=/opt/pipx \
+ARG GCOVR_VERSION
+ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
-    PIPX_MAN_DIR=/usr/share/man \
-    pipx install conan==${CONAN_VERSION}
+    PIPX_MAN_DIR=/usr/share/man
+RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
+    pipx install --pip-args='--no-cache' gcovr==${GCOVR_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER
@@ -55,12 +63,13 @@ FROM base AS gcc
 
 # Install GCC.
 ARG GCC_VERSION
-RUN apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
+RUN <<EOF
+apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
+apt clean
+rm -rf /var/lib/apt/lists/*
+EOF
 ENV CC=/usr/bin/gcc-${GCC_VERSION}
 ENV CXX=/usr/bin/g++-${GCC_VERSION}
-
-# Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
@@ -85,12 +94,13 @@ FROM base AS clang
 
 # Install Clang.
 ARG CLANG_VERSION
-RUN apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+RUN <<EOF
+apt install -y clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+apt clean
+rm -rf /var/lib/apt/lists/*
+EOF
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
-
-# Clean up unnecessary files to reduce image size.
-RUN rm -rf /var/lib/apt/lists/* && apt clean
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
