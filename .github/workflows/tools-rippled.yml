@@ -62,6 +62,7 @@ jobs:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
             type=sha,prefix=sha-
+            type=raw,value=latest
           labels: |
             org.opencontainers.image.authors=For inquiries, please use https://${{ github.repository }}/issues
             org.opencontainers.image.documentation=https://${{ github.repository }}
@@ -147,6 +148,7 @@ jobs:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
             type=sha,prefix=sha-
+            type=raw,value=latest
       - name: Create manifest list and push
         working-directory: /tmp/digests
         shell: bash
