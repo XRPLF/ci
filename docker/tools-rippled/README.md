@@ -29,6 +29,7 @@ Currently this Dockerfile can be used to build one image:
 * `clang-format` with C++ formatting tools. This image requires parameters:
   * `UBUNTU_VERSION` for selection of Ubuntu release (recommended `noble`)
   * `CLANG_FORMAT_VERSION` for [clang-format](http://clang.llvm.org/docs/ClangFormat.html) version
+  * `PRE_COMMIT_VERSION` for [pre-commit](https://pre-commit.com/) version
 
 Run the commands below from the current directory containing the Dockerfile to build an image.
 
@@ -41,6 +42,7 @@ registry.
 NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 CLANG_FORMAT_VERSION=18.1.8
+PRE_COMMIT_VERSION=4.2.0
 CONTAINER_IMAGE=xrplf/ci/tools-rippled-clang-format:latest
 
 docker buildx build . \
@@ -48,6 +50,7 @@ docker buildx build . \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CLANG_FORMAT_VERSION=${CLANG_FORMAT_VERSION} \
+  --build-arg PRE_COMMIT_VERSION=${PRE_COMMIT_VERSION} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}

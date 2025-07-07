@@ -10,6 +10,7 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
   CLANG_FORMAT_VERSION: 18.1.8
+  PRE_COMMIT_VERSION: 4.2.0
   NONROOT_USER: ci
   UBUNTU_VERSION: noble
 
@@ -74,6 +75,7 @@ jobs:
             NONROOT_USER=${{ env.NONROOT_USER }}
             UBUNTU_VERSION=${{ env.UBUNTU_VERSION }}
             CLANG_FORMAT_VERSION=${{ env.CLANG_FORMAT_VERSION }}
+            PRE_COMMIT_VERSION=${{ env.PRE_COMMIT_VERSION }}
           context: docker/tools-rippled
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}

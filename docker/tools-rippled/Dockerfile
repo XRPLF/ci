@@ -53,7 +53,9 @@ FROM base AS clang-format
 
 # Install clang-format.
 ARG CLANG_FORMAT_VERSION
-RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION}
+ARG PRE_COMMIT_VERSION
+RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION} && \
+    pipx install --pip-args='--no-cache' pre-commit==${PRE_COMMIT_VERSION}
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
