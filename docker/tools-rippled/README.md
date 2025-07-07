@@ -1,7 +1,7 @@
 ## tools-rippled: A Docker image used for building rippled
 
-The code in this repository creates a locked-down Ubuntu image for building and
-testing rippled in the GitHub CI pipelines, with additional tools installed.
+The code in this repository creates a locked-down Ubuntu image for the verification
+of rippled source code changes, with appropriate tools installed.
 
 Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
@@ -24,17 +24,13 @@ docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 ### Building and pushing the Docker image
 
-The same Dockerfile can be used to build a set of images:
+Currently this Dockerfile can be used to build one image:
 
-* `coverage` for reporting unit tests coverage. This image requires parameters
-  * `GCOVR_VERSION` for [gcovr](https://gcovr.com/en/stable/) version
-  * `GCC_VERSION` for the GCC version
-  * `CONAN_VERSION` for [Conan](https://docs.conan.io/2/) version
-* `clang-format` for C++ format tool. This image requires parameters
+* `clang-format` with C++ formatting tools. This image requires parameters:
+  * `UBUNTU_VERSION` for selection of Ubuntu release (recommended `noble`)
   * `CLANG_FORMAT_VERSION` for [clang-format](http://clang.llvm.org/docs/ClangFormat.html) version
-  * `CONAN_VERSION` for [Conan](https://docs.conan.io/2/) version
 
-To build either image, run the commands below from the current directory containing the Dockerfile.
+Run the commands below from the current directory containing the Dockerfile to build an image.
 
 #### Building the Docker image for clang-format
 
@@ -44,7 +40,6 @@ registry.
 ```shell
 NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
-CONAN_VERSION=2.18.0
 CLANG_FORMAT_VERSION=18.1.8
 CONTAINER_IMAGE=xrplf/ci/tools-rippled-clang-format:latest
 
@@ -52,33 +47,7 @@ docker buildx build . \
   --target clang-format \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg CLANG_FORMAT_VERSION=${CLANG_FORMAT_VERSION} \
-  --build-arg NONROOT_USER=${NONROOT_USER} \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
-  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
-```
-
-#### Building the Docker image for coverage.
-
-Ensure you've run the login command above to authenticate with the Docker
-registry.
-
-```shell
-NONROOT_USER=${USER}
-UBUNTU_VERSION=noble
-CONAN_VERSION=2.18.0
-GCC_VERSION=14
-GCOVR_VERSION=8.3
-CONTAINER_IMAGE=xrplf/ci/tools-rippled-coverage:latest
-
-docker buildx build . \
-  --target coverage \
-  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CONAN_VERSION=${CONAN_VERSION} \
-  --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}

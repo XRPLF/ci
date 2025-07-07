@@ -26,13 +26,10 @@ EOF
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
-pkgs+=(libc6-dev)       # Required build tool.
-pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
 apt update
@@ -41,52 +38,13 @@ apt clean
 rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install Conan.
-ARG CONAN_VERSION
 ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man
-RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER
 RUN useradd -ms /bin/bash ${NONROOT_USER}
-
-# ====================== coverage IMAGE ======================
-
-FROM base AS coverage
-
-# Install gcovr.
-ARG GCOVR_VERSION
-RUN pipx install --pip-args='--no-cache' gcovr==${GCOVR_VERSION}
-
-# Install GCC.
-ARG GCC_VERSION
-RUN <<EOF
-apt install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
-apt clean
-rm -rf /var/lib/apt/lists/*
-EOF
-ENV CC=/usr/bin/gcc-${GCC_VERSION}
-ENV CXX=/usr/bin/g++-${GCC_VERSION}
-
-# Switch to the non-root user.
-USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
-
-# Create a default Conan profile.
-RUN conan profile detect
-# Fix the C++ dialect.
-RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
-# Explicitly set the compiler flags.
-RUN <<EOF
-cat >>~/.conan2/profiles/default <<EOT
-[conf]
-tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-EOT
-EOF
-# Print the Conan profile to verify the configuration.
-RUN conan profile show
 
 # ====================== clang-format IMAGE ======================
 # Note, we do not install a compiler here.

@@ -58,10 +58,12 @@ EOF
 
 # Install Python-based tools.
 ARG CONAN_VERSION
+ARG GCOVR_VERSION
 ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man
-RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION}
+RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
+    pipx install --pip-args='--no-cache' gcovr==${GCOVR_VERSION}
 
 # Create the user to switch to, once all packages have been installed.
 ARG NONROOT_USER
