@@ -10,3 +10,6 @@ cmake --build .
 
 # Run the executable.
 ./example
+
+# Remove the Conan dependencies.
+conan remove -c "*"
