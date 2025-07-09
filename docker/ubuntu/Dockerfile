@@ -24,13 +24,11 @@ EOF
 # especially important when the image is built from a cached layer.
 RUN <<EOF
 pkgs=()
-pkgs+=(bison)           # Required build tool.
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
-pkgs+=(flex)            # Required build tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.

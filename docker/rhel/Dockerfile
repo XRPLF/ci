@@ -1,12 +1,3 @@
-# We want to use the subscription-free Red Hat UBI images, but those only
-# provide a subset of the packages available in the full Red Hat Enterprise
-# Linux (RHEL) distribution. To get some of the packages we need, we use those
-# provided by the Rocky Linux project, which is a community-developed operating
-# system designed to be a 100% bug-for-bug compatible alternative to RHEL.
-ARG RHEL_VERSION
-FROM rockylinux/rockylinux:${RHEL_VERSION%.*} AS rocky
-RUN dnf install -y bison flex
-
 # ====================== BASE IMAGE ======================
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/s2i-base:${RHEL_VERSION} AS base
 
@@ -37,10 +28,6 @@ dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
-
-# Copy Bison and Flex from the Rocky Linux image.
-COPY --from=rocky /usr/bin/bison /usr/bin/bison
-COPY --from=rocky /usr/bin/flex /usr/bin/flex
 
 # Install Python-based tools.
 ARG CONAN_VERSION
