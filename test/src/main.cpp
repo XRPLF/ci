@@ -1,6 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include <zlib.h>
 
@@ -10,23 +10,25 @@ int main(void) {
                             "dependencies across platforms and build systems."};
     char buffer_out [256] = {0};
 
-    z_stream defstream;
-    defstream.zalloc = Z_NULL;
-    defstream.zfree = Z_NULL;
-    defstream.opaque = Z_NULL;
-    defstream.avail_in = (uInt) strlen(buffer_in);
-    defstream.next_in = (Bytef *) buffer_in;
-    defstream.avail_out = (uInt) sizeof(buffer_out);
-    defstream.next_out = (Bytef *) buffer_out;
+    z_stream defstream = {
+        .next_in = (Bytef *)buffer_in,
+        .avail_in = (uInt)std::strlen(buffer_in),
+        .total_in = 0,
+        .next_out = (Bytef *)buffer_out,
+        .avail_out = (uInt)sizeof(buffer_out),
+        .zalloc = Z_NULL,
+        .zfree = Z_NULL,
+        .opaque = Z_NULL,
+    };
 
     deflateInit(&defstream, Z_BEST_COMPRESSION);
     deflate(&defstream, Z_FINISH);
     deflateEnd(&defstream);
 
-    printf("Uncompressed size is: %lu\n", strlen(buffer_in));
-    printf("Compressed size is: %lu\n", defstream.total_out);
+    std::printf("Uncompressed size is: %lu\n", strlen(buffer_in));
+    std::printf("Compressed size is: %lu\n", defstream.total_out);
 
-    printf("ZLIB VERSION: %s\n", zlibVersion());
+    std::printf("ZLIB VERSION: %s\n", zlibVersion());
 
     return EXIT_SUCCESS;
 }
