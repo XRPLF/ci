@@ -45,16 +45,25 @@ FROM base AS gcc
 
 # Install GCC. Red Hat installs GCC as a Software Collection (SCL) package,
 # where typically you would run `scl enable gcc-toolset-X` to open another Bash
-# shell with the GCC toolset enabled. To avoid having to do so, we just directly
-# point to the binaries.
+# shell with the GCC toolset enabled. To avoid having to do so, we delete the
+# default GCC packages first, and then reference the GCC toolset binaries
+# directly.
 ARG GCC_VERSION
 RUN <<EOF
+dnf remove -y gcc gcc-c++
 dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
 dnf clean -y all
 rm -rf /var/cache/dnf/*
+update-alternatives \
+    --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc ${GCC_VERSION} \
+    --slave /usr/bin/g++ g++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ \
+    --slave /usr/bin/cpp cpp /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/cpp \
+    --slave /usr/bin/gcov gcov /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov \
+    --slave /usr/bin/gcov-dump gcov-dump /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-dump-${GCC_VERSION} \
+    --slave /usr/bin/gcov-tool gcov-tool /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-tool-${GCC_VERSION}
 EOF
-ENV CC=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc
-ENV CXX=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++
+ENV CC=/usr/bin/gcc
+ENV CXX=/usr/bin/g++
 
 # Check that the installed GCC version matches the expected version.
 RUN <<EOF
