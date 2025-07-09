@@ -10,9 +10,9 @@ RUN dnf -y install bison flex
 # ====================== BASE IMAGE ======================
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/s2i-base:${RHEL_VERSION} AS base
 
-# Use Bash as the default shell for RUN commands and as the entrypoint.
-SHELL ["/bin/bash", "-c"]
-ENTRYPOINT ["/bin/bash"]
+# Use Bash as the default shell for RUN commands, using the options
+# `set -o errexit -o pipefail`.
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 # Update the packages installed on the system.
 RUN dnf -y update-minimal --security --sec-severity=Important --sec-severity=Critical
@@ -57,7 +57,7 @@ FROM base AS gcc
 # Install GCC.
 ARG GCC_VERSION
 RUN <<EOF
-dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+dnf -y install --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
 dnf -y clean all
 rm -rf /var/cache/dnf/*
 EOF
@@ -92,7 +92,7 @@ FROM base AS clang
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available.
 RUN <<EOF
-dnf install -y --setopt=tsflags=nodocs clang llvm
+dnf -y install --setopt=tsflags=nodocs clang llvm
 dnf -y clean all
 rm -rf /var/cache/dnf/*
 EOF

@@ -13,25 +13,24 @@ FROM gcc:${GCC_VERSION}-${DEBIAN_VERSION} AS gcc-src
 # ====================== BASE IMAGE ======================
 FROM debian:${DEBIAN_VERSION} AS base
 
-# Use Bash as the default shell for RUN commands and as the entrypoint.
-SHELL ["/bin/bash", "-c"]
-ENTRYPOINT ["/bin/bash"]
+# Use Bash as the default shell for RUN commands, using the options
+# `set -o errexit -o pipefail`.
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 # Ensure any packages installed directly or indirectly via dpkg do not require
 # manual interaction.
 ARG DEBIAN_FRONTEND=noninteractive
 RUN <<EOF
-set -ex
 ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-apt update
-apt upgrade -y
-apt install -y tzdata
-apt clean
+apt-get update
+apt-get upgrade -y
+apt-get install -y --no-install-recommends tzdata
+apt-get clean
 rm -rf /var/lib/apt/lists/*
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
 
-# Install tools that are shared by all stages. Run `apt update` again before
+# Install tools that are shared by all stages. Run `apt-get update` again before
 # installing the packages to ensure the package lists are up-to-date, which is
 # especially important when the image is built from a cached layer.
 RUN <<EOF
@@ -50,9 +49,9 @@ pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
-apt update
-apt install -y --no-install-recommends "${pkgs[@]}"
-apt clean
+apt-get update
+apt-get install -y --no-install-recommends "${pkgs[@]}"
+apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 
@@ -77,7 +76,6 @@ FROM base AS gcc
 COPY --from=gcc-src /usr/local/ /usr/local/
 COPY --from=gcc-src /etc/ld.so.conf.d/*.conf /etc/ld.so.conf.d/
 RUN <<EOF
-set -ex
 ldconfig -v
 dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc
 dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++
@@ -126,14 +124,13 @@ FROM base AS clang
 ARG DEBIAN_VERSION
 ARG CLANG_VERSION
 RUN <<EOF
-set -ex
 curl --no-progress-meter https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg
 printf "%s\n%s\n" \
   "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
   | tee /etc/apt/sources.list.d/llvm.list
-apt update
-apt install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
-apt clean
+apt-get update
+apt-get install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
+apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 ENV CC=/usr/bin/clang-${CLANG_VERSION}

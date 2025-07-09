@@ -2,7 +2,8 @@
 ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
-# Use Bash as the default shell for RUN commands with: `set -o errexit -o pipefail`
+# Use Bash as the default shell for RUN commands, using the options
+# `set -o errexit -o pipefail`.
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 # Ensure any packages installed directly or indirectly via dpkg do not require
@@ -10,15 +11,15 @@ SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 RUN <<EOF
 ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-apt update
-apt upgrade -y
-apt install -y tzdata
-apt clean
+apt-get update
+apt-get upgrade -y
+apt-get install -y --no-install-recommends tzdata
+apt-get clean
 rm -rf /var/lib/apt/lists/*
 dpkg-reconfigure --frontend noninteractive tzdata
 EOF
 
-# Install tools that are shared by all stages. Run `apt update` again before
+# Install tools that are shared by all stages. Run `apt-get update` again before
 # installing the packages to ensure the package lists are up-to-date, which is
 # especially important when the image is built from a cached layer.
 RUN <<EOF
@@ -37,9 +38,9 @@ pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
-apt update
-apt install -y --no-install-recommends "${pkgs[@]}"
-apt clean
+apt-get update
+apt-get install -y --no-install-recommends "${pkgs[@]}"
+apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 
@@ -62,13 +63,12 @@ FROM base AS gcc
 # Install GCC.
 ARG GCC_VERSION
 RUN <<EOF
-apt update
-apt install -y --no-install-recommends \
+apt-get update
+apt-get install -y --no-install-recommends \
     gcc-${GCC_VERSION} \
     g++-${GCC_VERSION}
-apt clean
+apt-get clean
 rm -rf /var/lib/apt/lists/*
-
 update-alternatives \
     --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} ${GCC_VERSION} \
     --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} \
@@ -76,12 +76,16 @@ update-alternatives \
     --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} \
     --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-${GCC_VERSION} \
     --slave /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-${GCC_VERSION}
-
-if [[ "$(gcc -dumpversion)" != "${GCC_VERSION}" ]]; then
+EOF
+ENV CC=/usr/bin/gcc
+ENV CXX=/usr/bin/g++
+# Sanity check.
+RUN <<EOF
+if [[ "$(${CC} -dumpversion)" != "${GCC_VERSION}" ]]; then
   echo "ERROR: gcc -dumpversion does not match expected version '${GCC_VERSION}'"
   exit 1
 fi
-if [[ "$(g++ -dumpversion)" != "${GCC_VERSION}" ]]; then
+if [[ "$(${CXX} -dumpversion)" != "${GCC_VERSION}" ]]; then
   echo "ERROR: g++ -dumpversion does not match expected version '${GCC_VERSION}'"
   exit 1
 fi
@@ -111,11 +115,11 @@ FROM base AS clang
 # Install Clang.
 ARG CLANG_VERSION
 RUN <<EOF
-apt update
-apt install -y \
+apt-get update
+apt-get install -y --no-install-recommends \
     clang-${CLANG_VERSION} \
     llvm-${CLANG_VERSION}
-apt clean
+apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
