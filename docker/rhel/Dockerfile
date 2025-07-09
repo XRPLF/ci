@@ -1,9 +1,11 @@
 # ====================== BASE IMAGE ======================
+ARG RHEL_VERSION
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/s2i-base:${RHEL_VERSION} AS base
 
 # Use Bash as the default shell for RUN commands, using the options
-# `set -o errexit -o pipefail`.
+# `set -o errexit -o pipefail`, and as the entrypoint.
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
+ENTRYPOINT ["/bin/bash"]
 
 # Update the packages installed on the system.
 RUN dnf update-minimal -y --security --sec-severity=Important --sec-severity=Critical
@@ -41,15 +43,34 @@ RUN useradd -ms /bin/bash ${NONROOT_USER}
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
-# Install GCC.
+# Install GCC. Red Hat installs GCC as a Software Collection (SCL) package,
+# where typically you would run `scl enable gcc-toolset-X` to open another Bash
+# shell with the GCC toolset enabled. To avoid having to do so, we just directly
+# point to the binaries.
 ARG GCC_VERSION
 RUN <<EOF
 dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
-ENV CC=/usr/bin/gcc
-ENV CXX=/usr/bin/g++
+ENV CC=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc
+ENV CXX=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++
+
+# Check that the installed GCC version matches the expected version.
+RUN <<EOF
+CC_VER=$(${CC} -dumpversion)
+CC_VER=${CC_VER%%.*}
+if [[ "${CC_VER}" != "${GCC_VERSION}" ]]; then
+  echo "ERROR: 'gcc -dumpversion' gives '${CC_VER}', which does not match expected version '${GCC_VERSION}'."
+  exit 1
+fi
+CXX_VER=$(${CXX} -dumpversion)
+CXX_VER=${CXX_VER%%.*}
+if [[ "${CXX_VER}" != "${GCC_VERSION}" ]]; then
+  echo "ERROR: g++ -dumpversion gives '${CXX_VER}', which does not match expected version '${GCC_VERSION}'."
+  exit 1
+fi
+EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}

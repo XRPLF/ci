@@ -14,8 +14,9 @@ FROM gcc:${GCC_VERSION}-${DEBIAN_VERSION} AS gcc-src
 FROM debian:${DEBIAN_VERSION} AS base
 
 # Use Bash as the default shell for RUN commands, using the options
-# `set -o errexit -o pipefail`.
+# `set -o errexit -o pipefail`, and as the entrypoint.
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
+ENTRYPOINT ["/bin/bash"]
 
 # Ensure any packages installed directly or indirectly via dpkg do not require
 # manual interaction.
@@ -95,6 +96,25 @@ EOF
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
 
+# Check that the installed GCC version matches the expected version. We must
+# repeat the GCC_VERSION argument here, as it is not inherited from the source
+# image.
+ARG GCC_VERSION
+RUN <<EOF
+CC_VER=$(${CC} -dumpversion)
+CC_VER=${CC_VER%%.*}
+if [[ "${CC_VER}" != "${GCC_VERSION}" ]]; then
+  echo "ERROR: 'gcc -dumpversion' gives '${CC_VER}', which does not match expected version '${GCC_VERSION}'."
+  exit 1
+fi
+CXX_VER=$(${CXX} -dumpversion)
+CXX_VER=${CXX_VER%%.*}
+if [[ "${CXX_VER}" != "${GCC_VERSION}" ]]; then
+  echo "ERROR: g++ -dumpversion gives '${CXX_VER}', which does not match expected version '${GCC_VERSION}'."
+  exit 1
+fi
+EOF
+
 # Switch to the non-root user.
 USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
@@ -129,7 +149,7 @@ FROM base AS clang
 
 # Install Clang. Use the LLVM apt repository to access the latest versions. We
 # must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
-# base image.
+# base or source images.
 ARG DEBIAN_VERSION
 ARG CLANG_VERSION
 RUN <<EOF
@@ -144,6 +164,22 @@ rm -rf /var/lib/apt/lists/*
 EOF
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
+
+# Check that the installed Clang version matches the expected version.
+RUN <<EOF
+CC_VER=$(${CC} -dumpversion)
+CC_VER=${CC_VER%%.*}
+if [[ "${CC_VER}" != "${CLANG_VERSION}" ]]; then
+  echo "ERROR: 'clang -dumpversion' gives '${CC_VER}', which does not match expected version '${GCC_VERSION}'."
+  exit 1
+fi
+CXX_VER=$(${CXX} -dumpversion)
+CXX_VER=${CXX_VER%%.*}
+if [[ "${CXX_VER}" != "${CLANG_VERSION}" ]]; then
+  echo "ERROR: clang++ -dumpversion gives '${CXX_VER}', which does not match expected version '${GCC_VERSION}'."
+  exit 1
+fi
+EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
@@ -166,11 +202,11 @@ cat >>~/.conan2/profiles/default <<EOT
 [conf]
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
-if [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -ge 20 ]]; then
+if [[ ${CC_VER} -ge 20 ]]; then
     cat >>~/.conan2/profiles/default <<EOT
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw', '-Wno-deprecated-declarations']
 EOT
-elif [[ $(clang-${CLANG_VERSION} --version | head -1 | grep -Po 'version \K[0-9]{2}') -eq 19 ]]; then
+elif [[ ${CC_VER} -eq 19 ]]; then
     cat >>~/.conan2/profiles/default <<EOT
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
