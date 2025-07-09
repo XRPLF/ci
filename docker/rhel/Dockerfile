@@ -5,7 +5,7 @@
 # system designed to be a 100% bug-for-bug compatible alternative to RHEL.
 ARG RHEL_VERSION
 FROM rockylinux/rockylinux:${RHEL_VERSION%.*} AS rocky
-RUN dnf -y install bison flex
+RUN dnf install -y bison flex
 
 # ====================== BASE IMAGE ======================
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/s2i-base:${RHEL_VERSION} AS base
@@ -15,7 +15,7 @@ FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/s2i-base:${RHEL_VERSION} AS base
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 # Update the packages installed on the system.
-RUN dnf -y update-minimal --security --sec-severity=Important --sec-severity=Critical
+RUN dnf update-minimal -y --security --sec-severity=Important --sec-severity=Critical
 
 # Install tools that are shared by all stages.
 RUN <<EOF
@@ -34,7 +34,7 @@ pkgs+=(rpm-build)        # Required packaging tool.
 pkgs+=(rpmdevtools)      # Required packaging tool.
 pkgs+=(wget)             # Required build tool.
 dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
-dnf -y clean all
+dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 
@@ -57,8 +57,8 @@ FROM base AS gcc
 # Install GCC.
 ARG GCC_VERSION
 RUN <<EOF
-dnf -y install --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
-dnf -y clean all
+dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 ENV CC=/usr/bin/gcc
@@ -99,8 +99,8 @@ FROM base AS clang
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available.
 RUN <<EOF
-dnf -y install --setopt=tsflags=nodocs clang llvm
-dnf -y clean all
+dnf install -y --setopt=tsflags=nodocs clang llvm
+dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 ENV CC=/usr/bin/clang
