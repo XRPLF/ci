@@ -170,13 +170,13 @@ RUN <<EOF
 CC_VER=$(${CC} -dumpversion)
 CC_VER=${CC_VER%%.*}
 if [[ "${CC_VER}" != "${CLANG_VERSION}" ]]; then
-  echo "ERROR: 'clang -dumpversion' gives '${CC_VER}', which does not match expected version '${GCC_VERSION}'."
+  echo "ERROR: 'clang -dumpversion' gives '${CC_VER}', which does not match expected version '${CLANG_VERSION}'."
   exit 1
 fi
 CXX_VER=$(${CXX} -dumpversion)
 CXX_VER=${CXX_VER%%.*}
 if [[ "${CXX_VER}" != "${CLANG_VERSION}" ]]; then
-  echo "ERROR: clang++ -dumpversion gives '${CXX_VER}', which does not match expected version '${GCC_VERSION}'."
+  echo "ERROR: clang++ -dumpversion gives '${CXX_VER}', which does not match expected version '${CLANG_VERSION}'."
   exit 1
 fi
 EOF
