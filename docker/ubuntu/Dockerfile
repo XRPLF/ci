@@ -96,7 +96,11 @@ USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
 
 # Create a default Conan profile.
-RUN conan profile detect
+RUN <<EOF
+conan profile detect
+rm -rf /tmp/*
+EOF
+
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # Explicitly set the compiler flags.
@@ -137,7 +141,11 @@ USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
 
 # Create a default Conan profile.
-RUN conan profile detect
+RUN <<EOF
+conan profile detect
+rm -rf /tmp/*
+EOF
+
 # Fix the C++ dialect.
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # Explicitly set the compiler flags. To ensure compatibility with a range of

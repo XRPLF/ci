@@ -13,3 +13,6 @@ cmake --build .
 
 # Remove the Conan dependencies.
 conan remove -c "*"
+cd $(conan config home)
+rm -f .conan.db
+rm -rf p/
