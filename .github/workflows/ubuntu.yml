@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/ubuntu.yml
       - docker/ubuntu/Dockerfile
+      - test
 
 env:
   CONTAINER_REGISTRY: ghcr.io

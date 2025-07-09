@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/debian.yml
       - docker/debian/Dockerfile
+      - test
 
 env:
   CONTAINER_REGISTRY: ghcr.io

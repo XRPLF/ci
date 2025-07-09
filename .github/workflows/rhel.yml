@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/rhel.yml
       - docker/rhel/Dockerfile
+      - test
 
 env:
   CONTAINER_REGISTRY: ghcr.io
