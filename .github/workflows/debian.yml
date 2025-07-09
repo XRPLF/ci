@@ -112,6 +112,7 @@ jobs:
           sbom: true
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.os.compiler_name }}
+          tags: ${{ env.CONTAINER_IMAGE }}
       - name: Test the Docker image
         if: ${{ github.ref_type == 'branch' && github.ref_name != github.event.repository.default_branch }}
         run: |
