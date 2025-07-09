@@ -115,6 +115,13 @@ EOF
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
+# Test the image by compiling a simple C++ program.
+RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
+cp -r /test test
+cd test && ./run.sh && cd ..
+rm -rf test
+EOF
+
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
@@ -165,3 +172,10 @@ fi
 EOF
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
+
+# Test the image by compiling a simple C++ program.
+RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
+cp -r /test test
+cd test && ./run.sh && cd ..
+rm -rf test
+EOF

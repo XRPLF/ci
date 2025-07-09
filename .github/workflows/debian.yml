@@ -104,7 +104,8 @@ jobs:
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             NONROOT_USER=${{ env.NONROOT_USER }}
             DEBIAN_VERSION=${{ matrix.os.release }}
-          context: docker/debian
+          context: .
+          file: docker/debian/Dockerfile
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}
           provenance: mode=max
@@ -113,10 +114,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.os.compiler_name }}
           tags: ${{ env.CONTAINER_IMAGE }}
-      - name: Test the Docker image
-        if: ${{ github.ref_type == 'branch' && github.ref_name != github.event.repository.default_branch }}
-        run: |
-          docker run --rm -v ${{ github.workspace }}/test:/tmp:ro ${{ env.CONTAINER_IMAGE }} /tmp/run.sh
       - name: Export digest
         if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
         shell: bash

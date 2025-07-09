@@ -29,7 +29,7 @@ versions by specifying the `DEBIAN_VERSION` build argument. There are additional
 arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 `CLANG_VERSION` for the Clang flavor.
 
-Run the commands below from the current directory containing the Dockerfile.
+Run the commands below from the root directory of the repository.
 
 #### Building the Docker image for GCC.
 
@@ -45,6 +45,7 @@ GCOVR_VERSION=8.3
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
+  --file docker/debian/Dockerfile \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
@@ -70,6 +71,7 @@ GCOVR_VERSION=8.3
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \
+  --file docker/debian/Dockerfile \
   --target clang \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
