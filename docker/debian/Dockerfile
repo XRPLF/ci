@@ -204,15 +204,13 @@ RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/d
 # of Clang.
 # TODO: Move extra flags into the rippled repository as a custom Conan profile.
 RUN <<EOF
+CXX_VER=$(${CXX} -dumpversion)
+CXX_VER=${CXX_VER%%.*}
 cat >>~/.conan2/profiles/default <<EOT
 [conf]
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
-if [[ ${CC_VER} -ge 20 ]]; then
-    cat >>~/.conan2/profiles/default <<EOT
-tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw', '-Wno-deprecated-declarations']
-EOT
-elif [[ ${CC_VER} -eq 19 ]]; then
+if [[ ${CXX_VER} -ge 19 ]]; then
     cat >>~/.conan2/profiles/default <<EOT
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
