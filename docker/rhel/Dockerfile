@@ -127,6 +127,23 @@ EOF
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
 
+# Check that the installed Clang version is not older than the minimum required.
+ARG MINIMUM_CLANG_VERSION=16
+RUN <<EOF
+CC_VER=$(${CC} -dumpversion)
+CC_VER=${CC_VER%%.*}
+if [[ ${CC_VER} -lt ${MINIMUM_CLANG_VERSION} ]]; then
+  echo "ERROR: 'clang -dumpversion' gives '${CC_VER}', which is less than minimum required '${MINIMUM_CLANG_VERSION}'."
+  exit 1
+fi
+CXX_VER=$(${CXX} -dumpversion)
+CXX_VER=${CXX_VER%%.*}
+if [[ ${CXX_VER} -lt ${MINIMUM_CLANG_VERSION} ]]; then
+  echo "ERROR: clang++ -dumpversion gives '${CXX_VER}', which is less than minimum required '${MINIMUM_CLANG_VERSION}'."
+  exit 1
+fi
+EOF
+
 # Switch to the non-root user.
 USER ${NONROOT_USER}
 WORKDIR /home/${NONROOT_USER}
