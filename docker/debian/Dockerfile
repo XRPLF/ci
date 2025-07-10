@@ -143,7 +143,8 @@ RUN conan profile show
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
 cp -r /test test
-cd test && ./run.sh && cd ..
+cd test && ./run.sh
+cd ..
 rm -rf test
 EOF
 
@@ -222,6 +223,7 @@ RUN conan profile show
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
 cp -r /test test
-cd test && ./run.sh && cd ..
+cd test && ./run.sh
+cd ..
 rm -rf test
 EOF
