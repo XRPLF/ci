@@ -59,6 +59,9 @@ RUN useradd -ms /bin/bash ${NONROOT_USER}
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
+# This is not inherited from base image, ensure no manual interaction needed.
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Install GCC and create the necessary symlinks.
 ARG GCC_VERSION
 RUN <<EOF
@@ -126,6 +129,9 @@ EOF
 
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
+
+# This is not inherited from base image, ensure no manual interaction needed.
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Install Clang.
 ARG CLANG_VERSION

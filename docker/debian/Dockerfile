@@ -70,6 +70,9 @@ RUN useradd -ms /bin/bash ${NONROOT_USER}
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
+# This is not inherited from base image, ensure no manual interaction needed.
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Copy GCC from the source image, make the package manager aware of its
 # existence, and create the necessary symlinks.
 COPY --from=gcc-src /usr/local/ /usr/local/
@@ -146,6 +149,9 @@ EOF
 
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
+
+# This is not inherited from base image, ensure no manual interaction needed.
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Install Clang. Use the LLVM apt repository to access the latest versions. We
 # must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
