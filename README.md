@@ -11,6 +11,10 @@ to build, run unit tests, and package different XRPLF projects. By using the sam
 for different projects, we are enforcing that XRPLF projects can be built in a wide selection
 of environments and using different C++ compilers.
 
+[Ubuntu instructions](docker/ubuntu/README.md)
+[Debian instructions](docker/debian/README.md)
+[RHEL instructions](docker/rhel/README.md)
+
 ## Tools images
 
 Aside from build images, XRPLF projects also use container images with specialized tools, e.g.
