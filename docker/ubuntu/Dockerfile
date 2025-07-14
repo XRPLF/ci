@@ -32,6 +32,7 @@ pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.

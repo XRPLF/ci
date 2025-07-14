@@ -28,6 +28,7 @@ pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by provi
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.

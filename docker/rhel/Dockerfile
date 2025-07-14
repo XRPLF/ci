@@ -18,6 +18,7 @@ pkgs+=(cmake)            # Required build tool.
 pkgs+=(file)             # Required packaging tool.
 pkgs+=(git)              # Required build tool.
 pkgs+=(gpg)              # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(gnupg2)           # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)               # Pretty printing.
 pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)      # Required build tool.
@@ -26,7 +27,7 @@ pkgs+=(python3-pip)      # Package manager for Python applications.
 pkgs+=(rpm-build)        # Required packaging tool.
 pkgs+=(rpmdevtools)      # Required packaging tool.
 pkgs+=(wget)             # Required build tool.
-dnf install -y --setopt=tsflags=nodocs "${pkgs[@]}"
+dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
