@@ -100,7 +100,8 @@ EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
+ENV HOME=/home/${NONROOT_USER}
+WORKDIR ${HOME}
 
 # Create a default Conan profile.
 RUN <<EOF
@@ -183,7 +184,8 @@ EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
+ENV HOME=/home/${NONROOT_USER}
+WORKDIR ${HOME}
 
 # Create a default Conan profile.
 RUN <<EOF

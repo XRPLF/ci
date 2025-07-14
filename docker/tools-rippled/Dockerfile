@@ -58,4 +58,5 @@ RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION} &
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
+ENV HOME=/home/${NONROOT_USER}
+WORKDIR ${HOME}

@@ -83,7 +83,8 @@ EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
+ENV HOME=/home/${NONROOT_USER}
+WORKDIR ${HOME}
 
 # Fix the Conan user home directory as it otherwise will point to the
 # /opt/app-root/src/.conan2 directory.
@@ -166,7 +167,8 @@ EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
+ENV HOME=/home/${NONROOT_USER}
+WORKDIR ${HOME}
 
 # Fix the Conan user home directory as it otherwise will point to the
 # /opt/app-root/src/.conan2 directory.
