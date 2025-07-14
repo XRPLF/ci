@@ -123,6 +123,9 @@ USER ${NONROOT_USER}
 ENV HOME=/home/${NONROOT_USER}
 WORKDIR ${HOME}
 
+# Set Conan home directory, so the users of this image can find default profile
+ENV CONAN_HOME=${HOME}/.conan2
+
 # Create a default Conan profile.
 RUN <<EOF
 conan profile detect
@@ -193,6 +196,9 @@ EOF
 USER ${NONROOT_USER}
 ENV HOME=/home/${NONROOT_USER}
 WORKDIR ${HOME}
+
+# Set Conan home directory, so the users of this image can find default profile
+ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
 RUN <<EOF

@@ -86,9 +86,8 @@ USER ${NONROOT_USER}
 ENV HOME=/home/${NONROOT_USER}
 WORKDIR ${HOME}
 
-# Fix the Conan user home directory as it otherwise will point to the
-# /opt/app-root/src/.conan2 directory.
-ENV CONAN_HOME=/home/${NONROOT_USER}/.conan2
+# Set Conan home directory, so the users of this image can find default profile
+ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
 RUN <<EOF
@@ -170,9 +169,8 @@ USER ${NONROOT_USER}
 ENV HOME=/home/${NONROOT_USER}
 WORKDIR ${HOME}
 
-# Fix the Conan user home directory as it otherwise will point to the
-# /opt/app-root/src/.conan2 directory.
-ENV CONAN_HOME=/home/${NONROOT_USER}/.conan2
+# Set Conan home directory, so the users of this image can find default profile
+ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
 RUN <<EOF
