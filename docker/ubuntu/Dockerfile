@@ -32,6 +32,7 @@ pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
@@ -101,7 +102,11 @@ EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
+ENV HOME=/home/${NONROOT_USER}
+WORKDIR ${HOME}
+
+# Set Conan home directory, so the users of this image can find default profile
+ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
 RUN <<EOF
@@ -184,7 +189,11 @@ EOF
 
 # Switch to the non-root user.
 USER ${NONROOT_USER}
-WORKDIR /home/${NONROOT_USER}
+ENV HOME=/home/${NONROOT_USER}
+WORKDIR ${HOME}
+
+# Set Conan home directory, so the users of this image can find default profile
+ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
 RUN <<EOF
