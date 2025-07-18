@@ -22,6 +22,7 @@ pkgs+=(jq)               # Pretty printing.
 pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)      # Required build tool.
 pkgs+=(perl-FindBin)     # Required to compile OpenSSL.
+pkgs+=(python3-jinja2)   # Required build tool.
 pkgs+=(python3-pip)      # Package manager for Python applications.
 pkgs+=(rpm-build)        # Required packaging tool.
 pkgs+=(rpmdevtools)      # Required packaging tool.

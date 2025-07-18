@@ -36,6 +36,7 @@ pkgs+=(jq)              # Pretty printing.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
+pkgs+=(python3-jinja2)  # Required build tool.
 pkgs+=(wget)            # Required build tool.
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
