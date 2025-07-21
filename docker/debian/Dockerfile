@@ -138,8 +138,7 @@ EOF
 RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/default
 # Explicitly set the compiler flags.
 RUN <<EOF
-cat >>~/.conan2/profiles/default <<EOT
-[conf]
+cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
 EOF
@@ -217,12 +216,11 @@ RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ~/.conan2/profiles/d
 RUN <<EOF
 CXX_VER=$(${CXX} -dumpversion)
 CXX_VER=${CXX_VER%%.*}
-cat >>~/.conan2/profiles/default <<EOT
-[conf]
+cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
 if [[ ${CXX_VER} -ge 19 ]]; then
-    cat >>~/.conan2/profiles/default <<EOT
+    cat >> $(conan config home)/global.conf <<EOT
 tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
 EOT
 fi
