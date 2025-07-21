@@ -98,7 +98,7 @@ rm -rf /tmp/*
 EOF
 
 # Fix the C++ dialect.
-RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' $(conan config home)/profiles/default
 # Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
@@ -180,7 +180,7 @@ rm -rf /tmp/*
 EOF
 
 # Fix the C++ dialect.
-RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' ${CONAN_HOME}/profiles/default
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' $(conan config home)/profiles/default
 # Explicitly set the compiler flags. To ensure compatibility with a range of
 # Clang compilers, we must also add extra flags that apply to certain versions
 # of Clang.
