@@ -13,7 +13,6 @@ env:
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.18.0
   GCOVR_VERSION: 8.3
-  NONROOT_USER: ci
 
 jobs:
   # Build the Docker image for Red Hat Enterprise Linux using different versions
@@ -93,7 +92,6 @@ jobs:
             CONAN_VERSION=${{ env.CONAN_VERSION }}
             GCC_VERSION=${{ matrix.os.compiler_version }}
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
-            NONROOT_USER=${{ env.NONROOT_USER }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/rhel/Dockerfile

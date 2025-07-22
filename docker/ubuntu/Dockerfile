@@ -54,10 +54,6 @@ ENV PIPX_HOME=/opt/pipx \
 RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
     pipx install --pip-args='--no-cache' gcovr==${GCOVR_VERSION}
 
-# Create the user to switch to, once all packages have been installed.
-ARG NONROOT_USER
-RUN useradd -ms /bin/bash ${NONROOT_USER}
-
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
@@ -100,9 +96,7 @@ if [[ "${CXX_VER}" != "${GCC_VERSION}" ]]; then
 fi
 EOF
 
-# Switch to the non-root user.
-USER ${NONROOT_USER}
-ENV HOME=/home/${NONROOT_USER}
+ENV HOME=/root
 WORKDIR ${HOME}
 
 # Set Conan home directory, so the users of this image can find default profile
@@ -187,9 +181,7 @@ if [[ "${CXX_VER}" != "${CLANG_VERSION}" ]]; then
 fi
 EOF
 
-# Switch to the non-root user.
-USER ${NONROOT_USER}
-ENV HOME=/home/${NONROOT_USER}
+ENV HOME=/root
 WORKDIR ${HOME}
 
 # Set Conan home directory, so the users of this image can find default profile

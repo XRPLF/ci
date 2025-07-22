@@ -37,7 +37,6 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 GCC_VERSION=14
 CONAN_VERSION=2.18.0
@@ -52,7 +51,6 @@ docker buildx build . \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
-  --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
@@ -63,7 +61,6 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 CLANG_VERSION=18
 CONAN_VERSION=2.18.0
@@ -78,7 +75,6 @@ docker buildx build . \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
-  --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
@@ -90,29 +86,17 @@ can do so with the following command:
 
 ```shell
 CODEBASE=<path to the rippled repository>
-docker run --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+docker run --user $(id -u):$(id -g) --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
-Once inside the container you can run the following commands to build `rippled`:
+Note, the above command will assume the identity of the current user in the newly created Docker container.
+**This might be exploited by other users with access to the same host (docker instance)**.
 
-```shell
-BUILD_TYPE=Debug
-cd /rippled
-# Remove any existing data from previous builds on the host machine.
-rm -rf CMakeCache.txt CMakeFiles build || true
-# Install dependencies via Conan.
-conan install . --build missing --settings build_type=${BUILD_TYPE} \
-  -o xrpld=True -o tests=True -o unity=True
-# Configure the build with CMake.
-cd build
-cmake -DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake \
-      -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
-# Build and test rippled. Setting the parallelism too high, e.g. to $(nproc),
-# can result in an error like "gmake[2]: ...... Killed".
-PARALLELISM=2
-cmake --build . -j ${PARALLELISM}
-./rippled --unittest --unittest-jobs ${PARALLELISM}
-```
+The recommended practice is to run Docker in [rootless mode](https://docs.docker.com/engine/security/rootless/),
+or use alternative container runtime such as [podman](https://docs.podman.io/en/latest/) which
+support [rootless environment](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md).
+This will have similar effect as `--user $(id -u):$(id -g)` (making this option redundant and invalid),
+while also securiting the container from other users on the same host.
 
 #### Pushing the Docker image to the GitHub registry
 

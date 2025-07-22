@@ -42,10 +42,6 @@ ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man
 
-# Create the user to switch to, once all packages have been installed.
-ARG NONROOT_USER
-RUN useradd -ms /bin/bash ${NONROOT_USER}
-
 # ====================== clang-format IMAGE ======================
 # Note, we do not install a compiler here.
 
@@ -57,7 +53,5 @@ ARG PRE_COMMIT_VERSION
 RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION} && \
     pipx install --pip-args='--no-cache' pre-commit==${PRE_COMMIT_VERSION}
 
-# Switch to the non-root user.
-USER ${NONROOT_USER}
-ENV HOME=/home/${NONROOT_USER}
+ENV HOME=/root
 WORKDIR ${HOME}

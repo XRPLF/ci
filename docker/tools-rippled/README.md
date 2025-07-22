@@ -39,7 +39,6 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-NONROOT_USER=${USER}
 UBUNTU_VERSION=noble
 CLANG_FORMAT_VERSION=18.1.8
 PRE_COMMIT_VERSION=4.2.0
@@ -51,7 +50,6 @@ docker buildx build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CLANG_FORMAT_VERSION=${CLANG_FORMAT_VERSION} \
   --build-arg PRE_COMMIT_VERSION=${PRE_COMMIT_VERSION} \
-  --build-arg NONROOT_USER=${NONROOT_USER} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
