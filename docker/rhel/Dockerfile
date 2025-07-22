@@ -140,8 +140,9 @@ FROM base AS clang
 
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available.
+# Note, gcc is needed for build dependencies.
 RUN <<EOF
-dnf install -y --setopt=tsflags=nodocs clang llvm
+dnf install -y --setopt=tsflags=nodocs clang llvm gcc
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF

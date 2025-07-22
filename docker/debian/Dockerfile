@@ -162,6 +162,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Install Clang. Use the LLVM apt repository to access the latest versions. We
 # must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
 # base or source images.
+# Note, gcc is needed for build dependencies.
 ARG DEBIAN_VERSION
 ARG CLANG_VERSION
 RUN <<EOF
@@ -170,6 +171,7 @@ printf "%s\n%s\n" \
   "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
   | tee /etc/apt/sources.list.d/llvm.list
 apt-get update
+apt-get install -y --no-install-recommends gcc
 apt-get install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*

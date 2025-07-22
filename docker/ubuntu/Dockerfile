@@ -157,13 +157,14 @@ FROM base AS clang
 # This is not inherited from base image, ensure no manual interaction needed.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install Clang.
+# Install Clang. Note, gcc is needed for build dependencies
 ARG CLANG_VERSION
 RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
     clang-${CLANG_VERSION} \
-    llvm-${CLANG_VERSION}
+    llvm-${CLANG_VERSION} \
+    gcc
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
