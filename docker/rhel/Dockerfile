@@ -52,6 +52,7 @@ dnf remove -y gcc gcc-c++
 dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
 dnf clean -y all
 rm -rf /var/cache/dnf/*
+update-alternatives --install /usr/bin/cc cc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 999
 update-alternatives \
     --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc ${GCC_VERSION} \
     --slave /usr/bin/g++ g++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ \
@@ -134,14 +135,15 @@ FROM base AS clang
 
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available.
-# Note, gcc is needed for build dependencies.
 RUN <<EOF
-dnf install -y --setopt=tsflags=nodocs clang llvm gcc
+dnf install -y --setopt=tsflags=nodocs clang llvm
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
+# This is required by some build dependencies
+RUN update-alternatives --install /usr/bin/cc cc $CC 999
 
 # Check that the installed Clang version is not older than the minimum required.
 ARG MINIMUM_CLANG_VERSION=16

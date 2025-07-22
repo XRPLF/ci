@@ -69,6 +69,7 @@ apt-get install -y --no-install-recommends \
     g++-${GCC_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
+update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-${GCC_VERSION} 999
 update-alternatives \
     --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} ${GCC_VERSION} \
     --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} \
@@ -151,19 +152,20 @@ FROM base AS clang
 # This is not inherited from base image, ensure no manual interaction needed.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install Clang. Note, gcc is needed for build dependencies
+# Install Clang.
 ARG CLANG_VERSION
 RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
     clang-${CLANG_VERSION} \
-    llvm-${CLANG_VERSION} \
-    gcc
+    llvm-${CLANG_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
+# This is required by some build dependencies
+RUN update-alternatives --install /usr/bin/cc cc $CC 999
 
 # Check that the installed Clang version matches the expected version.
 RUN <<EOF
