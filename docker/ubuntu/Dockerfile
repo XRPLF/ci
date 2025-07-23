@@ -29,7 +29,6 @@ pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by provi
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
-pkgs+=(debhelper)       # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -61,22 +60,26 @@ FROM base AS gcc
 # This is not inherited from base image, ensure no manual interaction needed.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install GCC and create the necessary symlinks.
+# Install GCC and create the necessary symlinks. We only support packaging with
+# gcc because of the hard package dependencies from libtool to gcc
 ARG GCC_VERSION
 RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
     gcc-${GCC_VERSION} \
-    g++-${GCC_VERSION}
+    g++-${GCC_VERSION} \
+    debhelper
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-${GCC_VERSION} 999
 update-alternatives \
-    --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} ${GCC_VERSION} \
+    --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 \
     --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} \
     --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} \
     --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-${GCC_VERSION} \
     --slave /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-${GCC_VERSION}
+update-alternatives --auto cc
+update-alternatives --auto gcc
 EOF
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
@@ -161,11 +164,19 @@ apt-get install -y --no-install-recommends \
     llvm-${CLANG_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
+update-alternatives --install /usr/bin/cc cc /usr/bin/clang-${CLANG_VERSION} 999
+update-alternatives --install \
+    /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 100 \
+    --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION}
+update-alternatives --install \
+    /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${CLANG_VERSION} 100
+update-alternatives --auto cc
+update-alternatives --auto clang
+update-alternatives --auto llvm-cov
 EOF
+
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
-# This is required by some build dependencies
-RUN update-alternatives --install /usr/bin/cc cc $CC 999
 
 # Check that the installed Clang version matches the expected version.
 RUN <<EOF

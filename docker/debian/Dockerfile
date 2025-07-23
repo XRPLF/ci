@@ -40,7 +40,6 @@ pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by provi
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
-pkgs+=(debhelper)       # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -168,11 +167,19 @@ apt-get update
 apt-get install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
+update-alternatives --install /usr/bin/cc cc /usr/bin/clang-${CLANG_VERSION} 999
+update-alternatives --install \
+    /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 100 \
+    --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION}
+update-alternatives --install \
+    /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${CLANG_VERSION} 100
+update-alternatives --auto cc
+update-alternatives --auto clang
+update-alternatives --auto llvm-cov
 EOF
+
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
-# This is required by some build dependencies
-RUN update-alternatives --install /usr/bin/cc cc $CC 999
 
 # Check that the installed Clang version matches the expected version.
 RUN <<EOF

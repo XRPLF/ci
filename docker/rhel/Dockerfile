@@ -54,12 +54,14 @@ dnf clean -y all
 rm -rf /var/cache/dnf/*
 update-alternatives --install /usr/bin/cc cc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 999
 update-alternatives \
-    --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc ${GCC_VERSION} \
+    --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 100 \
     --slave /usr/bin/g++ g++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ \
     --slave /usr/bin/cpp cpp /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/cpp \
     --slave /usr/bin/gcov gcov /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov \
     --slave /usr/bin/gcov-dump gcov-dump /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-dump-${GCC_VERSION} \
     --slave /usr/bin/gcov-tool gcov-tool /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-tool-${GCC_VERSION}
+update-alternatives --auto cc
+update-alternatives --auto gcc
 EOF
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
@@ -139,11 +141,12 @@ RUN <<EOF
 dnf install -y --setopt=tsflags=nodocs clang llvm
 dnf clean -y all
 rm -rf /var/cache/dnf/*
+update-alternatives --install /usr/bin/cc cc /usr/bin/clang 999
+update-alternatives --auto cc
 EOF
+
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
-# This is required by some build dependencies
-RUN update-alternatives --install /usr/bin/cc cc $CC 999
 
 # Check that the installed Clang version is not older than the minimum required.
 ARG MINIMUM_CLANG_VERSION=16
