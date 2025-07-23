@@ -29,6 +29,7 @@ pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by provi
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
+pkgs+=(debhelper)       # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -73,7 +74,6 @@ update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-${GCC_VERSION} 999
 update-alternatives \
     --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} ${GCC_VERSION} \
     --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} \
-    --slave /usr/bin/cpp cpp /usr/bin/cpp-${GCC_VERSION} \
     --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} \
     --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-${GCC_VERSION} \
     --slave /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-${GCC_VERSION}

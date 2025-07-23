@@ -40,6 +40,7 @@ pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by provi
 pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
+pkgs+=(debhelper)       # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
