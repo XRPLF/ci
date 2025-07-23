@@ -31,9 +31,9 @@ and `CLANG_VERSION` for the Clang flavor.
 
 Build image for `gcc` supports packaging.
 
-Run the commands below from the root directory of the repository.
+In order to build an image, run the commands below from the root directory of the repository.
 
-#### Building the Docker image for GCC.
+#### Building the Docker image for GCC
 
 Ensure you've run the login command above to authenticate with the Docker
 registry.
@@ -57,7 +57,7 @@ docker buildx build . \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
-#### Building the Docker image for Clang.
+#### Building the Docker image for Clang
 
 Ensure you've run the login command above to authenticate with the Docker
 registry.
