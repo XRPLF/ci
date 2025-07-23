@@ -29,6 +29,12 @@ versions by specifying the `DEBIAN_VERSION` build argument. There are additional
 arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 `CLANG_VERSION` for the Clang flavor.
 
+None of the build images support packaging, since (in order to be access the most
+recent official releases) the compilers are installed from external sources:
+
+* [gcc Docker Official Image](https://hub.docker.com/_/gcc)
+* [LLVM Debian/Ubuntu nightly packages](https://apt.llvm.org/)
+
 Run the commands below from the root directory of the repository.
 
 #### Building the Docker image for GCC.

@@ -29,6 +29,8 @@ future versions by specifying the `UBUNTU_VERSION` build argument. There are
 additional arguments to specify as well, namely `GCC_VERSION` for the GCC flavor
 and `CLANG_VERSION` for the Clang flavor.
 
+Build image for `gcc` supports packaging.
+
 Run the commands below from the root directory of the repository.
 
 #### Building the Docker image for GCC.

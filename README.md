@@ -15,6 +15,10 @@ of environments and using different C++ compilers.
 [Debian instructions](docker/debian/README.md)
 [RHEL instructions](docker/rhel/README.md)
 
+### Packaging
+
+Only some of the container images provided support packaging.
+
 ## Tools images
 
 Aside from build images, XRPLF projects also use container images with specialized tools, e.g.

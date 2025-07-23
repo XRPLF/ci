@@ -48,6 +48,8 @@ versions by specifying the `RHEL_VERSION` build argument. There are additional
 arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 `CLANG_VERSION` for the Clang flavor.
 
+Both build images for `gcc` and `clang` support packaging.
+
 Run the commands below from the root directory of the repository.
 
 #### Building the Docker image for GCC.
