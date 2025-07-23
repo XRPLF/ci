@@ -213,12 +213,8 @@ CXX_VER=${CXX_VER%%.*}
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
-if [[ ${CXX_VER} -ge 19 ]]; then
-    cat >> $(conan config home)/global.conf <<EOT
-tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
-EOT
-fi
 EOF
+
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 

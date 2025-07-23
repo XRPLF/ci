@@ -118,23 +118,6 @@ tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
 EOF
 
-# Apply workaround for gcc 12.1 bug, if needed (fixed in gcc 12.4)
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105651
-RUN <<EOF
-mkdir test && cd test
-cat >main.cpp <<EOT
-#include <string>
-std::string f() { return "_" + std::string(" "); }
-EOT
-${CXX} -std=c++20 -Wall -Werror -O3 -c main.cpp || touch fail
-if [[ -f fail ]]; then
-  cat >> $(conan config home)/global.conf <<EOT
-tools.build:cxxflags=['-Wno-restrict']
-EOT
-fi
-cd .. && rm -rf test
-EOF
-
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
@@ -207,12 +190,8 @@ CXX_VER=${CXX_VER%%.*}
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
-if [[ ${CXX_VER} -ge 19 ]]; then
-    cat >> $(conan config home)/global.conf <<EOT
-tools.build:cxxflags=['-Wno-missing-template-arg-list-after-template-kw']
-EOT
-fi
 EOF
+
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
