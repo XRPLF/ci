@@ -32,6 +32,7 @@ pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/d
 pkgs+=(jq)              # Pretty printing.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
+pkgs+=(vim)             # Text editor.
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean

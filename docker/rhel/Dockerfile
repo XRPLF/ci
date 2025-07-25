@@ -28,6 +28,7 @@ pkgs+=(python3-pip)      # Package manager for Python applications.
 pkgs+=(rpm-build)        # Required packaging tool.
 pkgs+=(rpmdevtools)      # Required packaging tool.
 pkgs+=(wget)             # Required build tool.
+pkgs+=(vim)              # Text editor.
 dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
 rm -rf /var/cache/dnf/*

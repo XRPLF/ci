@@ -39,6 +39,7 @@ pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(python3-jinja2)  # Required build tool.
 pkgs+=(wget)            # Required build tool.
+pkgs+=(vim)             # Text editor.
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
