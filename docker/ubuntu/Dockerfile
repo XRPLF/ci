@@ -139,21 +139,6 @@ FROM base AS clang
 # This is not inherited from base image, ensure no manual interaction needed.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Some build dependencies require GCC to be available.
-ARG GCC_VERSION
-RUN <<EOF
-apt-get update
-apt-get install -y --no-install-recommends \
-    gcc-${GCC_VERSION} \
-    g++-${GCC_VERSION} \
-    debhelper
-apt-get clean
-rm -rf /var/lib/apt/lists/*
-update-alternatives \
-    --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 \
-    --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION}
-EOF
-
 # Install Clang.
 ARG CLANG_VERSION
 RUN <<EOF

@@ -155,21 +155,6 @@ FROM base AS clang
 # This is not inherited from base image, ensure no manual interaction needed.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Some build dependencies require GCC to be available.
-COPY --from=gcc-src /usr/local/ /usr/local/
-COPY --from=gcc-src /etc/ld.so.conf.d/*.conf /etc/ld.so.conf.d/
-RUN <<EOF
-ldconfig -v
-dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc
-update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 100
-update-alternatives --install \
-  /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
-  --slave /usr/bin/g++ g++ /usr/local/bin/g++ \
-  --slave /usr/bin/gcc-ar gcc-ar /usr/local/bin/gcc-ar \
-  --slave /usr/bin/gcc-nm gcc-nm /usr/local/bin/gcc-nm \
-  --slave /usr/bin/gcc-ranlib gcc-ranlib /usr/local/bin/gcc-ranlib
-EOF
-
 # Install Clang. Use the LLVM apt repository to access the latest versions. We
 # must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
 # base or source images.
