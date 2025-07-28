@@ -115,8 +115,8 @@ EOF
 # Explicitly set the compiler flags and the distribution name and version.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
-tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
 EOT
 EOF
 
@@ -191,8 +191,8 @@ EOF
 # Explicitly set the compiler flags and the distribution name and version.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
-tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
 EOT
 EOF
 
