@@ -64,7 +64,6 @@ update-alternatives \
 update-alternatives --auto cc
 update-alternatives --auto gcc
 EOF
-# Set the compiler environment variables to point to the GCC binaries.
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
 
@@ -84,10 +83,10 @@ if [[ "${CXX_VER}" != "${GCC_VERSION}" ]]; then
 fi
 EOF
 
-# Set the Conan home directory, so the users of this image can find the default
-# profile.
 ENV HOME=/root
 WORKDIR ${HOME}
+
+# Set Conan home directory, so the users of this image can find default profile
 ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
@@ -96,11 +95,12 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Fix the C++ dialect.
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' $(conan config home)/profiles/default
+# Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
 EOT
 EOF
 
@@ -127,7 +127,7 @@ rm -rf /var/cache/dnf/*
 update-alternatives --install /usr/bin/cc cc /usr/bin/clang 999
 update-alternatives --auto cc
 EOF
-# Set the compiler environment variables to point to the GCC binaries.
+
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
 
@@ -148,10 +148,10 @@ if [[ ${CXX_VER} -lt ${MINIMUM_CLANG_VERSION} ]]; then
 fi
 EOF
 
-# Set the Conan home directory, so the users of this image can find the default
-# profile.
 ENV HOME=/root
 WORKDIR ${HOME}
+
+# Set Conan home directory, so the users of this image can find default profile
 ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
@@ -160,11 +160,17 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Fix the C++ dialect.
+RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' $(conan config home)/profiles/default
+# Explicitly set the compiler flags. To ensure compatibility with a range of
+# Clang compilers, we must also add extra flags that apply to certain versions
+# of Clang.
+# TODO: Move extra flags into the rippled repository as a custom Conan profile.
 RUN <<EOF
+CXX_VER=$(${CXX} -dumpversion)
+CXX_VER=${CXX_VER%%.*}
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
 EOT
 EOF
 
