@@ -64,6 +64,7 @@ update-alternatives \
 update-alternatives --auto cc
 update-alternatives --auto gcc
 EOF
+# Set the compiler environment variables to point to the GCC binaries.
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
 
@@ -126,7 +127,7 @@ rm -rf /var/cache/dnf/*
 update-alternatives --install /usr/bin/cc cc /usr/bin/clang 999
 update-alternatives --auto cc
 EOF
-
+# Set the compiler environment variables to point to the GCC binaries.
 ENV CC=/usr/bin/clang
 ENV CXX=/usr/bin/clang++
 

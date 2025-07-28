@@ -82,6 +82,7 @@ update-alternatives \
 update-alternatives --auto cc
 update-alternatives --auto gcc
 EOF
+# Set the compiler environment variables to point to the GCC binaries.
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
 
@@ -138,6 +139,21 @@ FROM base AS clang
 # This is not inherited from base image, ensure no manual interaction needed.
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Some build dependencies require GCC to be available.
+ARG GCC_VERSION
+RUN <<EOF
+apt-get update
+apt-get install -y --no-install-recommends \
+    gcc-${GCC_VERSION} \
+    g++-${GCC_VERSION} \
+    debhelper
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+update-alternatives \
+    --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 \
+    --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION}
+EOF
+
 # Install Clang.
 ARG CLANG_VERSION
 RUN <<EOF
@@ -157,7 +173,7 @@ update-alternatives --auto cc
 update-alternatives --auto clang
 update-alternatives --auto llvm-cov
 EOF
-
+# Set the compiler environment variables to point to the GCC binaries.
 ENV CC=/usr/bin/clang-${CLANG_VERSION}
 ENV CXX=/usr/bin/clang++-${CLANG_VERSION}
 
