@@ -116,10 +116,10 @@ if [[ "${CXX_VER}" != "${GCC_VERSION}" ]]; then
 fi
 EOF
 
+# Set the Conan home directory, so the users of this image can find the default
+# profile.
 ENV HOME=/root
 WORKDIR ${HOME}
-
-# Set Conan home directory, so the users of this image can find default profile
 ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
@@ -128,14 +128,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Fix the C++ dialect.
-RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' $(conan config home)/profiles/default
-# Explicitly set the compiler flags.
+# Explicitly set the compiler flags and the distribution name and version.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
+tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
 EOF
+
 # Print the Conan profile to verify the configuration.
 RUN conan profile show
 
@@ -197,10 +197,10 @@ if [[ "${CXX_VER}" != "${CLANG_VERSION}" ]]; then
 fi
 EOF
 
+# Set the Conan home directory, so the users of this image can find the default
+# profile.
 ENV HOME=/root
 WORKDIR ${HOME}
-
-# Set Conan home directory, so the users of this image can find default profile
 ENV CONAN_HOME=${HOME}/.conan2
 
 # Create a default Conan profile.
@@ -209,16 +209,10 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Fix the C++ dialect.
-RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' $(conan config home)/profiles/default
-# Explicitly set the compiler flags. To ensure compatibility with a range of
-# Clang compilers, we must also add extra flags that apply to certain versions
-# of Clang.
-# TODO: Move extra flags into the rippled repository as a custom Conan profile.
+# Explicitly set the compiler flags and the distribution name and version.
 RUN <<EOF
-CXX_VER=$(${CXX} -dumpversion)
-CXX_VER=${CXX_VER%%.*}
 cat >> $(conan config home)/global.conf <<EOT
+tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 EOT
 EOF
