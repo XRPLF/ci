@@ -105,6 +105,7 @@ RUN sed -i -e 's|^compiler\.cppstd=.*$|compiler.cppstd=20|' $(conan config home)
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
 EOT
 EOF
 
@@ -180,6 +181,7 @@ CXX_VER=$(${CXX} -dumpversion)
 CXX_VER=${CXX_VER%%.*}
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
 EOT
 EOF
 
