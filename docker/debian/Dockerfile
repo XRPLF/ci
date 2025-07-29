@@ -81,9 +81,12 @@ ldconfig -v
 dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc
 dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++
 dpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran
-update-alternatives --install /usr/bin/cc cc /usr/local/bin/gcc 999
-update-alternatives --install \
-  /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
+update-alternatives \
+  --install /usr/bin/cc cc /usr/local/bin/gcc 999
+update-alternatives \
+  --install /usr/bin/c++ c++ /usr/local/bin/g++ 999
+update-alternatives \
+  --install /usr/bin/gcc gcc /usr/local/bin/gcc 100 \
   --slave /usr/bin/g++ g++ /usr/local/bin/g++ \
   --slave /usr/bin/gcc-ar gcc-ar /usr/local/bin/gcc-ar \
   --slave /usr/bin/gcc-nm gcc-nm /usr/local/bin/gcc-nm \
@@ -93,6 +96,7 @@ update-alternatives --install \
   --slave /usr/bin/gcov-dump gcov-dump /usr/local/bin/gcov-dump \
   --slave /usr/bin/lto-dump lto-dump /usr/local/bin/lto-dump
 update-alternatives --auto cc
+update-alternatives --auto c++
 update-alternatives --auto gcc
 EOF
 ENV CC=/usr/bin/gcc
@@ -176,13 +180,17 @@ apt-get update
 apt-get install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-install-recommends clang-${CLANG_VERSION} llvm-${CLANG_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
-update-alternatives --install /usr/bin/cc cc /usr/bin/clang-${CLANG_VERSION} 999
-update-alternatives --install \
-    /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 100 \
-    --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION}
-update-alternatives --install \
-    /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${CLANG_VERSION} 100
+update-alternatives \
+  --install /usr/bin/cc cc /usr/bin/clang-${CLANG_VERSION} 999
+update-alternatives \
+  --install /usr/bin/c++ c++ /usr/bin/clang++-${CLANG_VERSION} 999
+update-alternatives \
+  --install /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 100 \
+  --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION}
+update-alternatives \
+  --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${CLANG_VERSION} 100
 update-alternatives --auto cc
+update-alternatives --auto c++
 update-alternatives --auto clang
 update-alternatives --auto llvm-cov
 EOF

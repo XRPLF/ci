@@ -53,15 +53,19 @@ dnf remove -y gcc gcc-c++
 dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
 dnf clean -y all
 rm -rf /var/cache/dnf/*
-update-alternatives --install /usr/bin/cc cc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 999
 update-alternatives \
-    --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 100 \
-    --slave /usr/bin/g++ g++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ \
-    --slave /usr/bin/cpp cpp /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/cpp \
-    --slave /usr/bin/gcov gcov /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov \
-    --slave /usr/bin/gcov-dump gcov-dump /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-dump-${GCC_VERSION} \
-    --slave /usr/bin/gcov-tool gcov-tool /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-tool-${GCC_VERSION}
+  --install /usr/bin/cc cc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 999
+update-alternatives \
+  --install /usr/bin/c++ c++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ 999
+update-alternatives \
+  --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 100 \
+  --slave /usr/bin/g++ g++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ \
+  --slave /usr/bin/cpp cpp /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/cpp \
+  --slave /usr/bin/gcov gcov /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov \
+  --slave /usr/bin/gcov-dump gcov-dump /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-dump-${GCC_VERSION} \
+  --slave /usr/bin/gcov-tool gcov-tool /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-tool-${GCC_VERSION}
 update-alternatives --auto cc
+update-alternatives --auto c++
 update-alternatives --auto gcc
 EOF
 ENV CC=/usr/bin/gcc
@@ -125,8 +129,12 @@ RUN <<EOF
 dnf install -y --setopt=tsflags=nodocs clang llvm gcc gcc-c++
 dnf clean -y all
 rm -rf /var/cache/dnf/*
-update-alternatives --install /usr/bin/cc cc /usr/bin/clang 999
+update-alternatives \
+  --install /usr/bin/cc cc /usr/bin/clang 999
+update-alternatives \
+  --install /usr/bin/c++ c++ /usr/bin/clang++ 999
 update-alternatives --auto cc
+update-alternatives --auto c++
 EOF
 
 ENV CC=/usr/bin/clang

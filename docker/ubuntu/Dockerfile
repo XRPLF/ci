@@ -67,19 +67,23 @@ ARG GCC_VERSION
 RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
-    gcc-${GCC_VERSION} \
-    g++-${GCC_VERSION} \
-    debhelper
+  gcc-${GCC_VERSION} \
+  g++-${GCC_VERSION} \
+  debhelper
 apt-get clean
 rm -rf /var/lib/apt/lists/*
-update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-${GCC_VERSION} 999
 update-alternatives \
-    --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 \
-    --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} \
-    --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} \
-    --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-${GCC_VERSION} \
-    --slave /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-${GCC_VERSION}
+  --install /usr/bin/cc cc /usr/bin/gcc-${GCC_VERSION} 999
+update-alternatives \
+  --install /usr/bin/c++ c++ /usr/bin/g++-${GCC_VERSION} 999
+update-alternatives \
+  --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 \
+  --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} \
+  --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} \
+  --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-${GCC_VERSION} \
+  --slave /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-${GCC_VERSION}
 update-alternatives --auto cc
+update-alternatives --auto c++
 update-alternatives --auto gcc
 EOF
 ENV CC=/usr/bin/gcc
@@ -152,17 +156,21 @@ ARG CLANG_VERSION
 RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
-    clang-${CLANG_VERSION} \
-    llvm-${CLANG_VERSION}
+  clang-${CLANG_VERSION} \
+  llvm-${CLANG_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
-update-alternatives --install /usr/bin/cc cc /usr/bin/clang-${CLANG_VERSION} 999
-update-alternatives --install \
-    /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 100 \
-    --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION}
-update-alternatives --install \
-    /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${CLANG_VERSION} 100
+update-alternatives \
+  --install /usr/bin/cc cc /usr/bin/clang-${CLANG_VERSION} 999
+update-alternatives \
+  --install /usr/bin/c++ c++ /usr/bin/clang++-${CLANG_VERSION} 999
+update-alternatives \
+  --install /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 100 \
+  --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION}
+update-alternatives \
+  --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${CLANG_VERSION} 100
 update-alternatives --auto cc
+update-alternatives --auto c++
 update-alternatives --auto clang
 update-alternatives --auto llvm-cov
 EOF
