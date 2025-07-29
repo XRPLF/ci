@@ -48,6 +48,10 @@ ENV PIPX_HOME=/opt/pipx \
 
 FROM base AS clang-format
 
+# These are not inherited from base image.
+ARG UBUNTU_VERSION
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Install clang-format.
 ARG CLANG_FORMAT_VERSION
 ARG PRE_COMMIT_VERSION

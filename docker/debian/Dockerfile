@@ -69,7 +69,8 @@ RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
-# This is not inherited from base image, ensure no manual interaction needed.
+# These are not inherited from base image.
+ARG DEBIAN_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Copy GCC from the source image, make the package manager aware of its
@@ -156,13 +157,13 @@ EOF
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
-# This is not inherited from base image, ensure no manual interaction needed.
+# These are not inherited from base image.
+ARG DEBIAN_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install Clang. Use the LLVM apt repository to access the latest versions. We
 # must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
 # base or source images. Some build dependencies require GCC to be also available.
-ARG DEBIAN_VERSION
 ARG CLANG_VERSION
 RUN <<EOF
 apt-get update

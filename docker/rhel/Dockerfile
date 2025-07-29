@@ -42,6 +42,9 @@ RUN pip install --no-cache conan==${CONAN_VERSION} gcovr==${GCOVR_VERSION}
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
+# This is not inherited from base image.
+ARG RHEL_VERSION
+
 # Install GCC. Red Hat installs GCC as a Software Collection (SCL) package,
 # where typically you would run `scl enable gcc-toolset-X` to open another Bash
 # shell with the GCC toolset enabled. To avoid having to do so, we delete the
@@ -121,6 +124,9 @@ EOF
 
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
+
+# This is not inherited from base image.
+ARG RHEL_VERSION
 
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available. Some build dependencies require GCC

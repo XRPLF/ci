@@ -58,7 +58,8 @@ RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
-# This is not inherited from base image, ensure no manual interaction needed.
+# These are not inherited from base image.
+ARG UBUNTU_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install GCC and create the necessary symlinks. We only support packaging with
@@ -140,7 +141,8 @@ EOF
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
-# This is not inherited from base image, ensure no manual interaction needed.
+# These are not inherited from base image.
+ARG UBUNTU_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install Clang. Some build dependencies require GCC to be also available.
