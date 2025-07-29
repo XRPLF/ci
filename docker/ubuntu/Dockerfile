@@ -124,11 +124,14 @@ RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
+core.package_id:default_build_mode=full_mode
+core.package_id:default_embed_mode=full_mode
+core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 
 # Print the Conan profile to verify the configuration.
-RUN conan profile show
+RUN conan profile show && conan config show 'core*'
 
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
@@ -207,11 +210,14 @@ RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
+core.package_id:default_build_mode=full_mode
+core.package_id:default_embed_mode=full_mode
+core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 
 # Print the Conan profile to verify the configuration.
-RUN conan profile show
+RUN conan profile show && conan config show 'core*'
 
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
