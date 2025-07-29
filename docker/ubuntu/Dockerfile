@@ -128,7 +128,7 @@ RUN conan profile show
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
 cp -r /test test
-cd test && ./run.sh
+cd test && ./run.sh gcc
 cd ..
 rm -rf test
 EOF
@@ -139,19 +139,12 @@ FROM base AS clang
 # This is not inherited from base image, ensure no manual interaction needed.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Some build dependencies require GCC to be available.
-ARG GCC_VERSION
+# Some build dependencies require GCC to be also available.
 RUN <<EOF
 apt-get update
-apt-get install -y --no-install-recommends \
-    gcc-${GCC_VERSION} \
-    g++-${GCC_VERSION} \
-    debhelper
+apt-get install -y --no-install-recommends gcc g++
 apt-get clean
 rm -rf /var/lib/apt/lists/*
-update-alternatives \
-    --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 \
-    --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION}
 EOF
 
 # Install Clang.
@@ -225,7 +218,7 @@ RUN conan profile show
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
 cp -r /test test
-cd test && ./run.sh
+cd test && ./run.sh clang
 cd ..
 rm -rf test
 EOF

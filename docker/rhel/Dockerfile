@@ -110,7 +110,7 @@ RUN conan profile show
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
 cp -r /test test
-cd test && ./run.sh
+cd test && ./run.sh gcc
 cd ..
 rm -rf test
 EOF
@@ -119,9 +119,10 @@ EOF
 FROM base AS clang
 
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
-# to install and we get what is available.
+# to install and we get what is available. Some build dependencies require GCC
+# to be also available.
 RUN <<EOF
-dnf install -y --setopt=tsflags=nodocs clang llvm
+dnf install -y --setopt=tsflags=nodocs clang llvm gcc gcc-c++
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 update-alternatives --install /usr/bin/cc cc /usr/bin/clang 999
@@ -180,7 +181,7 @@ RUN conan profile show
 # Test the image by compiling a simple C++ program.
 RUN --mount=type=bind,source=test,target=/test,readonly <<EOF
 cp -r /test test
-cd test && ./run.sh
+cd test && ./run.sh clang
 cd ..
 rm -rf test
 EOF
