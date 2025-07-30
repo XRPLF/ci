@@ -133,14 +133,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Add the distribution name and version, so they are taken into account when
-# building dependencies.
+# Add the distribution name and version, so they can be taken into account when
+# building dependencies. This requires setting the `os` field in the activated
+# profile where this image is used to the appropriate value.
 RUN <<EOF
 cat >> $(conan config home)/settings_user.yml <<EOT
 os:
   debian-${DEBIAN_VERSION}:
 EOT
-sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/g" $(conan config home)/profiles/default
 EOF
 
 # Explicitly set the compiler flags.
@@ -228,14 +228,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Add the distribution name and version, so they are taken into account when
-# building dependencies.
+# Add the distribution name and version, so they can be taken into account when
+# building dependencies. This requires setting the `os` field in the activated
+# profile where this image is used to the appropriate value.
 RUN <<EOF
 cat >> $(conan config home)/settings_user.yml <<EOT
 os:
   debian-${DEBIAN_VERSION}:
 EOT
-sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/g" $(conan config home)/profiles/default
 EOF
 
 # Explicitly set the compiler flags and the distribution name and version.
