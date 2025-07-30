@@ -140,7 +140,7 @@ cat >> $(conan config home)/settings_user.yml <<EOT
 os:
   debian-${DEBIAN_VERSION}:
 EOT
-sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/1" $(conan config home)/profiles/default
+sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/g" $(conan config home)/profiles/default
 EOF
 
 # Explicitly set the compiler flags.
@@ -235,7 +235,7 @@ cat >> $(conan config home)/settings_user.yml <<EOT
 os:
   debian-${DEBIAN_VERSION}:
 EOT
-sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/1" $(conan config home)/profiles/default
+sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/g" $(conan config home)/profiles/default
 EOF
 
 # Explicitly set the compiler flags and the distribution name and version.

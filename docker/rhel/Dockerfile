@@ -110,7 +110,7 @@ cat >> $(conan config home)/settings_user.yml <<EOT
 os:
   rhel-${RHEL_VERSION}:
 EOT
-sed -i "s/os=Linux/os=rhel-${RHEL_VERSION}/1" $(conan config home)/profiles/default
+sed -i "s/os=Linux/os=rhel-${RHEL_VERSION}/g" $(conan config home)/profiles/default
 EOF
 
 # Explicitly set the compiler flags.
@@ -191,7 +191,7 @@ cat >> $(conan config home)/settings_user.yml <<EOT
 os:
   rhel-${RHEL_VERSION}:
 EOT
-sed -i "s/os=Linux/os=rhel-${RHEL_VERSION}/1" $(conan config home)/profiles/default
+sed -i "s/os=Linux/os=rhel-${RHEL_VERSION}/g" $(conan config home)/profiles/default
 EOF
 
 # Explicitly set the compiler flags.

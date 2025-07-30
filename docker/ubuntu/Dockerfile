@@ -126,7 +126,7 @@ cat >> $(conan config home)/settings_user.yml <<EOT
 os:
   ubuntu-${UBUNTU_VERSION}:
 EOT
-sed -i "s/os=Linux/os=ubuntu-${UBUNTU_VERSION}/1" $(conan config home)/profiles/default
+sed -i "s/os=Linux/os=ubuntu-${UBUNTU_VERSION}/g" $(conan config home)/profiles/default
 EOF
 
 # Explicitly set the compiler flags.
