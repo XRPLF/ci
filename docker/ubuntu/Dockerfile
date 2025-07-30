@@ -33,13 +33,13 @@ pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/decrypting.
-pkgs+=(jq)              # Pretty printing.
+pkgs+=(jq)              # JSON manipulation.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(python3-jinja2)  # Required build tool.
-pkgs+=(wget)            # Required build tool.
 pkgs+=(vim)             # Text editor.
+pkgs+=(wget)            # Required build tool.
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
@@ -119,14 +119,20 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Add the distribution name and version, so they are taken into account when
+# building dependencies.
+RUN <<EOF
+cat >> $(conan config home)/settings_user.yml <<EOT
+os:
+  ubuntu-${UBUNTU_VERSION}:
+EOT
+sed -i "s/os=Linux/os=ubuntu-${UBUNTU_VERSION}/1" $(conan config home)/profiles/default
+EOF
+
+# Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
-core.package_id:default_build_mode=full_mode
-core.package_id:default_embed_mode=full_mode
-core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 
@@ -205,14 +211,10 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["Ubuntu", "${UBUNTU_VERSION}"]
-core.package_id:default_build_mode=full_mode
-core.package_id:default_embed_mode=full_mode
-core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 

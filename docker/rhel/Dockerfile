@@ -19,7 +19,7 @@ pkgs+=(file)             # Required packaging tool.
 pkgs+=(git)              # Required build tool.
 pkgs+=(gpg)              # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(gnupg2)           # Dependency for tools requiring signing or encrypting/decrypting.
-pkgs+=(jq)               # Pretty printing.
+pkgs+=(jq)               # JSON manipulation.
 pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)      # Required build tool.
 pkgs+=(perl-FindBin)     # Required to compile OpenSSL.
@@ -27,8 +27,8 @@ pkgs+=(python3-jinja2)   # Required build tool.
 pkgs+=(python3-pip)      # Package manager for Python applications.
 pkgs+=(rpm-build)        # Required packaging tool.
 pkgs+=(rpmdevtools)      # Required packaging tool.
-pkgs+=(wget)             # Required build tool.
 pkgs+=(vim)              # Text editor.
+pkgs+=(wget)             # Required build tool.
 dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
 rm -rf /var/cache/dnf/*
@@ -103,14 +103,20 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Add the distribution name and version, so they are taken into account when
+# building dependencies.
+RUN <<EOF
+cat >> $(conan config home)/settings_user.yml <<EOT
+os:
+  rhel-${RHEL_VERSION}:
+EOT
+sed -i "s/os=Linux/os=rhel-${RHEL_VERSION}/1" $(conan config home)/profiles/default
+EOF
+
+# Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
-core.package_id:default_build_mode=full_mode
-core.package_id:default_embed_mode=full_mode
-core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 
@@ -178,14 +184,20 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Add the distribution name and version, so they are taken into account when
+# building dependencies.
+RUN <<EOF
+cat >> $(conan config home)/settings_user.yml <<EOT
+os:
+  rhel-${RHEL_VERSION}:
+EOT
+sed -i "s/os=Linux/os=rhel-${RHEL_VERSION}/1" $(conan config home)/profiles/default
+EOF
+
+# Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["RHEL", "${RHEL_VERSION}"]
-core.package_id:default_build_mode=full_mode
-core.package_id:default_embed_mode=full_mode
-core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 

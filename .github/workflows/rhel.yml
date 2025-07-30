@@ -19,7 +19,7 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   REDHAT_REGISTRY: registry.redhat.io
   BUILDKIT_PROGRESS: plain
-  CONAN_VERSION: 2.18.0
+  CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
 
 jobs:

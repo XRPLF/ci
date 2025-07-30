@@ -44,13 +44,13 @@ pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/decrypting.
-pkgs+=(jq)              # Pretty printing.
+pkgs+=(jq)              # JSON manipulation.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(pipx)            # Package manager for Python applications.
 pkgs+=(python3-jinja2)  # Required build tool.
-pkgs+=(wget)            # Required build tool.
 pkgs+=(vim)             # Text editor.
+pkgs+=(wget)            # Required build tool.
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
@@ -72,6 +72,7 @@ FROM base AS gcc
 # These are not inherited from base image.
 ARG DEBIAN_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
+ARG GCC_VERSION
 
 # Copy GCC from the source image, make the package manager aware of its
 # existence, and create the necessary symlinks.
@@ -104,10 +105,7 @@ EOF
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
 
-# Check that the installed GCC version matches the expected version. We must
-# repeat the GCC_VERSION argument here, as it is not inherited from the source
-# image.
-ARG GCC_VERSION
+# Check that the installed GCC version matches the expected version.
 RUN <<EOF
 CC_VER=$(${CC} -dumpversion)
 CC_VER=${CC_VER%%.*}
@@ -135,14 +133,20 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Add the distribution name and version, so they are taken into account when
+# building dependencies.
+RUN <<EOF
+cat >> $(conan config home)/settings_user.yml <<EOT
+os:
+  debian-${DEBIAN_VERSION}:
+EOT
+sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/1" $(conan config home)/profiles/default
+EOF
+
+# Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["Debian", "${DEBIAN_VERSION}"]
-core.package_id:default_build_mode=full_mode
-core.package_id:default_embed_mode=full_mode
-core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 
@@ -164,9 +168,8 @@ FROM base AS clang
 ARG DEBIAN_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install Clang. Use the LLVM apt repository to access the latest versions. We
-# must repeat the DEBIAN_VERSION argument here, as it is not inherited from the
-# base or source images. Some build dependencies require GCC to be also available.
+# Install Clang. Use the LLVM apt repository to access the latest versions. Some
+# build dependencies require GCC to be also available.
 ARG CLANG_VERSION
 RUN <<EOF
 apt-get update
@@ -225,14 +228,20 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
+# Add the distribution name and version, so they are taken into account when
+# building dependencies.
+RUN <<EOF
+cat >> $(conan config home)/settings_user.yml <<EOT
+os:
+  debian-${DEBIAN_VERSION}:
+EOT
+sed -i "s/os=Linux/os=debian-${DEBIAN_VERSION}/1" $(conan config home)/profiles/default
+EOF
+
 # Explicitly set the compiler flags and the distribution name and version.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
-tools.info.package_id:confs+=["Debian", "${DEBIAN_VERSION}"]
-core.package_id:default_build_mode=full_mode
-core.package_id:default_embed_mode=full_mode
-core.package_id:default_non_embed_mode=full_mode
 EOT
 EOF
 
