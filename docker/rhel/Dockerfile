@@ -42,9 +42,6 @@ RUN pip install --no-cache conan==${CONAN_VERSION} gcovr==${GCOVR_VERSION}
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
-# This is not inherited from base image.
-ARG RHEL_VERSION
-
 # Install GCC. Red Hat installs GCC as a Software Collection (SCL) package,
 # where typically you would run `scl enable gcc-toolset-X` to open another Bash
 # shell with the GCC toolset enabled. To avoid having to do so, we delete the
@@ -103,16 +100,6 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Add the distribution name and version, so they can be taken into account when
-# building dependencies. This requires setting the `os` field in the activated
-# profile where this image is used to the appropriate value.
-RUN <<EOF
-cat >> $(conan config home)/settings_user.yml <<EOT
-os:
-  rhel-${RHEL_VERSION}:
-EOT
-EOF
-
 # Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
@@ -133,9 +120,6 @@ EOF
 
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
-
-# This is not inherited from base image.
-ARG RHEL_VERSION
 
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available. Some build dependencies require GCC
@@ -182,16 +166,6 @@ ENV CONAN_HOME=${HOME}/.conan2
 RUN <<EOF
 conan profile detect
 rm -rf /tmp/*
-EOF
-
-# Add the distribution name and version, so they can be taken into account when
-# building dependencies. This requires setting the `os` field in the activated
-# profile where this image is used to the appropriate value.
-RUN <<EOF
-cat >> $(conan config home)/settings_user.yml <<EOT
-os:
-  rhel-${RHEL_VERSION}:
-EOT
 EOF
 
 # Explicitly set the compiler flags.

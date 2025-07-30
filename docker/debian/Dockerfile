@@ -69,8 +69,7 @@ RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
-# These are not inherited from base image.
-ARG DEBIAN_VERSION
+# These are not inherited from the base image.
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GCC_VERSION
 
@@ -133,16 +132,6 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Add the distribution name and version, so they can be taken into account when
-# building dependencies. This requires setting the `os` field in the activated
-# profile where this image is used to the appropriate value.
-RUN <<EOF
-cat >> $(conan config home)/settings_user.yml <<EOT
-os:
-  debian-${DEBIAN_VERSION}:
-EOT
-EOF
-
 # Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
@@ -164,7 +153,7 @@ EOF
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
-# These are not inherited from base image.
+# These are not inherited from the base image.
 ARG DEBIAN_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -226,16 +215,6 @@ ENV CONAN_HOME=${HOME}/.conan2
 RUN <<EOF
 conan profile detect
 rm -rf /tmp/*
-EOF
-
-# Add the distribution name and version, so they can be taken into account when
-# building dependencies. This requires setting the `os` field in the activated
-# profile where this image is used to the appropriate value.
-RUN <<EOF
-cat >> $(conan config home)/settings_user.yml <<EOT
-os:
-  debian-${DEBIAN_VERSION}:
-EOT
 EOF
 
 # Explicitly set the compiler flags and the distribution name and version.
