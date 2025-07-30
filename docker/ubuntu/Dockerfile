@@ -211,6 +211,16 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
+# Add the distribution name and version, so they are taken into account when
+# building dependencies.
+RUN <<EOF
+cat >> $(conan config home)/settings_user.yml <<EOT
+os:
+  ubuntu-${UBUNTU_VERSION}:
+EOT
+sed -i "s/os=Linux/os=ubuntu-${UBUNTU_VERSION}/g" $(conan config home)/profiles/default
+EOF
+
 # Explicitly set the compiler flags.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
