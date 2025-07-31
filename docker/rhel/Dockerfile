@@ -42,12 +42,15 @@ RUN pip install --no-cache conan==${CONAN_VERSION} gcovr==${GCOVR_VERSION}
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
+# These are not inherited from the base image.
+ARG GCC_VERSION
+ARG RHEL_VERSION
+
 # Install GCC. Red Hat installs GCC as a Software Collection (SCL) package,
 # where typically you would run `scl enable gcc-toolset-X` to open another Bash
 # shell with the GCC toolset enabled. To avoid having to do so, we delete the
 # default GCC packages first, and then reference the GCC toolset binaries
 # directly.
-ARG GCC_VERSION
 RUN <<EOF
 dnf remove -y gcc gcc-c++
 dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
@@ -100,10 +103,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags.
+# Explicitly set the compiler flags, as well as a custom flag that specifies the
+# distribution name and version. This is important to avoid conflicts between
+# builds using the same compiler but different distribution versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:distro="rhel-${RHEL_VERSION}"
+tools.info.package_id:confs=["user.package:distro"]
 EOT
 EOF
 
@@ -120,6 +127,9 @@ EOF
 
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
+
+# This is not inherited from the base image.
+ARG RHEL_VERSION
 
 # Install Clang. Note that in the RHEL UBIs, we cannot choose the Clang version
 # to install and we get what is available. Some build dependencies require GCC
@@ -168,10 +178,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags.
+# Explicitly set the compiler flags, as well as a custom flag that specifies the
+# distribution name and version. This is important to avoid conflicts between
+# builds using the same compiler but different distribution versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:distro="rhel-${RHEL_VERSION}"
+tools.info.package_id:confs=["user.package:distro"]
 EOT
 EOF
 

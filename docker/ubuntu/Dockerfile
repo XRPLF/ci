@@ -58,12 +58,13 @@ RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
-# This is not inherited from the base image.
+# These are not inherited from the base image.
 ARG DEBIAN_FRONTEND=noninteractive
+ARG GCC_VERSION
+ARG UBUNTU_VERSION
 
 # Install GCC and create the necessary symlinks. We only support packaging with
 # gcc because of the hard package dependencies from libtool to gcc
-ARG GCC_VERSION
 RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
@@ -118,10 +119,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags.
+# Explicitly set the compiler flags, as well as a custom flag that specifies the
+# distribution name and version. This is important to avoid conflicts between
+# builds using the same compiler but different distribution versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:distro="ubuntu-${UBUNTU_VERSION}"
+tools.info.package_id:confs=["user.package:distro"]
 EOT
 EOF
 
@@ -139,8 +144,9 @@ EOF
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
-# This is not inherited from the base image.
+# These are not inherited from the base image.
 ARG DEBIAN_FRONTEND=noninteractive
+ARG UBUNTU_VERSION
 
 # Install Clang. Some build dependencies require GCC to be also available.
 ARG CLANG_VERSION
@@ -199,10 +205,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags.
+# Explicitly set the compiler flags, as well as a custom flag that specifies the
+# distribution name and version. This is important to avoid conflicts between
+# builds using the same compiler but different distribution versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:distro="ubuntu-${UBUNTU_VERSION}"
+tools.info.package_id:confs=["user.package:distro"]
 EOT
 EOF
 

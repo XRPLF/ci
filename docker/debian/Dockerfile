@@ -71,6 +71,7 @@ FROM base AS gcc
 
 # These are not inherited from the base image.
 ARG DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_VERSION
 ARG GCC_VERSION
 
 # Copy GCC from the source image, make the package manager aware of its
@@ -132,10 +133,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags.
+# Explicitly set the compiler flags, as well as a custom flag that specifies the
+# distribution name and version. This is important to avoid conflicts between
+# builds using the same compiler but different distribution versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:distro="debian-${DEBIAN_VERSION}"
+tools.info.package_id:confs=["user.package:distro"]
 EOT
 EOF
 
@@ -154,8 +159,8 @@ EOF
 FROM base AS clang
 
 # These are not inherited from the base image.
-ARG DEBIAN_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_VERSION
 
 # Install Clang. Use the LLVM apt repository to access the latest versions. Some
 # build dependencies require GCC to be also available.
@@ -217,10 +222,14 @@ conan profile detect
 rm -rf /tmp/*
 EOF
 
-# Explicitly set the compiler flags and the distribution name and version.
+# Explicitly set the compiler flags, as well as a custom flag that specifies the
+# distribution name and version. This is important to avoid conflicts between
+# builds using the same compiler but different distribution versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:distro="debian-${DEBIAN_VERSION}"
+tools.info.package_id:confs=["user.package:distro"]
 EOT
 EOF
 
