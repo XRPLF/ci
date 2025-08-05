@@ -1,7 +1,7 @@
 ## tools-rippled: A Docker image used for building rippled
 
-The code in this repository creates a locked-down Ubuntu image for the verification
-of rippled source code changes, with appropriate tools installed.
+The code in this repository creates a locked-down Ubuntu image for the
+verification of rippled source code changes, with appropriate tools installed.
 
 Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
@@ -31,7 +31,8 @@ Currently this Dockerfile can be used to build one image:
   * `CLANG_FORMAT_VERSION` for [clang-format](http://clang.llvm.org/docs/ClangFormat.html) version
   * `PRE_COMMIT_VERSION` for [pre-commit](https://pre-commit.com/) version
 
-Run the commands below from the current directory containing the Dockerfile to build an image.
+In order to build an image, run the commands below from the root directory of
+the repository.
 
 #### Building the Docker image for clang-format
 
@@ -45,11 +46,34 @@ PRE_COMMIT_VERSION=4.2.0
 CONTAINER_IMAGE=xrplf/ci/tools-rippled-clang-format:latest
 
 docker buildx build . \
+  --file docker/tools-rippled/Dockerfile \
   --target clang-format \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CLANG_FORMAT_VERSION=${CLANG_FORMAT_VERSION} \
   --build-arg PRE_COMMIT_VERSION=${PRE_COMMIT_VERSION} \
+  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
+  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+```
+
+#### Building the Docker image for documentation
+
+Ensure you've run the login command above to authenticate with the Docker
+registry.
+
+```shell
+UBUNTU_VERSION=noble
+DOXYGEN_VERSION=1.9.8+ds-2build5
+GRAPHVIZ_VERSION=2.42.2-9ubuntu0.1
+CONTAINER_IMAGE=xrplf/ci/tools-rippled-documentation:latest
+
+docker buildx build . \
+  --file docker/tools-rippled/Dockerfile \
+  --target documentation \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg DOXYGEN_VERSION=${DOXYGEN_VERSION} \
+  --build-arg GRAPHVIZ_VERSION=${GRAPHVIZ_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```

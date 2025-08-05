@@ -19,6 +19,8 @@ env:
   BUILDKIT_PROGRESS: plain
   CLANG_FORMAT_VERSION: 18.1.8
   PRE_COMMIT_VERSION: 4.2.0
+  DOXYGEN_VERSION: 1.9.8+ds-2build5
+  GRAPHVIZ_VERSION: 2.42.2-9ubuntu0.1
   UBUNTU_VERSION: noble
 
 jobs:
@@ -32,6 +34,7 @@ jobs:
             runner: ubuntu-24.04-arm
         tool:
           - clang-format
+          - documentation
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -82,6 +85,8 @@ jobs:
             UBUNTU_VERSION=${{ env.UBUNTU_VERSION }}
             CLANG_FORMAT_VERSION=${{ env.CLANG_FORMAT_VERSION }}
             PRE_COMMIT_VERSION=${{ env.PRE_COMMIT_VERSION }}
+            DOXYGEN_VERSION=${{ env.DOXYGEN_VERSION }}
+            GRAPHVIZ_VERSION=${{ env.GRAPHVIZ_VERSION }}
           context: docker/tools-rippled
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}
@@ -111,6 +116,7 @@ jobs:
       matrix:
         tool:
           - clang-format
+          - documentation
     runs-on: ubuntu-24.04
     needs:
       - build

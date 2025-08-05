@@ -2,8 +2,9 @@
 ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
-# Use Bash as the default shell for RUN commands and as the entrypoint.
-SHELL ["/bin/bash", "-c"]
+# Use Bash as the default shell for RUN commands, using the options
+# `set -o errexit -o pipefail`, and as the entrypoint.
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
 # Ensure any packages installed directly or indirectly via dpkg do not require
@@ -43,7 +44,7 @@ ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man
 
-# ====================== clang-format IMAGE ======================
+# ====================== CLANG-FORMAT IMAGE ======================
 # Note, we do not install a compiler here.
 
 FROM base AS clang-format
@@ -57,6 +58,28 @@ ARG CLANG_FORMAT_VERSION
 ARG PRE_COMMIT_VERSION
 RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION} && \
     pipx install --pip-args='--no-cache' pre-commit==${PRE_COMMIT_VERSION}
+
+ENV HOME=/root
+WORKDIR ${HOME}
+
+# ====================== DOCUMENTATION IMAGE ======================
+# Note, we do not install a compiler here.
+
+FROM base AS documentation
+
+# These are not inherited from base image.
+ARG UBUNTU_VERSION
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install doxygen and graphviz.
+ARG DOXYGEN_VERSION
+ARG GRAPHVIZ_VERSION
+RUN <<EOF
+apt-get update
+apt-get install -y doxygen=${DOXYGEN_VERSION} graphviz=${GRAPHVIZ_VERSION}
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+EOF
 
 ENV HOME=/root
 WORKDIR ${HOME}
