@@ -1,7 +1,7 @@
 ## tools-rippled: A Docker image used for building rippled
 
-The code in this repository creates a locked-down Ubuntu image for the verification
-of rippled source code changes, with appropriate tools installed.
+The code in this repository creates a locked-down Ubuntu image for the
+verification of rippled source code changes, with appropriate tools installed.
 
 Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
