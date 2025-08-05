@@ -33,7 +33,7 @@ dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 
-# Update the `python3` symlink to point to the latest Python 3 version.
+# Update the symlinks to point to the latest Python versions.
 RUN <<EOF
 ln -sf /usr/bin/python3.12 /usr/bin/python3
 ln -sf /usr/bin/python3.12 /usr/bin/python
