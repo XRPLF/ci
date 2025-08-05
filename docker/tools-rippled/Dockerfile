@@ -43,7 +43,7 @@ ENV PIPX_HOME=/opt/pipx \
     PIPX_BIN_DIR=/usr/bin \
     PIPX_MAN_DIR=/usr/share/man
 
-# ====================== clang-format IMAGE ======================
+# ====================== CLANG-FORMAT IMAGE ======================
 # Note, we do not install a compiler here.
 
 FROM base AS clang-format
@@ -57,6 +57,26 @@ ARG CLANG_FORMAT_VERSION
 ARG PRE_COMMIT_VERSION
 RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION} && \
     pipx install --pip-args='--no-cache' pre-commit==${PRE_COMMIT_VERSION}
+
+ENV HOME=/root
+WORKDIR ${HOME}
+
+# ====================== DOCUMENTATION IMAGE ======================
+# Note, we do not install a compiler here.
+
+FROM base AS documentation
+
+# These are not inherited from base image.
+ARG UBUNTU_VERSION
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install doxygen and graphviz.
+RUN <<EOF
+apt-get update
+apt-get install -y doxygen graphviz
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+EOF
 
 ENV HOME=/root
 WORKDIR ${HOME}
