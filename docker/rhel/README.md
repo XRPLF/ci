@@ -50,7 +50,8 @@ arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 
 Both build images for `gcc` and `clang` support packaging.
 
-In order to build an image, run the commands below from the root directory of the repository.
+In order to build an image, run the commands below from the root directory of
+the repository.
 
 #### Building the Docker image for GCC
 
@@ -108,14 +109,17 @@ CODEBASE=<path to the rippled repository>
 docker run --user $(id -u):$(id -g) --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
-Note, the above command will assume the identity of the current user in the newly created Docker container.
-**This might be exploited by other users with access to the same host (docker instance)**.
+Note, the above command will assume the identity of the current user in the
+newly created Docker container.
+**This might be exploited by other users with access to the same host (docker
+instance)**.
 
 The recommended practice is to run Docker in [rootless mode](https://docs.docker.com/engine/security/rootless/),
 or use alternative container runtime such as [podman](https://docs.podman.io/en/latest/) which
 support [rootless environment](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md).
-This will have similar effect as `--user $(id -u):$(id -g)` (making this option redundant and invalid),
-while also securing the container from other users on the same host.
+This will have similar effect as `--user $(id -u):$(id -g)` (making this option
+redundant and invalid), while also securing the container from other users on
+the same host.
 
 Once inside the container you can run the following commands to build `rippled`:
 

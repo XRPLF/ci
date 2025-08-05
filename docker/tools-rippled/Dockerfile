@@ -2,8 +2,9 @@
 ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
-# Use Bash as the default shell for RUN commands and as the entrypoint.
-SHELL ["/bin/bash", "-c"]
+# Use Bash as the default shell for RUN commands, using the options
+# `set -o errexit -o pipefail`, and as the entrypoint.
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
 # Ensure any packages installed directly or indirectly via dpkg do not require
@@ -71,9 +72,11 @@ ARG UBUNTU_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install doxygen and graphviz.
+ARG DOXYGEN_VERSION
+ARG GRAPHVIZ_VERSION
 RUN <<EOF
 apt-get update
-apt-get install -y doxygen graphviz
+apt-get install -y doxygen=${DOXYGEN_VERSION} graphviz=${GRAPHVIZ_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
