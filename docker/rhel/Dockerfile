@@ -33,14 +33,17 @@ dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 
-# Update the symlinks to point to the latest Python versions.
+# Add symlinks to point to the latest Python versions. The /usr/local/bin
+# directory is in the PATH before the /usr/bin directory, so the new Python
+# versions will be used by default.
 RUN <<EOF
-ln -sf /usr/bin/python3.12 /usr/bin/python3
-ln -sf /usr/bin/python3.12 /usr/bin/python
-ln -sf /usr/bin/pydoc3.12 /usr/bin/pydoc3
-ln -sf /usr/bin/pydoc3.12 /usr/bin/pydoc
-ln -sf /usr/bin/pip3.12 /usr/bin/pip3
-ln -sf /usr/bin/pip3.12 /usr/bin/pip
+mkdir -p /usr/local/bin
+ln -sf /usr/bin/python3.12 /usr/local/bin/python3
+ln -sf /usr/bin/python3.12 /usr/local/bin/python
+ln -sf /usr/bin/pydoc3.12 /usr/local/bin/pydoc3
+ln -sf /usr/bin/pydoc3.12 /usr/local/bin/pydoc
+ln -sf /usr/bin/pip3.12 /usr/local/bin/pip3
+ln -sf /usr/bin/pip3.12 /usr/local/bin/pip
 EOF
 
 # Install Python-based tools.
