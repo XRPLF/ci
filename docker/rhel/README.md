@@ -44,9 +44,10 @@ docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 ### Building and pushing the Docker image
 
 The same Dockerfile can be used to build an image for RHEL 9.6 or future
-versions by specifying the `RHEL_VERSION` build argument. There are additional
-arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
-`CLANG_VERSION` for the Clang flavor.
+versions by specifying the `RHEL_VERSION` build argument. There is an additional
+argument to specify as well, namely `GCC_VERSION` for the GCC flavor; in the
+RHEL images we cannot choose the Clang version to install, so the Clang version
+is set to "any".
 
 Both build images for `gcc` and `clang` support packaging.
 
@@ -86,7 +87,7 @@ registry.
 RHEL_VERSION=9.6
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
-CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang-${CLANG_VERSION}
+CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang-any
 
 docker buildx build . \
   --file docker/rhel/Dockerfile \
