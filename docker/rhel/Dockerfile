@@ -44,6 +44,8 @@ ln -sf /usr/bin/pydoc3.12 /usr/local/bin/pydoc3
 ln -sf /usr/bin/pydoc3.12 /usr/local/bin/pydoc
 ln -sf /usr/bin/pip3.12 /usr/local/bin/pip3
 ln -sf /usr/bin/pip3.12 /usr/local/bin/pip
+mkdir -p /usr/local/lib
+ln -sf /usr/lib/python3.12 /usr/local/lib/python3.12
 EOF
 
 # Install Python-based tools.
