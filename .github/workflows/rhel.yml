@@ -35,12 +35,18 @@ jobs:
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
         os:
+          - release: 9.4
+            compiler_name: gcc
+            compiler_version: 12
           - release: 9.6
             compiler_name: gcc
             compiler_version: 13
           - release: 9.6
             compiler_name: gcc
             compiler_version: 14
+          - release: 9.4
+            compiler_name: clang
+            compiler_version: 'any'
           - release: 9.6
             compiler_name: clang
             compiler_version: 'any'
