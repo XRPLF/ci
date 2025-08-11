@@ -10,23 +10,24 @@ ENTRYPOINT ["/bin/bash"]
 # Install tools that are shared by all stages.
 RUN <<EOF
 pkgs=()
-pkgs+=(ca-certificates)  # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-pkgs+=(cmake)            # Required build tool.
-pkgs+=(file)             # Required packaging tool.
-pkgs+=(git)              # Required build tool.
-pkgs+=(gpg)              # Dependency for tools requiring signing or encrypting/decrypting.
-pkgs+=(gnupg2)           # Dependency for tools requiring signing or encrypting/decrypting.
-pkgs+=(jq)               # JSON manipulation.
-pkgs+=(libstdc++-static) # Required to statically link libraries into rippled.
-pkgs+=(ninja-build)      # Required build tool.
-pkgs+=(perl-FindBin)     # Required to compile OpenSSL.
-pkgs+=(python3.12)       # Required build tool.
-pkgs+=(python3.12-pip)   # Package manager for Python applications.
-pkgs+=(python3-jinja2)   # Required build tool.
-pkgs+=(rpm-build)        # Required packaging tool.
-pkgs+=(rpmdevtools)      # Required packaging tool.
-pkgs+=(vim)              # Text editor.
-pkgs+=(wget)             # Required build tool.
+pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+pkgs+=(cmake)             # Required build tool.
+pkgs+=(file)              # Required packaging tool.
+pkgs+=(git)               # Required build tool.
+pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(gnupg2)            # Dependency for tools requiring signing or encrypting/decrypting.
+pkgs+=(jq)                # JSON manipulation.
+pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
+pkgs+=(ninja-build)       # Required build tool.
+pkgs+=(perl-FindBin)      # Required to compile OpenSSL.
+pkgs+=(perl-File-Compare) # Required to compile OpenSSL.
+pkgs+=(python3.12)        # Required build tool.
+pkgs+=(python3.12-pip)    # Package manager for Python applications.
+pkgs+=(python3-jinja2)    # Required build tool.
+pkgs+=(rpm-build)         # Required packaging tool.
+pkgs+=(rpmdevtools)       # Required packaging tool.
+pkgs+=(vim)               # Text editor.
+pkgs+=(wget)              # Required build tool.
 dnf update -y
 dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
