@@ -99,8 +99,8 @@ RUN <<EOF
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
 \. "${HOME}/.nvm/nvm.sh"
 nvm install ${NODE_VERSION}
-# Update npm to the latest version.
-npm install -g npm@${NPM_VERSION} --registry=https://registry.npmjs.org
+export NPM_CONFIG_REGISTRY=https://registry.npmjs.org
+npm install -g --no-audit --no-fund npm@latest
 npm install -g --no-audit --no-fund prettier@${PRETTIER_VERSION}
 EOF
 
