@@ -102,6 +102,7 @@ nvm install ${NODE_VERSION}
 export NPM_CONFIG_REGISTRY=https://registry.npmjs.org
 npm install -g --no-audit --no-fund npm@latest
 npm install -g --no-audit --no-fund prettier@${PRETTIER_VERSION}
+npm cache clean --force
 EOF
 
 ENV HOME=/root
