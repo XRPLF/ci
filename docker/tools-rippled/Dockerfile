@@ -49,8 +49,7 @@ ENV PIPX_HOME=/opt/pipx \
 
 FROM base AS clang-format
 
-# These are not inherited from base image.
-ARG UBUNTU_VERSION
+# This is not inherited from base image.
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install clang-format.
@@ -67,8 +66,7 @@ WORKDIR ${HOME}
 
 FROM base AS documentation
 
-# These are not inherited from base image.
-ARG UBUNTU_VERSION
+# This is not inherited from base image.
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install doxygen and graphviz.
@@ -79,6 +77,31 @@ apt-get update
 apt-get install -y doxygen=${DOXYGEN_VERSION} graphviz=${GRAPHVIZ_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
+EOF
+
+ENV HOME=/root
+WORKDIR ${HOME}
+
+# ====================== PRETTIER IMAGE ======================
+# Note, we do not install a compiler here.
+
+FROM base AS prettier
+
+# This is not inherited from base image.
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install node and npm via nvm, and then install prettier, see also
+# https://nodejs.org/en/download.
+ARG NVM_VERSION
+ARG NODE_VERSION
+ARG PRETTIER_VERSION
+RUN <<EOF
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
+\. "${HOME}/.nvm/nvm.sh"
+nvm install ${NODE_VERSION}
+# Update npm to the latest version.
+npm install -g npm@${NPM_VERSION} --registry=https://registry.npmjs.org
+npm install -g --no-audit --no-fund prettier@${PRETTIER_VERSION}
 EOF
 
 ENV HOME=/root

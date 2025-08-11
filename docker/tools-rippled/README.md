@@ -78,6 +78,30 @@ docker buildx build . \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
+#### Building the Docker image for prettier
+
+Ensure you've run the login command above to authenticate with the Docker
+registry.
+
+```shell
+UBUNTU_VERSION=noble
+NODE_VERSION=24.5.0
+NVM_VERSION=0.40.3
+PRETTIER_VERSION=3.6.2
+CONTAINER_IMAGE=xrplf/ci/tools-rippled-prettier:latest
+
+docker buildx build . \
+  --file docker/tools-rippled/Dockerfile \
+  --target prettier \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg NODE_VERSION=${NODE_VERSION} \
+  --build-arg NVM_VERSION=${NVM_VERSION} \
+  --build-arg PRETTIER_VERSION=${PRETTIER_VERSION} \
+  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
+  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+```
+
 #### Pushing the Docker image to the GitHub registry
 
 If you want to push the image to the GitHub registry, you can do so with the
