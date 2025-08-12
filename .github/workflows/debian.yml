@@ -46,6 +46,9 @@ jobs:
             compiler_name: gcc
             compiler_version: 14
           - release: bookworm
+            compiler_name: gcc
+            compiler_version: 15
+          - release: bookworm
             compiler_name: clang
             compiler_version: 16
           - release: bookworm
