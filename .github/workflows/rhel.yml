@@ -6,6 +6,7 @@ on:
       - .github/workflows/rhel.yml
       - docker/rhel/Dockerfile
       - test
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/tools-rippled.yml
       - docker/tools-rippled/Dockerfile
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

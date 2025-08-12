@@ -6,6 +6,7 @@ on:
       - .github/workflows/ubuntu.yml
       - docker/ubuntu/Dockerfile
       - test
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

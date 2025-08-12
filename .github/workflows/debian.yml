@@ -6,6 +6,7 @@ on:
       - .github/workflows/debian.yml
       - docker/debian/Dockerfile
       - test
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
