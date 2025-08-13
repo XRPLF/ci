@@ -29,12 +29,7 @@ versions by specifying the `DEBIAN_VERSION` build argument. There are additional
 arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 `CLANG_VERSION` for the Clang flavor.
 
-None of the build images support packaging, since (in order to be access the
-most recent official releases) the compilers are installed from external
-sources:
-
-* [gcc Docker Official Image](https://hub.docker.com/_/gcc)
-* [LLVM Debian/Ubuntu nightly packages](https://apt.llvm.org/)
+Build image for `gcc` supports packaging.
 
 In order to build an image, run the commands below from the root directory of
 the repository.
@@ -49,6 +44,7 @@ DEBIAN_VERSION=bookworm
 GCC_VERSION=12
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -60,6 +56,7 @@ docker buildx build . \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
@@ -73,6 +70,7 @@ DEBIAN_VERSION=bookworm
 CLANG_VERSION=17
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \
@@ -84,6 +82,7 @@ docker buildx build . \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 

@@ -21,6 +21,7 @@ env:
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
+  CMAKE_VERSION: 3.31.6
   FALLBACK_GCC: 12
   FALLBACK_CLANG: 16
 
@@ -36,6 +37,9 @@ jobs:
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
         os:
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 12
           - release: bookworm
             compiler_name: gcc
             compiler_version: 12
@@ -114,6 +118,7 @@ jobs:
             CONAN_VERSION=${{ env.CONAN_VERSION }}
             GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || env.FALLBACK_GCC }}
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
+            CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             DEBIAN_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/debian/Dockerfile
@@ -144,6 +149,9 @@ jobs:
     strategy:
       matrix:
         os:
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 12
           - release: bookworm
             compiler_name: gcc
             compiler_version: 12
