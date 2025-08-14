@@ -8,7 +8,8 @@
 # image, even though it is not used for Clang.
 ARG DEBIAN_VERSION
 ARG GCC_VERSION=invalid
-FROM gcc:${GCC_VERSION}-${DEBIAN_VERSION} AS gcc-src
+ARG BASE_IMAGE=gcc:${GCC_VERSION}-${DEBIAN_VERSION}
+FROM ${BASE_IMAGE} AS gcc-src
 
 # ====================== BASE IMAGE ======================
 FROM debian:${DEBIAN_VERSION} AS base
