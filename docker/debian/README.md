@@ -34,6 +34,30 @@ Build image for `gcc` supports packaging.
 In order to build an image, run the commands below from the root directory of
 the repository.
 
+#### Note on old Debian releases
+
+This image supports variety of releases of Debian, GCC and Clang.
+
+The GCC binaries are sourced from [Docker "Official Image" for gcc](https://github.com/docker-library/gcc)
+with an important caveat - in order to install a GCC release in older
+Debian versions, we keep a local copy of `Dockerfile` from the above repository,
+backported to an older Debian base image. Such dockerfiles are stored in this
+directory with special file extension, e.g. `gcc-12-bullseye`. They are not altered from
+the source, except for change of the base image to older Debian version. They also
+show in a comment the specific `Dockerfile` they have been sourced from.
+
+If you want to build a Docker image for GCC and an older Debian version, you should
+first build GCC using an appropriate image, giving it the _exact_ name and tag as
+used by the main `Dockerfile`, e.g. `gcc:12-bullseye`. This may require significant
+CPU resources and take some time (e.g. 30 minutes using 40 cores) and it's needed
+to ensure that we do not use an old GCC release with known, and fixed, bugs.
+
+For example:
+
+```shell
+docker buildx build . --progress plain --file docker/debian/Dockerfile.gcc-12-bullseye --tag gcc:12-bullseye
+```
+
 #### Building the Docker image for GCC
 
 Ensure you've run the login command above to authenticate with the Docker
