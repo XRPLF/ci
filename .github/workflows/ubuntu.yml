@@ -21,6 +21,7 @@ env:
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
+  CMAKE_VERSION: 3.31.6
   FALLBACK_GCC: 12
   FALLBACK_CLANG: 16
 
@@ -109,6 +110,7 @@ jobs:
             CONAN_VERSION=${{ env.CONAN_VERSION }}
             GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || env.FALLBACK_GCC }}
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
+            CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             UBUNTU_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/ubuntu/Dockerfile

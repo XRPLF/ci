@@ -31,7 +31,8 @@ pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # Pretty printing.
-pkgs+=(pipx)            # Package manager for Python applications.
+pkgs+=(python3-venv)    # Python environment management tool.
+pkgs+=(python3-pip)     # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
 pkgs+=(vim)             # Text editor.
 apt-get update
@@ -40,9 +41,10 @@ apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 
-ENV PIPX_HOME=/opt/pipx \
-    PIPX_BIN_DIR=/usr/bin \
-    PIPX_MAN_DIR=/usr/share/man
+# Prepare the environment for Python-based tools.
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv ${VIRTUAL_ENV}
+ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
 
 # ====================== CLANG-FORMAT IMAGE ======================
 # Note, we do not install a compiler here.
@@ -56,8 +58,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Install clang-format.
 ARG CLANG_FORMAT_VERSION
 ARG PRE_COMMIT_VERSION
-RUN pipx install --pip-args='--no-cache' clang-format==${CLANG_FORMAT_VERSION} && \
-    pipx install --pip-args='--no-cache' pre-commit==${PRE_COMMIT_VERSION}
+RUN pip install --no-cache \
+    clang-format==${CLANG_FORMAT_VERSION} \
+    pre-commit==${PRE_COMMIT_VERSION}
 
 ENV HOME=/root
 WORKDIR ${HOME}

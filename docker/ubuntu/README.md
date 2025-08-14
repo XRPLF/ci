@@ -44,6 +44,7 @@ UBUNTU_VERSION=noble
 GCC_VERSION=14
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
 CONTAINER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -54,6 +55,7 @@ docker buildx build . \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
@@ -68,6 +70,7 @@ UBUNTU_VERSION=noble
 CLANG_VERSION=18
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
 CONTAINER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \
@@ -78,6 +81,7 @@ docker buildx build . \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```

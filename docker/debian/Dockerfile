@@ -57,7 +57,7 @@ apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install Python-based tools.
+# Install Python-based tools and cmake.
 ARG CONAN_VERSION
 ARG GCOVR_VERSION
 ARG CMAKE_VERSION
