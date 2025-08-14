@@ -6,6 +6,7 @@ on:
       - .github/workflows/rhel.yml
       - docker/rhel/Dockerfile
       - test
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,6 +22,7 @@ env:
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
+  CMAKE_VERSION: 3.31.6
 
 jobs:
   # Build the Docker image for Red Hat Enterprise Linux using different versions
@@ -38,6 +40,12 @@ jobs:
           - release: 9.4
             compiler_name: gcc
             compiler_version: 12
+          - release: 9.4
+            compiler_name: gcc
+            compiler_version: 13
+          - release: 9.4
+            compiler_name: gcc
+            compiler_version: 14
           - release: 9.6
             compiler_name: gcc
             compiler_version: 13
@@ -106,6 +114,7 @@ jobs:
             CONAN_VERSION=${{ env.CONAN_VERSION }}
             GCC_VERSION=${{ matrix.os.compiler_version }}
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
+            CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/rhel/Dockerfile
@@ -139,6 +148,12 @@ jobs:
           - release: 9.4
             compiler_name: gcc
             compiler_version: 12
+          - release: 9.4
+            compiler_name: gcc
+            compiler_version: 13
+          - release: 9.4
+            compiler_name: gcc
+            compiler_version: 14
           - release: 9.6
             compiler_name: gcc
             compiler_version: 13

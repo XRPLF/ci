@@ -8,7 +8,8 @@
 # image, even though it is not used for Clang.
 ARG DEBIAN_VERSION
 ARG GCC_VERSION=invalid
-FROM gcc:${GCC_VERSION}-${DEBIAN_VERSION} AS gcc-src
+ARG BASE_IMAGE=gcc:${GCC_VERSION}-${DEBIAN_VERSION}
+FROM ${BASE_IMAGE} AS gcc-src
 
 # ====================== BASE IMAGE ======================
 FROM debian:${DEBIAN_VERSION} AS base
@@ -37,9 +38,9 @@ EOF
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-pkgs+=(cmake)           # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
+pkgs+=(debhelper)       # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -47,8 +48,8 @@ pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/d
 pkgs+=(jq)              # JSON manipulation.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
-pkgs+=(pipx)            # Package manager for Python applications.
-pkgs+=(python3-jinja2)  # Required build tool.
+pkgs+=(python3-venv)    # Python environment management tool.
+pkgs+=(python3-pip)     # Package manager for Python applications.
 pkgs+=(vim)             # Text editor.
 pkgs+=(wget)            # Required build tool.
 apt-get update
@@ -57,14 +58,18 @@ apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install Python-based tools.
+# Install Python-based tools and cmake.
 ARG CONAN_VERSION
 ARG GCOVR_VERSION
-ENV PIPX_HOME=/opt/pipx \
-    PIPX_BIN_DIR=/usr/bin \
-    PIPX_MAN_DIR=/usr/share/man
-RUN pipx install --pip-args='--no-cache' conan==${CONAN_VERSION} && \
-    pipx install --pip-args='--no-cache' gcovr==${GCOVR_VERSION}
+ARG CMAKE_VERSION
+
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv ${VIRTUAL_ENV}
+ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
+RUN pip install --no-cache \
+  conan==${CONAN_VERSION} \
+  gcovr==${GCOVR_VERSION} \
+  cmake==${CMAKE_VERSION}
 
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
@@ -83,6 +88,13 @@ ldconfig -v
 dpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc
 dpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++
 dpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran
+dpkg-divert --divert /usr/bin/gcc-ar.orig --rename /usr/bin/gcc-ar
+dpkg-divert --divert /usr/bin/gcc-nm.orig --rename /usr/bin/gcc-nm
+dpkg-divert --divert /usr/bin/gcc-ranlib.orig --rename /usr/bin/gcc-ranlib
+dpkg-divert --divert /usr/bin/gcov.orig --rename /usr/bin/gcov
+dpkg-divert --divert /usr/bin/gcov-tool.orig --rename /usr/bin/gcov-tool
+dpkg-divert --divert /usr/bin/gcov-dump.orig --rename /usr/bin/gcov-dump
+dpkg-divert --divert /usr/bin/lto-dump.orig --rename /usr/bin/lto-dump
 update-alternatives \
   --install /usr/bin/cc cc /usr/local/bin/gcc 999
 update-alternatives \

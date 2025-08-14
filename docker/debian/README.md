@@ -29,15 +29,34 @@ versions by specifying the `DEBIAN_VERSION` build argument. There are additional
 arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 `CLANG_VERSION` for the Clang flavor.
 
-None of the build images support packaging, since (in order to be access the
-most recent official releases) the compilers are installed from external
-sources:
-
-* [gcc Docker Official Image](https://hub.docker.com/_/gcc)
-* [LLVM Debian/Ubuntu nightly packages](https://apt.llvm.org/)
+Build image for `gcc` supports packaging.
 
 In order to build an image, run the commands below from the root directory of
 the repository.
+
+#### Note on old Debian releases
+
+This image supports variety of releases of Debian, GCC and Clang.
+
+The GCC binaries are sourced from [Docker "Official Image" for gcc](https://github.com/docker-library/gcc)
+with an important caveat - in order to install a GCC release in older
+Debian versions, we keep a local copy of `Dockerfile` from the above repository,
+backported to an older Debian base image. Such dockerfiles are stored in this
+directory with special file extension, e.g. `gcc-12-bullseye`. They are not altered from
+the source, except for change of the base image to older Debian version. They also
+show in a comment the specific `Dockerfile` they have been sourced from.
+
+If you want to build a Docker image for GCC and an older Debian version, you should
+first build GCC using an appropriate image, giving it the _exact_ name and tag as
+passed later to the main `Dockerfile` as `BASE_IMAGE`. This may require significant
+CPU resources and take some time (e.g. 30 minutes using 40 cores) and it's needed
+to ensure that we do not use an old GCC release with known, and fixed, bugs.
+
+For example:
+
+```shell
+docker buildx build . --progress plain --file docker/debian/Dockerfile.gcc-12-bullseye --tag localhost.localdomain/gcc:12-bullseye
+```
 
 #### Building the Docker image for GCC
 
@@ -49,6 +68,7 @@ DEBIAN_VERSION=bookworm
 GCC_VERSION=12
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -60,6 +80,33 @@ docker buildx build . \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+```
+
+If you have prepared a GCC image for an older Debian version, you also need
+to explicitly set `BASE_IMAGE` build argument, e.g.
+
+```shell
+DEBIAN_VERSION=bullseye
+GCC_VERSION=12
+CONAN_VERSION=2.19.1
+GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
+BASE_IMAGE=localhost.localdomain/gcc:12-bullseye
+CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
+
+docker buildx build . \
+  --file docker/debian/Dockerfile \
+  --target gcc \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
+  --build-arg GCC_VERSION=${GCC_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg BASE_IMAGE=${BASE_IMAGE} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
@@ -73,6 +120,7 @@ DEBIAN_VERSION=bookworm
 CLANG_VERSION=17
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \
@@ -84,6 +132,7 @@ docker buildx build . \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 

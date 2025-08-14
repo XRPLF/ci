@@ -11,7 +11,6 @@ ENTRYPOINT ["/bin/bash"]
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-pkgs+=(cmake)             # Required build tool.
 pkgs+=(file)              # Required packaging tool.
 pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
@@ -23,7 +22,6 @@ pkgs+=(perl-FindBin)      # Required to compile OpenSSL.
 pkgs+=(perl-File-Compare) # Required to compile OpenSSL.
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
-pkgs+=(python3-jinja2)    # Required build tool.
 pkgs+=(rpm-build)         # Required packaging tool.
 pkgs+=(rpmdevtools)       # Required packaging tool.
 pkgs+=(vim)               # Text editor.
@@ -49,10 +47,18 @@ mkdir -p /usr/local/lib
 ln -sf /usr/lib/python3.12 /usr/local/lib/python3.12
 EOF
 
-# Install Python-based tools.
+# Install Python-based tools and cmake.
 ARG CONAN_VERSION
 ARG GCOVR_VERSION
-RUN pip install --no-cache conan==${CONAN_VERSION} gcovr==${GCOVR_VERSION}
+ARG CMAKE_VERSION
+
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv ${VIRTUAL_ENV}
+ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
+RUN pip install --no-cache \
+  conan==${CONAN_VERSION} \
+  gcovr==${GCOVR_VERSION} \
+  cmake==${CMAKE_VERSION}
 
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
