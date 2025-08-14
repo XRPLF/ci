@@ -48,14 +48,14 @@ show in a comment the specific `Dockerfile` they have been sourced from.
 
 If you want to build a Docker image for GCC and an older Debian version, you should
 first build GCC using an appropriate image, giving it the _exact_ name and tag as
-used by the main `Dockerfile`, e.g. `gcc:12-bullseye`. This may require significant
+passed later to the main `Dockerfile` as `BASE_IMAGE`. This may require significant
 CPU resources and take some time (e.g. 30 minutes using 40 cores) and it's needed
 to ensure that we do not use an old GCC release with known, and fixed, bugs.
 
 For example:
 
 ```shell
-docker buildx build . --progress plain --file docker/debian/Dockerfile.gcc-12-bullseye --tag gcc:12-bullseye
+docker buildx build . --progress plain --file docker/debian/Dockerfile.gcc-12-bullseye --tag localhost.localdomain/gcc:12-bullseye
 ```
 
 #### Building the Docker image for GCC
@@ -81,6 +81,32 @@ docker buildx build . \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+```
+
+If you have prepared a GCC image for an older Debian version, you also need
+to explicitly set `BASE_IMAGE` build argument, e.g.
+
+```shell
+DEBIAN_VERSION=bullseye
+GCC_VERSION=12
+CONAN_VERSION=2.19.1
+GCOVR_VERSION=8.3
+CMAKE_VERSION=3.31.6
+BASE_IMAGE=localhost.localdomain/gcc:12-bullseye
+CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
+
+docker buildx build . \
+  --file docker/debian/Dockerfile \
+  --target gcc \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
+  --build-arg GCC_VERSION=${GCC_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg BASE_IMAGE=${BASE_IMAGE} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
