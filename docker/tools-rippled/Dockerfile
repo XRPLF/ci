@@ -66,13 +66,47 @@ ENV HOME=/root
 WORKDIR ${HOME}
 
 # ====================== DOCUMENTATION IMAGE ======================
-# Note, we do not install a compiler here.
 
 FROM base AS documentation
 
 # These are not inherited from base image.
 ARG UBUNTU_VERSION
 ARG DEBIAN_FRONTEND=noninteractive
+
+# Install cmake, required to build the `docs` target.
+ARG CMAKE_VERSION
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv ${VIRTUAL_ENV}
+ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
+RUN pip install --no-cache cmake==${CMAKE_VERSION}
+
+# Install GCC and create the necessary symlinks.
+ARG GCC_VERSION
+RUN <<EOF
+apt-get update
+apt-get install -y --no-install-recommends \
+  gcc-${GCC_VERSION} \
+  g++-${GCC_VERSION} \
+  debhelper
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+update-alternatives \
+  --install /usr/bin/cc cc /usr/bin/gcc-${GCC_VERSION} 999
+update-alternatives \
+  --install /usr/bin/c++ c++ /usr/bin/g++-${GCC_VERSION} 999
+update-alternatives \
+  --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 \
+  --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} \
+  --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} \
+  --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-${GCC_VERSION} \
+  --slave /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-${GCC_VERSION}
+update-alternatives --auto cc
+update-alternatives --auto c++
+update-alternatives --auto gcc
+EOF
+# Set the compiler environment variables to point to the GCC binaries.
+ENV CC=/usr/bin/gcc
+ENV CXX=/usr/bin/g++
 
 # Install doxygen and graphviz.
 ARG DOXYGEN_VERSION

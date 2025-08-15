@@ -19,9 +19,11 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
   CLANG_FORMAT_VERSION: 18.1.8
-  PRE_COMMIT_VERSION: 4.2.0
+  CMAKE_VERSION: 3.31.6
   DOXYGEN_VERSION: 1.9.8+ds-2build5
+  GCC_VERSION: 14
   GRAPHVIZ_VERSION: 2.42.2-9ubuntu0.1
+  PRE_COMMIT_VERSION: 4.2.0
   UBUNTU_VERSION: noble
 
 jobs:
@@ -85,9 +87,11 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
             UBUNTU_VERSION=${{ env.UBUNTU_VERSION }}
             CLANG_FORMAT_VERSION=${{ env.CLANG_FORMAT_VERSION }}
-            PRE_COMMIT_VERSION=${{ env.PRE_COMMIT_VERSION }}
+            CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             DOXYGEN_VERSION=${{ env.DOXYGEN_VERSION }}
+            GCC_VERSION=${{ env.GCC_VERSION }}
             GRAPHVIZ_VERSION=${{ env.GRAPHVIZ_VERSION }}
+            PRE_COMMIT_VERSION=${{ env.PRE_COMMIT_VERSION }}
           context: docker/tools-rippled
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}

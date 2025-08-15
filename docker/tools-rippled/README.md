@@ -63,7 +63,9 @@ registry.
 
 ```shell
 UBUNTU_VERSION=noble
+CMAKE_VERSION=3.31.6
 DOXYGEN_VERSION=1.9.8+ds-2build5
+GCC_VERSION=14
 GRAPHVIZ_VERSION=2.42.2-9ubuntu0.1
 CONTAINER_IMAGE=xrplf/ci/tools-rippled-documentation:latest
 
@@ -72,7 +74,9 @@ docker buildx build . \
   --target documentation \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg DOXYGEN_VERSION=${DOXYGEN_VERSION} \
+  --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg GRAPHVIZ_VERSION=${GRAPHVIZ_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
