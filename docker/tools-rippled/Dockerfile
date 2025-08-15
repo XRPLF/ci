@@ -78,11 +78,12 @@ RUN python3 -m venv ${VIRTUAL_ENV}
 ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
 RUN pip install --no-cache cmake==${CMAKE_VERSION}
 
-# Install GCC and create the necessary symlinks.
+# Install make, GCC and create the necessary symlinks.
 ARG GCC_VERSION
 RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
+  make \
   gcc-${GCC_VERSION} \
   g++-${GCC_VERSION}
 apt-get clean
