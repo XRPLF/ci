@@ -86,8 +86,7 @@ RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
   gcc-${GCC_VERSION} \
-  g++-${GCC_VERSION} \
-  debhelper
+  g++-${GCC_VERSION}
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 update-alternatives \
