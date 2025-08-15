@@ -128,15 +128,16 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Install node and npm via nvm, and then install prettier, see also
 # https://nodejs.org/en/download.
-ARG NVM_VERSION
 ARG NODE_VERSION
+ARG NPM_VERSION
+ARG NVM_VERSION
 ARG PRETTIER_VERSION
+ENV NPM_CONFIG_REGISTRY=https://registry.npmjs.org
 RUN <<EOF
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
 \. "${HOME}/.nvm/nvm.sh"
 nvm install ${NODE_VERSION}
-export NPM_CONFIG_REGISTRY=https://registry.npmjs.org
-npm install -g --no-audit --no-fund npm@latest
+npm install -g --no-audit --no-fund npm@${NPM_VERSION}
 npm install -g --no-audit --no-fund prettier@${PRETTIER_VERSION}
 npm cache clean --force
 EOF
