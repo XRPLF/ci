@@ -1,3 +1,7 @@
+# This argument must be defined before the base image, so it can be used in the
+# prettier image, which does not derive from the base image, below.
+ARG NODE_VERSION
+
 # ====================== BASE IMAGE ======================
 ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION} AS base
@@ -71,11 +75,8 @@ FROM base AS documentation
 # This is not inherited from base image.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install cmake, required to build the `docs` target.
+# Install cmake.
 ARG CMAKE_VERSION
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv ${VIRTUAL_ENV}
-ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
 RUN pip install --no-cache cmake==${CMAKE_VERSION}
 
 # Install make, GCC and create the necessary symlinks.
@@ -122,22 +123,18 @@ WORKDIR ${HOME}
 # ====================== PRETTIER IMAGE ======================
 # Note, we do not install a compiler here.
 
-FROM base AS prettier
+FROM node:${NODE_VERSION}-alpine AS prettier
 
-# This is not inherited from base image.
-ARG DEBIAN_FRONTEND=noninteractive
+# Use SH as the default shell for RUN commands, using the options
+# `set -o errexit -o pipefail`, and as the entrypoint.
+SHELL ["/bin/sh", "-e", "-o", "pipefail", "-c"]
+ENTRYPOINT ["/bin/sh"]
 
-# Install node and npm via nvm, and then install prettier, see also
-# https://nodejs.org/en/download.
-ARG NODE_VERSION
+# Update NPM and install prettier.
 ARG NPM_VERSION
-ARG NVM_VERSION
 ARG PRETTIER_VERSION
 ENV NPM_CONFIG_REGISTRY=https://registry.npmjs.org
 RUN <<EOF
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
-\. "${HOME}/.nvm/nvm.sh"
-nvm install ${NODE_VERSION}
 npm install -g --no-audit --no-fund npm@${NPM_VERSION}
 npm install -g --no-audit --no-fund prettier@${PRETTIER_VERSION}
 npm cache clean --force

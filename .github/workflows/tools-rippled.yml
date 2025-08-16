@@ -23,9 +23,8 @@ env:
   DOXYGEN_VERSION: 1.9.8+ds-2build5
   GCC_VERSION: 14
   GRAPHVIZ_VERSION: 2.42.2-9ubuntu0.1
-  NODE_VERSION: 24.5.0
+  NODE_VERSION: 24.6.0
   NPM_VERSION: 11.5.2
-  NVM_VERSION: 0.40.3
   PRETTIER_VERSION: 3.6.2
   PRE_COMMIT_VERSION: 4.2.0
   UBUNTU_VERSION: noble
@@ -98,7 +97,6 @@ jobs:
             GRAPHVIZ_VERSION=${{ env.GRAPHVIZ_VERSION }}
             NODE_VERSION=${{ env.NODE_VERSION }}
             NPM_VERSION=${{ env.NPM_VERSION }}
-            NVM_VERSION=${{ env.NVM_VERSION }}
             PRETTIER_VERSION=${{ env.PRETTIER_VERSION }}
             PRE_COMMIT_VERSION=${{ env.PRE_COMMIT_VERSION }}
           context: docker/tools-rippled

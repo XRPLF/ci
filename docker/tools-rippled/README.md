@@ -24,7 +24,7 @@ docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 ### Building and pushing the Docker image
 
-Currently this Dockerfile can be used to build one image:
+Currently, this Dockerfile can be used to build one image:
 
 * `clang-format` with C++ formatting tools. This image requires parameters:
   * `UBUNTU_VERSION` for selection of Ubuntu release (recommended `noble`)
@@ -89,9 +89,8 @@ registry.
 
 ```shell
 UBUNTU_VERSION=noble
-NODE_VERSION=24.5.0
+NODE_VERSION=24.6.0
 NPM_VERSION=11.5.2
-NVM_VERSION=0.40.3
 PRETTIER_VERSION=3.6.2
 CONTAINER_IMAGE=xrplf/ci/tools-rippled-prettier:latest
 
@@ -102,7 +101,6 @@ docker buildx build . \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg NODE_VERSION=${NODE_VERSION} \
   --build-arg NPM_VERSION=${NPM_VERSION} \
-  --build-arg NVM_VERSION=${NVM_VERSION} \
   --build-arg PRETTIER_VERSION=${PRETTIER_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
