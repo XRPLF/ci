@@ -125,10 +125,8 @@ WORKDIR ${HOME}
 
 FROM node:${NODE_VERSION}-alpine AS prettier
 
-# Use SH as the default shell for RUN commands, using the options
-# `set -o errexit -o pipefail`, and as the entrypoint.
-SHELL ["/bin/sh", "-e", "-o", "pipefail", "-c"]
-ENTRYPOINT ["/bin/sh"]
+# Install bash and git.
+RUN apk add --no-cache bash git
 
 # Update NPM and install prettier.
 ARG NPM_VERSION
