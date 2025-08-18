@@ -24,12 +24,24 @@ docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 ### Building and pushing the Docker image
 
-Currently, this Dockerfile can be used to build one image:
+Currently, this Dockerfile can be used to build one the following images:
 
 * `clang-format` with C++ formatting tools. This image requires parameters:
-  * `UBUNTU_VERSION` for selection of Ubuntu release (recommended `noble`)
-  * `CLANG_FORMAT_VERSION` for [clang-format](http://clang.llvm.org/docs/ClangFormat.html) version
-  * `PRE_COMMIT_VERSION` for [pre-commit](https://pre-commit.com/) version
+  * `UBUNTU_VERSION` for selecting the Ubuntu release (recommended `noble`).
+  * `CLANG_FORMAT_VERSION` for the [clang-format](http://clang.llvm.org/docs/ClangFormat.html) version.
+  * `PRE_COMMIT_VERSION` for the [pre-commit](https://pre-commit.com/) version.
+* `documentation` with tools for building the rippled documentation. This image
+  requires parameters:
+  * `UBUNTU_VERSION` for selecting the Ubuntu release (recommended `noble`)
+  * `CMAKE_VERSION` for the [CMake](https://cmake.org/) version.
+  * `DOXYGEN_VERSION` for the [Doxygen](https://www.doxygen.nl/) version.
+  * `GCC_VERSION` for the [GCC](https://gcc.gnu.org/) version.
+  * `GRAPHVIZ_VERSION` for the [Graphviz](https://graphviz.org/) version.
+* `prettier` with tools for formatting JavaScript and TypeScript code. This
+  image requires parameters:
+  * `NODE_VERSION` for the [Node.js](https://nodejs.org/) version.
+  * `NPM_VERSION` for the [npm](https://www.npmjs.com/) version.
+  * `PRETTIER_VERSION` for the [Prettier](https://prettier.io/) version.
 
 In order to build an image, run the commands below from the root directory of
 the repository.
@@ -88,7 +100,6 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-UBUNTU_VERSION=noble
 NODE_VERSION=24.6.0
 NPM_VERSION=11.5.2
 PRETTIER_VERSION=3.6.2
@@ -102,7 +113,6 @@ docker buildx build . \
   --build-arg NODE_VERSION=${NODE_VERSION} \
   --build-arg NPM_VERSION=${NPM_VERSION} \
   --build-arg PRETTIER_VERSION=${PRETTIER_VERSION} \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 

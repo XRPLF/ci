@@ -1,9 +1,11 @@
 # This argument must be defined before the base image, so it can be used in the
-# prettier image, which does not derive from the base image, below.
-ARG NODE_VERSION
+# prettier image, which does not derive from the base image, below. We set both
+# the Node and Ubuntu versions to "undefined" to satisfy the syntax checker, as
+# it checks if the `FROM` command has a valid image, even when it is not used.
+ARG NODE_VERSION=undefined
+ARG UBUNTU_VERSION=undefined
 
 # ====================== BASE IMAGE ======================
-ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
 # Use Bash as the default shell for RUN commands, using the options
@@ -121,7 +123,7 @@ ENV HOME=/root
 WORKDIR ${HOME}
 
 # ====================== PRETTIER IMAGE ======================
-# Note, we do not install a compiler here.
+# Note, this image does not inherit from the base image.
 
 FROM node:${NODE_VERSION}-alpine AS prettier
 
