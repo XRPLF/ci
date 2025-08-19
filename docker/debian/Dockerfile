@@ -146,13 +146,14 @@ rm -rf /tmp/*
 EOF
 
 # Explicitly set the compiler flags, as well as a custom flag that specifies the
-# distribution name and version. This is important to avoid conflicts between
-# builds using the same compiler but different distribution versions.
+# compiler and distro names and versions. This is important to avoid conflicts
+# between builds using different compilers and/or different distro versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:compiler="gcc-${GCC_VERSION}"
 user.package:distro="debian-${DEBIAN_VERSION}"
-tools.info.package_id:confs=["user.package:distro"]
+tools.info.package_id:confs=["user.package:compiler", "user.package:distro"]
 EOT
 EOF
 
@@ -235,13 +236,14 @@ rm -rf /tmp/*
 EOF
 
 # Explicitly set the compiler flags, as well as a custom flag that specifies the
-# distribution name and version. This is important to avoid conflicts between
-# builds using the same compiler but different distribution versions.
+# compiler and distro names and versions. This is important to avoid conflicts
+# between builds using different compilers and/or different distro versions.
 RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
+user.package:compiler="clang-${CLANG_VERSION}"
 user.package:distro="debian-${DEBIAN_VERSION}"
-tools.info.package_id:confs=["user.package:distro"]
+tools.info.package_id:confs=["user.package:compiler", "user.package:distro"]
 EOT
 EOF
 

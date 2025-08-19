@@ -108,6 +108,10 @@ This will have similar effect as `--user $(id -u):$(id -g)` (making this option
 redundant and invalid), while also securing the container from other users on
 the same host.
 
+If you see an error such as `bash: /root/.bashrc: Permission denied` and the
+prompt shows `I have no name!`, then exit the container and run it again without
+the `--user $(id -u):$(id -g)` option, or run it in rootless mode.
+
 Once inside the container you can run the following commands to build `rippled`:
 
 ```shell
@@ -116,8 +120,9 @@ cd /rippled
 # Remove any existing data from previous builds on the host machine.
 rm -rf CMakeCache.txt CMakeFiles build || true
 # Install dependencies via Conan.
-conan install . --build missing --settings build_type=${BUILD_TYPE} \
-  -o xrpld=True -o tests=True -o unity=True
+conan remote add --index=0 xrplf https://conan.ripplex.io
+conan install . --build missing --settings:all build_type=${BUILD_TYPE} \
+  --options:host '&:tests=True' --options:host '&:xrpld=True'
 # Configure the build with CMake.
 cd build
 cmake -DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake \
