@@ -131,7 +131,7 @@ RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 user.package:compiler="gcc-${GCC_VERSION}"
-user.package:distro="debian-${DEBIAN_VERSION}"
+user.package:distro="rhel-${RHEL_VERSION}"
 tools.info.package_id:confs=["user.package:compiler", "user.package:distro"]
 EOT
 EOF
@@ -207,7 +207,7 @@ RUN <<EOF
 cat >> $(conan config home)/global.conf <<EOT
 tools.build:compiler_executables={"c": "${CC}", "cpp": "${CXX}"}
 user.package:compiler="clang-${CLANG_VERSION}"
-user.package:distro="debian-${DEBIAN_VERSION}"
+user.package:distro="rhel-${RHEL_VERSION}"
 tools.info.package_id:confs=["user.package:compiler", "user.package:distro"]
 EOT
 EOF
