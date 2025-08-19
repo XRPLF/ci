@@ -20,6 +20,7 @@ pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)       # Required build tool.
 pkgs+=(perl-FindBin)      # Required to compile OpenSSL.
 pkgs+=(perl-File-Compare) # Required to compile OpenSSL.
+pkgs+=(perl-IPC-Cmd)      # Required to compile OpenSSL.
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
