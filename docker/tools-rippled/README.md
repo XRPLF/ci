@@ -26,10 +26,14 @@ docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 Currently, this Dockerfile can be used to build one the following images:
 
-* `clang-format` with C++ formatting tools. This image requires parameters:
+* `pre-commit` with formatting tools for various languages. This image requires
+  parameters:
   * `UBUNTU_VERSION` for selecting the Ubuntu release (recommended `noble`).
   * `CLANG_FORMAT_VERSION` for the [clang-format](http://clang.llvm.org/docs/ClangFormat.html) version.
+  * `NODE_VERSION` for the [Node.js](https://nodejs.org/) version.
+  * `NPM_VERSION` for the [npm](https://www.npmjs.com/) version.
   * `PRE_COMMIT_VERSION` for the [pre-commit](https://pre-commit.com/) version.
+  * `PRETTIER_VERSION` for the [Prettier](https://prettier.io/) version.
 * `documentation` with tools for building the rippled documentation. This image
   requires parameters:
   * `UBUNTU_VERSION` for selecting the Ubuntu release (recommended `noble`)
@@ -37,16 +41,11 @@ Currently, this Dockerfile can be used to build one the following images:
   * `DOXYGEN_VERSION` for the [Doxygen](https://www.doxygen.nl/) version.
   * `GCC_VERSION` for the [GCC](https://gcc.gnu.org/) version.
   * `GRAPHVIZ_VERSION` for the [Graphviz](https://graphviz.org/) version.
-* `prettier` with tools for formatting JavaScript and TypeScript code. This
-  image requires parameters:
-  * `NODE_VERSION` for the [Node.js](https://nodejs.org/) version.
-  * `NPM_VERSION` for the [npm](https://www.npmjs.com/) version.
-  * `PRETTIER_VERSION` for the [Prettier](https://prettier.io/) version.
 
 In order to build an image, run the commands below from the root directory of
 the repository.
 
-#### Building the Docker image for clang-format
+#### Building the Docker image for pre-commit
 
 Ensure you've run the login command above to authenticate with the Docker
 registry.
@@ -54,16 +53,22 @@ registry.
 ```shell
 UBUNTU_VERSION=noble
 CLANG_FORMAT_VERSION=18.1.8
+NODE_VERSION=24.5.0
+NPM_VERSION=11.5.2
 PRE_COMMIT_VERSION=4.2.0
-CONTAINER_IMAGE=xrplf/ci/tools-rippled-clang-format:latest
+PRETTIER_VERSION=3.6.2
+CONTAINER_IMAGE=xrplf/ci/tools-rippled-pre-commit:latest
 
 docker buildx build . \
   --file docker/tools-rippled/Dockerfile \
-  --target clang-format \
+  --target pre-commit \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg CLANG_FORMAT_VERSION=${CLANG_FORMAT_VERSION} \
+  --build-arg NODE_VERSION=${NODE_VERSION} \
+  --build-arg NPM_VERSION=${NPM_VERSION} \
   --build-arg PRE_COMMIT_VERSION=${PRE_COMMIT_VERSION} \
+  --build-arg PRETTIER_VERSION=${PRETTIER_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
@@ -91,28 +96,6 @@ docker buildx build . \
   --build-arg GCC_VERSION=${GCC_VERSION} \
   --build-arg GRAPHVIZ_VERSION=${GRAPHVIZ_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
-  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
-```
-
-#### Building the Docker image for prettier
-
-Ensure you've run the login command above to authenticate with the Docker
-registry.
-
-```shell
-NODE_VERSION=24.6.0
-NPM_VERSION=11.5.2
-PRETTIER_VERSION=3.6.2
-CONTAINER_IMAGE=xrplf/ci/tools-rippled-prettier:latest
-
-docker buildx build . \
-  --file docker/tools-rippled/Dockerfile \
-  --target prettier \
-  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg NODE_VERSION=${NODE_VERSION} \
-  --build-arg NPM_VERSION=${NPM_VERSION} \
-  --build-arg PRETTIER_VERSION=${PRETTIER_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 

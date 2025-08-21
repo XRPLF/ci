@@ -23,7 +23,7 @@ env:
   DOXYGEN_VERSION: 1.9.8+ds-2build5
   GCC_VERSION: 14
   GRAPHVIZ_VERSION: 2.42.2-9ubuntu0.1
-  NODE_VERSION: 24.6.0
+  NODE_VERSION: 24.5.0
   NPM_VERSION: 11.5.2
   PRETTIER_VERSION: 3.6.2
   PRE_COMMIT_VERSION: 4.2.0
@@ -39,9 +39,8 @@ jobs:
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
         tool:
-          - clang-format
           - documentation
-          - prettier
+          - pre-commit
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -127,9 +126,8 @@ jobs:
     strategy:
       matrix:
         tool:
-          - clang-format
           - documentation
-          - prettier
+          - pre-commit
     runs-on: ubuntu-24.04
     needs:
       - build
