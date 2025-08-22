@@ -54,7 +54,7 @@ FROM base AS pre-commit
 # This is not inherited from base image.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install clang-format and pre-commit.
+# Install clang-format, pre-commit and pre-commit-hooks.
 ARG CLANG_FORMAT_VERSION
 ARG PRE_COMMIT_VERSION
 ARG PRE_COMMIT_HOOKS_VERSION

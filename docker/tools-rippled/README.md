@@ -33,6 +33,7 @@ Currently, this Dockerfile can be used to build one the following images:
   * `NODE_VERSION` for the [Node.js](https://nodejs.org/) version.
   * `NPM_VERSION` for the [npm](https://www.npmjs.com/) version.
   * `PRE_COMMIT_VERSION` for the [pre-commit](https://pre-commit.com/) version.
+  * `PRE_COMMIT_HOOKS_VERSION` for the [pre-commit-hooks](https://pypi.org/project/pre-commit-hooks/) version.
   * `PRETTIER_VERSION` for the [Prettier](https://prettier.io/) version.
 * `documentation` with tools for building the rippled documentation. This image
   requires parameters:
