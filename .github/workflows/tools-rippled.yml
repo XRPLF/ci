@@ -25,8 +25,9 @@ env:
   GRAPHVIZ_VERSION: 2.42.2-9ubuntu0.1
   NODE_VERSION: 24.5.0
   NPM_VERSION: 11.5.2
-  PRETTIER_VERSION: 3.6.2
   PRE_COMMIT_VERSION: 4.2.0
+  PRE_COMMIT_HOOKS_VERSION: 6.0.0
+  PRETTIER_VERSION: 3.6.2
   UBUNTU_VERSION: noble
 
 jobs:
@@ -96,8 +97,9 @@ jobs:
             GRAPHVIZ_VERSION=${{ env.GRAPHVIZ_VERSION }}
             NODE_VERSION=${{ env.NODE_VERSION }}
             NPM_VERSION=${{ env.NPM_VERSION }}
-            PRETTIER_VERSION=${{ env.PRETTIER_VERSION }}
             PRE_COMMIT_VERSION=${{ env.PRE_COMMIT_VERSION }}
+            PRE_COMMIT_HOOKS_VERSION=${{ env.PRE_COMMIT_HOOKS_VERSION }}
+            PRETTIER_VERSION=${{ env.PRETTIER_VERSION }}
           context: docker/tools-rippled
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.architecture.platform }}

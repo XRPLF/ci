@@ -57,9 +57,11 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Install clang-format and pre-commit.
 ARG CLANG_FORMAT_VERSION
 ARG PRE_COMMIT_VERSION
+ARG PRE_COMMIT_HOOKS_VERSION
 RUN pip install --no-cache \
     clang-format==${CLANG_FORMAT_VERSION} \
-    pre-commit==${PRE_COMMIT_VERSION}
+    pre-commit==${PRE_COMMIT_VERSION} \
+    pre-commit-hooks==${PRE_COMMIT_HOOKS_VERSION}
 
 # Install Node.JS, NPM, and prettier.
 ARG NODE_VERSION
