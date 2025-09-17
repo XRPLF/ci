@@ -29,12 +29,7 @@ Currently, this Dockerfile can be used to build one the following images:
 * `pre-commit` with formatting tools for various languages. This image requires
   parameters:
   * `UBUNTU_VERSION` for selecting the Ubuntu release (recommended `noble`).
-  * `CLANG_FORMAT_VERSION` for the [clang-format](http://clang.llvm.org/docs/ClangFormat.html) version.
-  * `NODE_VERSION` for the [Node.js](https://nodejs.org/) version.
-  * `NPM_VERSION` for the [npm](https://www.npmjs.com/) version.
   * `PRE_COMMIT_VERSION` for the [pre-commit](https://pre-commit.com/) version.
-  * `PRE_COMMIT_HOOKS_VERSION` for the [pre-commit-hooks](https://pypi.org/project/pre-commit-hooks/) version.
-  * `PRETTIER_VERSION` for the [Prettier](https://prettier.io/) version.
 * `documentation` with tools for building the rippled documentation. This image
   requires parameters:
   * `UBUNTU_VERSION` for selecting the Ubuntu release (recommended `noble`)
@@ -53,12 +48,7 @@ registry.
 
 ```shell
 UBUNTU_VERSION=noble
-CLANG_FORMAT_VERSION=18.1.8
-NODE_VERSION=24.5.0
-NPM_VERSION=11.5.2
 PRE_COMMIT_VERSION=4.2.0
-PRE_COMMIT_HOOKS_VERSION=6.0.0
-PRETTIER_VERSION=3.6.2
 CONTAINER_IMAGE=xrplf/ci/tools-rippled-pre-commit:latest
 
 docker buildx build . \
@@ -66,12 +56,7 @@ docker buildx build . \
   --target pre-commit \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CLANG_FORMAT_VERSION=${CLANG_FORMAT_VERSION} \
-  --build-arg NODE_VERSION=${NODE_VERSION} \
-  --build-arg NPM_VERSION=${NPM_VERSION} \
   --build-arg PRE_COMMIT_VERSION=${PRE_COMMIT_VERSION} \
-  --build-arg PRE_COMMIT_HOOKS_VERSION=${PRE_COMMIT_HOOKS_VERSION} \
-  --build-arg PRETTIER_VERSION=${PRETTIER_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
