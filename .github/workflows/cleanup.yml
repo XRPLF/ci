@@ -12,13 +12,18 @@ jobs:
     permissions:
       packages: write
     strategy:
+        fail-fast: false
         matrix:
           image:
             - debian-bullseye
             - debian-bookworm
+            - debian-gcc
             - rhel-9.4
             - rhel-9.6
-            - tools-rippled
+            - tools-rippled-clang-format
+            - tools-rippled-documentation
+            - tools-rippled-pre-commit
+            - tools-rippled-prettier
             - ubuntu-jammy
             - ubuntu-noble
     steps:
