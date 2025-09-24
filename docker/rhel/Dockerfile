@@ -17,6 +17,7 @@ pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(gnupg2)            # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)                # JSON manipulation.
+pkgs+=(libatomic)         # Required to use mold linker.
 pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)       # Required build tool.
 pkgs+=(perl-FindBin)      # Required to compile OpenSSL.
@@ -30,7 +31,6 @@ pkgs+=(rpm-build)         # Required packaging tool.
 pkgs+=(rpmdevtools)       # Required packaging tool.
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
-pkgs+=(libatomic)         # Required to use mold linker.
 dnf update -y
 dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
