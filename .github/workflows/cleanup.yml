@@ -4,7 +4,6 @@ on:
   schedule:
     - cron: "42 2 * * 0" # Run every Sunday at 02:42 UTC.
   workflow_dispatch:
-  push:
 
 jobs:
   cleanup:
@@ -34,5 +33,4 @@ jobs:
           delete-orphaned-images: true
           delete-partial-images: true
           delete-untagged: true
-          dry-run: true
           package: ci/${{ matrix.image }}
