@@ -11,6 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    strategy:
+        matrix:
+          image:
+            - debian-bullseye
+#            - debian-bookworm
+#            - rhel-9.4
+#            - rhel-9.6
+#            - tools-rippled
+#            - ubuntu-jammy
+#            - ubuntu-noble
     steps:
       - name: Cleanup images in the GitHub Container Registry
         uses: dataaxiom/ghcr-cleanup-action@v1
@@ -20,4 +30,4 @@ jobs:
           delete-partial-images: true
           delete-untagged: true
           dry-run: true
-          packages: debian,rhel,tools-rippled,ubuntu
+          package: ${{ matrix.image }}
