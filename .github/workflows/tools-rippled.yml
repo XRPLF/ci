@@ -6,6 +6,11 @@ on:
       - .github/workflows/tools-rippled.yml
       - docker/tools-rippled/Dockerfile
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to give the Docker images (e.g. v1.2.3)."
+        required: true
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,6 +22,7 @@ defaults:
 
 env:
   CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_TAG: ${{ github.event.inputs.tag || 'latest' }}
   BUILDKIT_PROGRESS: plain
   CMAKE_VERSION: 3.31.6
   DOXYGEN_VERSION: 1.9.8+ds-2build5
@@ -70,8 +76,8 @@ jobs:
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
+            type=raw,value=${{ env.CONTAINER_TAG }}
             type=sha,prefix=sha-
-            type=raw,value=latest
           labels: |
             org.opencontainers.image.authors=For inquiries, please use https://${{ github.repository }}/issues
             org.opencontainers.image.documentation=https://${{ github.repository }}
@@ -155,8 +161,8 @@ jobs:
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
+            type=raw,value=${{ env.CONTAINER_TAG }}
             type=sha,prefix=sha-
-            type=raw,value=latest
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |

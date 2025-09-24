@@ -7,6 +7,11 @@ on:
       - docker/debian/Dockerfile*
       - test
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag suffix to give the Docker images (e.g. v1.2.3)."
+        required: true
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,6 +23,7 @@ defaults:
 
 env:
   CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_TAG: ${{ github.event.inputs.tag || 'latest' }}
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
@@ -137,7 +143,7 @@ jobs:
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
-            type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}
+            type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-${{ env.CONTAINER_TAG }}
             type=sha,prefix=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-sha-
           labels: |
             org.opencontainers.image.authors=For inquiries, please use https://${{ github.repository }}/issues
@@ -253,7 +259,7 @@ jobs:
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
-            type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}
+            type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-${{ env.CONTAINER_TAG }}
             type=sha,prefix=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-sha-
       - name: Create manifest list and push
         working-directory: /tmp/digests
