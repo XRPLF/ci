@@ -23,6 +23,7 @@ env:
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
   CMAKE_VERSION: 3.31.6
+  MOLD_VERSION: 2.40.4
 
 jobs:
   # Build the Docker image for Red Hat Enterprise Linux using different versions
@@ -115,6 +116,7 @@ jobs:
             GCC_VERSION=${{ matrix.os.compiler_version }}
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             CMAKE_VERSION=${{ env.CMAKE_VERSION }}
+            MOLD_VERSION=${{ env.MOLD_VERSION }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/rhel/Dockerfile

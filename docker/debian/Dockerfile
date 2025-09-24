@@ -46,6 +46,7 @@ pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)              # JSON manipulation.
+pkgs+=(libatomic1)      # Required by mold linker.
 pkgs+=(libc6-dev)       # Required build tool.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(python3-venv)    # Python environment management tool.
@@ -70,6 +71,17 @@ RUN pip install --no-cache \
   conan==${CONAN_VERSION} \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
+
+# Install mold https://github.com/rui314/mold
+ARG MOLD_VERSION
+
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
+tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
+rm mold.tar.gz
+mold --version
+EOF
 
 # ====================== GCC IMAGE ======================
 FROM base AS gcc

@@ -1,5 +1,6 @@
 # ====================== BASE IMAGE ======================
 ARG RHEL_VERSION
+
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/ubi:${RHEL_VERSION} AS base
 
 # Use Bash as the default shell for RUN commands, using the options
@@ -16,6 +17,7 @@ pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(gnupg2)            # Dependency for tools requiring signing or encrypting/decrypting.
 pkgs+=(jq)                # JSON manipulation.
+pkgs+=(libatomic)         # Required by mold linker.
 pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)       # Required build tool.
 pkgs+=(perl-FindBin)      # Required to compile OpenSSL.
@@ -62,6 +64,17 @@ RUN pip install --no-cache \
   conan==${CONAN_VERSION} \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
+
+# Install mold https://github.com/rui314/mold
+ARG MOLD_VERSION
+
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
+tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
+rm mold.tar.gz
+mold --version
+EOF
 
 # ====================== GCC IMAGE ======================
 FROM base AS gcc

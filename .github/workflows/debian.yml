@@ -22,6 +22,7 @@ env:
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
   CMAKE_VERSION: 3.31.6
+  MOLD_VERSION: 2.40.4
   FALLBACK_GCC: 12
   FALLBACK_CLANG: 16
 
@@ -155,6 +156,7 @@ jobs:
             GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || env.FALLBACK_GCC }}
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             CMAKE_VERSION=${{ env.CMAKE_VERSION }}
+            MOLD_VERSION=${{ env.MOLD_VERSION }}
             DEBIAN_VERSION=${{ matrix.os.release }}
             BASE_IMAGE=${{ env.CONTAINER_IMAGE_GCC && format('{0}@{1}', env.CONTAINER_IMAGE_GCC, steps.build-gcc.outputs.digest) || format('gcc:{0}-{1}', matrix.os.compiler_version, matrix.os.release) }}
           context: .
