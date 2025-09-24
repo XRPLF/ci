@@ -1,5 +1,6 @@
 # ====================== BASE IMAGE ======================
 ARG RHEL_VERSION
+
 FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/ubi:${RHEL_VERSION} AS base
 
 # Use Bash as the default shell for RUN commands, using the options
@@ -29,6 +30,7 @@ pkgs+=(rpm-build)         # Required packaging tool.
 pkgs+=(rpmdevtools)       # Required packaging tool.
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
+pkgs+=(libatomic)         # Required to use mold linker.
 dnf update -y
 dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
@@ -62,6 +64,16 @@ RUN pip install --no-cache \
   conan==${CONAN_VERSION} \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
+
+# Install mold https://github.com/rui314/mold
+ARG MOLD_VERSION
+
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
+tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
+rm mold.tar.gz
+EOF
 
 # ====================== GCC IMAGE ======================
 FROM base AS gcc

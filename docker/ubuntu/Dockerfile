@@ -58,6 +58,16 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
+# Install mold https://github.com/rui314/mold
+ARG MOLD_VERSION
+
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
+tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
+rm mold.tar.gz
+EOF
+
 # ====================== GCC IMAGE ======================
 FROM base AS gcc
 
