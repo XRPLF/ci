@@ -30,4 +30,5 @@ jobs:
           delete-partial-images: true
           delete-untagged: true
           dry-run: true
+          repository: ${{ github.repository }}
           package: ${{ matrix.image }}
