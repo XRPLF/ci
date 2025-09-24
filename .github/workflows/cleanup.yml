@@ -1,0 +1,22 @@
+name: Docker image cleanup
+
+on:
+  schedule:
+    - cron: "42 2 * * 0" # Run every Sunday at 02:42 UTC.
+  workflow_dispatch:
+  push:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Cleanup images in the GitHub Container Registry
+        uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          delete-ghost-images: true
+          delete-orphaned-images: true
+          delete-partial-images: true
+          delete-untagged: true
+          dry-run: true
