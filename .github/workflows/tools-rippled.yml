@@ -68,6 +68,14 @@ jobs:
           echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/tools-rippled-${{ matrix.tool }}" >> $GITHUB_ENV
           PLATFORM=${{ matrix.architecture.platform }}
           echo "PLATFORM_PAIR=${PLATFORM//\//-}" >> $GITHUB_ENV
+      - name: Check if image already exists
+        if: ${{ env.CONTAINER_TAG != 'latest' }}
+        run: |
+          RET=$(docker manifest inspect ${{ env.CONTAINER_IMAGE }}:${{ env.CONTAINER_TAG }})
+          if [ ${RET} -eq 0 ]; then
+            echo 'Image ${{ env.CONTAINER_IMAGE }}:${{ env.CONTAINER_TAG }} already exists.'
+            exit 1
+          fi
       - name: Prepare container metadata
         id: meta
         uses: docker/metadata-action@v5

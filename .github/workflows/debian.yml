@@ -103,6 +103,14 @@ jobs:
             echo "CONTAINER_REPOSITORY_GCC=${CONTAINER_REPO}/debian-gcc" >> $GITHUB_ENV
             echo "CONTAINER_IMAGE_GCC=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/debian-gcc" >> $GITHUB_ENV
           fi
+      - name: Check if image already exists
+        if: ${{ env.CONTAINER_TAG != 'latest' }}
+        run: |
+          RET=$(docker manifest inspect ${{ env.CONTAINER_IMAGE }}:${{ env.CONTAINER_TAG }})
+          if [ ${RET} -eq 0 ]; then
+            echo 'Image ${{ env.CONTAINER_IMAGE }}:${{ env.CONTAINER_TAG }} already exists.'
+            exit 1
+          fi
       - name: Prepare gcc image metadata
         if: ${{ env.CONTAINER_IMAGE_GCC }}
         id: meta-gcc
