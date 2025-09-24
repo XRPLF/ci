@@ -66,6 +66,7 @@ ARCH=$(uname -m)
 wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
 tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
+mold --version
 EOF
 
 # ====================== GCC IMAGE ======================
