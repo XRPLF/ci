@@ -20,3 +20,4 @@ jobs:
           delete-partial-images: true
           delete-untagged: true
           dry-run: true
+          packages: debian,rhel,tools-rippled,ubuntu
