@@ -1,7 +1,12 @@
 name: Docker image cleanup
 
 on:
+  pull_request:
+    paths:
+      - .github/workflows/cleanup.yml
   push:
+    branches:
+      - main
     paths:
       - .github/workflows/cleanup.yml
   schedule:
@@ -36,5 +41,5 @@ jobs:
           delete-orphaned-images: true
           delete-partial-images: true
           delete-untagged: true
-          dry-run: ${{ github.event_name == 'push' }}
+          dry-run: ${{ github.event_name == 'pull_request' }}
           package: ci/${{ matrix.image }}
