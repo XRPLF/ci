@@ -73,11 +73,11 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
       - name: Login to GitHub Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.repository_owner }}
@@ -100,7 +100,7 @@ jobs:
       - name: Prepare gcc image metadata
         if: ${{ env.CONTAINER_IMAGE_GCC }}
         id: meta-gcc
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,manifest-descriptor
         with:
@@ -116,7 +116,7 @@ jobs:
         # TODO: Move to separate workflow or job
         if: ${{ env.CONTAINER_IMAGE_GCC }}
         id: build-gcc
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           build-args: |
              BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
@@ -131,7 +131,7 @@ jobs:
           labels: ${{ steps.meta-gcc.outputs.labels }}
       - name: Prepare container metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,manifest-descriptor
         with:
@@ -146,7 +146,7 @@ jobs:
             org.opencontainers.image.title=${{ env.CONTAINER_REPOSITORY }}
       - name: Build and push the Docker image
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           build-args: |
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
@@ -176,7 +176,7 @@ jobs:
           touch "/tmp/digests/${DIGEST#sha256:}"
       - name: Upload digest
         if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
@@ -225,17 +225,17 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Download digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           path: /tmp/digests
           pattern: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-*
           merge-multiple: true
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
       - name: Login to GitHub Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.repository_owner }}
@@ -247,7 +247,7 @@ jobs:
           echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/debian-${{ matrix.os.release }}" >> $GITHUB_ENV
       - name: Prepare container metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: index
         with:
