@@ -12,6 +12,7 @@ ENTRYPOINT ["/bin/bash"]
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+pkgs+=(binutils-gold)     # Required build tool.
 pkgs+=(file)              # Required packaging tool.
 pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
@@ -51,6 +52,8 @@ ln -sf /usr/bin/pip3.12 /usr/local/bin/pip
 mkdir -p /usr/local/lib
 ln -sf /usr/lib/python3.12 /usr/local/lib/python3.12
 EOF
+
+RUN ld.gold --version
 
 # Install Python-based tools and cmake.
 ARG CONAN_VERSION
