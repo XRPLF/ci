@@ -38,7 +38,7 @@ EOF
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-pkgs+=(binutils)        # Required build tools.
+pkgs+=(binutils-gold)   # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
