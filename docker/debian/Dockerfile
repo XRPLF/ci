@@ -38,6 +38,7 @@ EOF
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
+pkgs+=(binutils)        # Required build tools.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
@@ -58,6 +59,8 @@ apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
+
+RUN ld.gold --version
 
 # Install Python-based tools and cmake.
 ARG CONAN_VERSION
