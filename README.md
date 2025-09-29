@@ -19,10 +19,20 @@ of environments and using different C++ compilers.
 
 Only some of the container images provided support packaging.
 
+## Compiler images
+
+Container images created by `gcc` workflow are a [backport](https://github.com/docker-library/gcc) of
+official Docker images for [GNU Compiler Collection](https://hub.docker.com/_/gcc). The official images
+are built on a most recent official Debian release, which results in coupling to a higher
+[GLIBC](https://sourceware.org/glibc/) version than the versions which we want to support.
+The purpose of `gcc` images created in this repository is to provide most recent releases of
+the GCC compiler for older Debian (and derived distros) versions. These are in turn used
+by some of the Debian [build images](#build-images).
+
 ## Tools images
 
-Aside from build images, XRPLF projects also use container images with specialized tools, e.g.
-to enforce code formatting, run sanitizers, run code coverage tools etc.
+Aside from build and compiler images, XRPLF projects also use container images with specialized tools,
+e.g. to enforce code formatting, run sanitizers etc.
 The required images are created by workflows starting with `tools-` and ending
 with the project name e.g. `tools-rippled`, and are only meant to support specific projects.
 These images may also contain a complete C++ build environment, if needed.

@@ -24,41 +24,28 @@ docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 ### Building and pushing the Docker image
 
-The same Dockerfile can be used to build an image for Debian Bookworm or future
-versions by specifying the `DEBIAN_VERSION` build argument. There are additional
+The same Dockerfile can be used to build an image for different Debian releases
+by specifying the `DEBIAN_VERSION` build argument. There are additional
 arguments to specify as well, namely `GCC_VERSION` for the GCC flavor and
 `CLANG_VERSION` for the Clang flavor.
 
 Build image for `gcc` supports packaging.
 
-In order to build an image, run the commands below from the root directory of
-the repository.
+#### Note on old GCC binaries
 
-#### Note on old Debian releases
+This image supports variety of releases of Debian, GCC and Clang. In order to
+support current GCC versions on an older Debian releases, we rely on `gcc` images
+backported from the [official GCC repository](https://github.com/docker-library/gcc).
 
-This image supports variety of releases of Debian, GCC and Clang.
+Hence, depending on the Debian release used, the GCC binaries are sourced from either of:
 
-The GCC binaries are sourced from [Docker "Official Image" for gcc](https://github.com/docker-library/gcc)
-with an important caveat - in order to install a GCC release in older
-Debian versions, we keep a local copy of `Dockerfile` from the above repository,
-backported to an older Debian base image. Such dockerfiles are stored in this
-directory with special file extension, e.g. `gcc-12-bullseye`. They are not altered from
-the source, except for change of the base image to older Debian version. They also
-show in a comment the specific `Dockerfile` they have been sourced from.
-
-If you want to build a Docker image for GCC and an older Debian version, you should
-first build GCC using an appropriate image, giving it the _exact_ name and tag as
-passed later to the main `Dockerfile` as `BASE_IMAGE`. This may require significant
-CPU resources and take some time (e.g. 30 minutes using 40 cores) and it's needed
-to ensure that we do not use an old GCC release with known, and fixed, bugs.
-
-For example:
-
-```shell
-docker buildx build . --progress plain --file docker/debian/Dockerfile.gcc-12-bullseye --tag localhost.localdomain/gcc:12-bullseye
-```
+- for `DEBIAN_VERSION=bookworm` : `gcc:$GCC_VERSION-$DEBIAN_VERSION`, produced in the [official GCC repository](https://github.com/docker-library/gcc)
+- for `DEBIAN_VERSION=bullseye` : `xrplf/ci/gcc:$GCC_VERSION-$DEBIAN_VERSION`, produced in [this repository](https://github.com/XRPLF/ci/pkgs/container/gcc)
 
 #### Building the Docker image for GCC
+
+In order to build an image, run the commands below from the root directory of
+the repository.
 
 Ensure you've run the login command above to authenticate with the Docker
 registry.
@@ -86,8 +73,8 @@ docker buildx build . \
   --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
 ```
 
-If you have prepared a GCC image for an older Debian version, you also need
-to explicitly set `BASE_IMAGE` build argument, e.g.
+In order to build an image for Bullseye, you also need to explicitly set
+`BASE_IMAGE` build argument, e.g.
 
 ```shell
 DEBIAN_VERSION=bullseye
@@ -96,7 +83,7 @@ CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=3.31.6
 MOLD_VERSION=2.40.4
-BASE_IMAGE=localhost.localdomain/gcc:12-bullseye
+BASE_IMAGE=xrplf/ci/gcc:12-bullseye
 CONTAINER_IMAGE=xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
