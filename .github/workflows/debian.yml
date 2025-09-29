@@ -41,6 +41,15 @@ jobs:
           - release: bullseye
             compiler_name: gcc
             compiler_version: 12
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 13
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 14
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 15
           - release: bookworm
             compiler_name: gcc
             compiler_version: 12
@@ -158,6 +167,15 @@ jobs:
           - release: bullseye
             compiler_name: gcc
             compiler_version: 12
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 13
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 14
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 15
           - release: bookworm
             compiler_name: gcc
             compiler_version: 12
