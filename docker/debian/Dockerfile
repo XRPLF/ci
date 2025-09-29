@@ -2,9 +2,10 @@
 # the `COPY --from XXX` command used in a stage below does not allow `XXX` to
 # contain dynamic values supplied via an argument. We are using GCC image rather
 # than the official Debian package to access the latest versions, built by the
-# GCC team specifically for this Debian release. For build images using official
-# distribution packages, see Ubuntu. We set the GCC version to "undefined" to
-# satisfy the syntax checker, as it checks if the `FROM` command has a valid
+# [Docker community](https://github.com/docker-library/gcc/), or by [us](docker/gcc),
+# specifically for this Debian release. For build images using the official
+# distribution packages, see Ubuntu. We set the GCC version to "undefined"
+# to satisfy the syntax checker, as it checks if the `FROM` command has a valid
 # image, even though it is not used for Clang.
 ARG DEBIAN_VERSION
 ARG GCC_VERSION=undefined

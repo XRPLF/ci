@@ -1,7 +1,7 @@
 FROM buildpack-deps:bullseye
 
 ## NOTE: EVERYTHING BELOW THIS COMMENT IS FROM
-## https://github.com/docker-library/gcc/blob/7070981b23d22d3ca790f87bff26f13f3614dd4c/12/Dockerfile
+## https://github.com/docker-library/gcc/blob/58af1a21e095e94e24b02350d0dbbc3d7f0a62ba/14/Dockerfile
 
 
 RUN set -eux; \
@@ -41,9 +41,9 @@ ENV GCC_MIRRORS \
 # only attempt the origin FTP as a mirror of last resort
 		ftp://ftp.gnu.org/gnu/gcc
 
-# Last Modified: 2025-07-11
-ENV GCC_VERSION 12.5.0
-# Docker EOL: 2027-01-11
+# Last Modified: 2025-05-23
+ENV GCC_VERSION 14.3.0
+# Docker EOL: 2026-11-23
 
 RUN set -ex; \
 	\
