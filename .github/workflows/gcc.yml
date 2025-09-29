@@ -16,6 +16,7 @@ defaults:
     shell: bash
 
 env:
+  PUSH: ${{ github.event == 'push' && github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
 
@@ -87,19 +88,19 @@ jobs:
           context: .
           file: docker/gcc/Dockerfile.${{ matrix.os.compiler_version }}-${{ matrix.os.release }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+          outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}
           platforms: ${{ matrix.architecture.platform }}
           provenance: mode=max
-          push: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+          push: ${{ env.PUSH }}
           sbom: true
       - name: Export digest
-        if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+        if: ${{ env.PUSH }}
         run: |
           mkdir -p /tmp/digests
           DIGEST="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${DIGEST#sha256:}"
       - name: Upload digest
-        if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+        if: ${{ env.PUSH }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: digests-${{ matrix.os.compiler_version }}-${{ matrix.os.release }}-${{ env.PLATFORM_PAIR }}
@@ -108,7 +109,7 @@ jobs:
           retention-days: 1
 
   merge:
-    if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+    if: ${{ github.event == 'push' && github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
     strategy:
       matrix:
         os:
