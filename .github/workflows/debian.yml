@@ -17,6 +17,7 @@ defaults:
     shell: bash
 
 env:
+  PUSH: ${{ github.event == 'push' && github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.19.1
@@ -41,6 +42,15 @@ jobs:
           - release: bullseye
             compiler_name: gcc
             compiler_version: 12
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 13
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 14
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 15
           - release: bookworm
             compiler_name: gcc
             compiler_version: 12
@@ -94,41 +104,8 @@ jobs:
           PLATFORM=${{ matrix.architecture.platform }}
           echo "PLATFORM_PAIR=${PLATFORM//\//-}" >> $GITHUB_ENV
           if [ "${{ matrix.os.release == 'bullseye' }}" == "true" ]; then
-            echo "CONTAINER_REPOSITORY_GCC=${CONTAINER_REPO}/debian-gcc" >> $GITHUB_ENV
-            echo "CONTAINER_IMAGE_GCC=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/debian-gcc" >> $GITHUB_ENV
+            echo "CONTAINER_IMAGE_GCC=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/gcc" >> $GITHUB_ENV
           fi
-      - name: Prepare gcc image metadata
-        if: ${{ env.CONTAINER_IMAGE_GCC }}
-        id: meta-gcc
-        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
-        env:
-          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,manifest-descriptor
-        with:
-          images: ${{ env.CONTAINER_IMAGE_GCC }}
-          labels: |
-            org.opencontainers.image.authors=For inquiries, please use https://${{ github.repository }}/issues
-            org.opencontainers.image.documentation=https://${{ github.repository }}
-            org.opencontainers.image.vendor=XRPLF
-            org.opencontainers.image.title=${{ env.CONTAINER_REPOSITORY_GCC }}
-      - name: Build gcc image
-        # Note, we always push this image, otherwise steps.build will fail.
-        # Also, because we always push it, we intentionally do not tag it.
-        # TODO: Move to separate workflow or job
-        if: ${{ env.CONTAINER_IMAGE_GCC }}
-        id: build-gcc
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-        with:
-          build-args: |
-             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
-             BUILDKIT_INLINE_CACHE=1
-          context: .
-          file: docker/debian/Dockerfile.gcc-${{ matrix.os.compiler_version }}-${{ matrix.os.release }}
-          outputs: type=image,name=${{ env.CONTAINER_IMAGE_GCC }},push-by-digest=true,name-canonical=true,push=true
-          platforms: ${{ matrix.architecture.platform }}
-          provenance: mode=max
-          push: true
-          sbom: true
-          labels: ${{ steps.meta-gcc.outputs.labels }}
       - name: Prepare container metadata
         id: meta
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
@@ -158,24 +135,24 @@ jobs:
             CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             MOLD_VERSION=${{ env.MOLD_VERSION }}
             DEBIAN_VERSION=${{ matrix.os.release }}
-            BASE_IMAGE=${{ env.CONTAINER_IMAGE_GCC && format('{0}@{1}', env.CONTAINER_IMAGE_GCC, steps.build-gcc.outputs.digest) || format('gcc:{0}-{1}', matrix.os.compiler_version, matrix.os.release) }}
+            BASE_IMAGE=${{ env.CONTAINER_IMAGE_GCC && format('{0}:{1}-{2}', env.CONTAINER_IMAGE_GCC, matrix.os.compiler_version, matrix.os.release) || format('gcc:{0}-{1}', matrix.os.compiler_version, matrix.os.release) }}
           context: .
           file: docker/debian/Dockerfile
-          outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}
           platforms: ${{ matrix.architecture.platform }}
           provenance: mode=max
-          push: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+          push: ${{ env.PUSH }}
           sbom: true
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.os.compiler_name }}
       - name: Export digest
-        if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+        if: ${{ env.PUSH }}
         run: |
           mkdir -p /tmp/digests
           DIGEST="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${DIGEST#sha256:}"
       - name: Upload digest
-        if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+        if: ${{ env.PUSH }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-${{ env.PLATFORM_PAIR }}
@@ -184,13 +161,22 @@ jobs:
           retention-days: 1
 
   merge:
-    if: ${{ github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
+    if: ${{ github.event == 'push' && github.ref_type == 'branch' && github.ref_name == github.event.repository.default_branch }}
     strategy:
       matrix:
         os:
           - release: bullseye
             compiler_name: gcc
             compiler_version: 12
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 13
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 14
+          - release: bullseye
+            compiler_name: gcc
+            compiler_version: 15
           - release: bookworm
             compiler_name: gcc
             compiler_version: 12
