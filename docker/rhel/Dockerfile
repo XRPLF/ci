@@ -8,7 +8,9 @@ FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/ubi:${RHEL_VERSION} AS base
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
-# Install tools that are shared by all stages.
+# Install tools that are shared by all stages. Note that we lock the dnf package \
+# manager to the current RHEL version, to avoid inadvertently upgrading to a
+# newer RHEL version if it becomes available.
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
@@ -32,8 +34,11 @@ pkgs+=(rpm-build)         # Required packaging tool.
 pkgs+=(rpmdevtools)       # Required packaging tool.
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
+dnf install -y python3-dnf-plugin-versionlock
+dnf versionlock redhat-release-*
 dnf update -y
 dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
+dnf remove -y python3-dnf-plugin-versionlock
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
