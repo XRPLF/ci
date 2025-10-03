@@ -31,9 +31,9 @@ jobs:
   # of GCC. Note, the `os` part of matrix must be kept in sync with the `merge`
   # job below. Also note that we only push images for the major version of RHEL
   # but the UBI images require a valid minor version to also be provided, e.g.
-  #    release=9.6 + compiler_name=gcc + compiler_version=14 (matrix) ->
-  #    ubi:9.6 + gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ (Dockerfile) ->
-  #    rhel-9:gcc-14 (our image).
+  #  release=9.6 + compiler_name=gcc + compiler_version=14 (matrix) ->
+  #  ubi:9.6 + gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ (Dockerfile) ->
+  #  rhel-9:gcc-14 (our image).
   build:
     strategy:
       matrix:
