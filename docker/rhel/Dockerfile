@@ -1,7 +1,7 @@
 # ====================== BASE IMAGE ======================
 ARG RHEL_VERSION
 
-FROM registry.redhat.io/ubi${RHEL_VERSION%.*}/ubi:${RHEL_VERSION} AS base
+FROM registry.redhat.io/ubi${RHEL_VERSION}/ubi:latest AS base
 
 # Use Bash as the default shell for RUN commands, using the options
 # `set -o errexit -o pipefail`, and as the entrypoint.

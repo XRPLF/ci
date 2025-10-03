@@ -60,7 +60,7 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-RHEL_VERSION=9.6
+RHEL_VERSION=9
 GCC_VERSION=13
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
@@ -88,7 +88,7 @@ Ensure you've run the login command above to authenticate with the Docker
 registry.
 
 ```shell
-RHEL_VERSION=9.6
+RHEL_VERSION=9
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=3.31.6
