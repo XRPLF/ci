@@ -61,12 +61,12 @@ registry.
 
 ```shell
 RHEL_VERSION=9.6
-GCC_VERSION=13
+GCC_VERSION=12
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=3.31.6
 MOLD_VERSION=2.40.4
-CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:gcc-${GCC_VERSION}
+CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION%%.*}:gcc-${GCC_VERSION}
 
 docker buildx build . \
   --file docker/rhel/Dockerfile \
@@ -93,7 +93,7 @@ CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=3.31.6
 MOLD_VERSION=2.40.4
-CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION}:clang-any
+CONTAINER_IMAGE=xrplf/ci/rhel-${RHEL_VERSION%%.*}:clang-any
 
 docker buildx build . \
   --file docker/rhel/Dockerfile \

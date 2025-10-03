@@ -28,8 +28,12 @@ env:
 
 jobs:
   # Build the Docker image for Red Hat Enterprise Linux using different versions
-  # of GCC
-  # Note, the `os` part of matrix must be kept in sync with the `merge` job below
+  # of GCC. Note, the `os` part of matrix must be kept in sync with the `merge`
+  # job below. Also note that we only push images for the major version of RHEL
+  # but the UBI images require a valid minor version to also be provided, e.g.
+  #    release=9.6 + compiler_name=gcc + compiler_version=14 (matrix) ->
+  #    ubi:9.6 + gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ (Dockerfile) ->
+  #    rhel-9:gcc-14 (our image).
   build:
     strategy:
       matrix:
@@ -39,24 +43,15 @@ jobs:
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
         os:
-          - release: 9.4
+          - release: 9.6
             compiler_name: gcc
             compiler_version: 12
-          - release: 9.4
-            compiler_name: gcc
-            compiler_version: 13
-          - release: 9.4
-            compiler_name: gcc
-            compiler_version: 14
           - release: 9.6
             compiler_name: gcc
             compiler_version: 13
           - release: 9.6
             compiler_name: gcc
             compiler_version: 14
-          - release: 9.4
-            compiler_name: clang
-            compiler_version: 'any'
           - release: 9.6
             compiler_name: clang
             compiler_version: 'any'
@@ -87,8 +82,10 @@ jobs:
           # still does not provide convenient action expression syntax for lowercase.
           GITHUB_REPO=${{ github.repository }}
           CONTAINER_REPO=${GITHUB_REPO@L}
-          echo "CONTAINER_REPOSITORY=${CONTAINER_REPO}/rhel-${{ matrix.os.release }}" >> $GITHUB_ENV
-          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/rhel-${{ matrix.os.release }}" >> $GITHUB_ENV
+          RHEL_VERSION=${{ matrix.os.release }}
+          MAJOR_VERSION=${RHEL_VERSION%%.*}
+          echo "CONTAINER_REPOSITORY=${CONTAINER_REPO}/rhel-${MAJOR_VERSION}" >> $GITHUB_ENV
+          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/rhel-${MAJOR_VERSION}" >> $GITHUB_ENV
           PLATFORM=${{ matrix.architecture.platform }}
           echo "PLATFORM_PAIR=${PLATFORM//\//-}" >> $GITHUB_ENV
       - name: Prepare container metadata
@@ -148,24 +145,15 @@ jobs:
     strategy:
       matrix:
         os:
-          - release: 9.4
+          - release: 9.6
             compiler_name: gcc
             compiler_version: 12
-          - release: 9.4
-            compiler_name: gcc
-            compiler_version: 13
-          - release: 9.4
-            compiler_name: gcc
-            compiler_version: 14
           - release: 9.6
             compiler_name: gcc
             compiler_version: 13
           - release: 9.6
             compiler_name: gcc
             compiler_version: 14
-          - release: 9.4
-            compiler_name: clang
-            compiler_version: 'any'
           - release: 9.6
             compiler_name: clang
             compiler_version: 'any'
@@ -195,7 +183,9 @@ jobs:
         run: |
           GITHUB_REPO=${{ github.repository }}
           CONTAINER_REPO=${GITHUB_REPO@L}
-          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/rhel-${{ matrix.os.release }}" >> $GITHUB_ENV
+          RHEL_VERSION=${{ matrix.os.release }}
+          MAJOR_VERSION=${RHEL_VERSION%%.*}
+          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/rhel-${MAJOR_VERSION}" >> $GITHUB_ENV
       - name: Prepare container metadata
         id: meta
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
