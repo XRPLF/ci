@@ -90,26 +90,31 @@ ARG RHEL_VERSION
 # where typically you would run `scl enable gcc-toolset-X` to open another Bash
 # shell with the GCC toolset enabled. To avoid having to do so, we delete the
 # default GCC packages first, and then reference the GCC toolset binaries
-# directly.
+# directly. Note: we only do so for RHEL 9, as no toolsets are available for
+# RHEL 10 at the moment, and the default GCC 14 is sufficient.
 RUN <<EOF
-dnf remove -y gcc gcc-c++
-dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+if [ "${RHEL_VERSION}" -eq "9" ]; then
+  dnf remove -y gcc gcc-c++
+  dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+  update-alternatives \
+    --install /usr/bin/cc cc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 999
+  update-alternatives \
+    --install /usr/bin/c++ c++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ 999
+  update-alternatives \
+    --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 100 \
+    --slave /usr/bin/g++ g++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ \
+    --slave /usr/bin/cpp cpp /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/cpp \
+    --slave /usr/bin/gcov gcov /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov \
+    --slave /usr/bin/gcov-dump gcov-dump /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-dump-${GCC_VERSION} \
+    --slave /usr/bin/gcov-tool gcov-tool /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-tool-${GCC_VERSION}
+  update-alternatives --auto cc
+  update-alternatives --auto c++
+  update-alternatives --auto gcc
+else
+  dnf install -y --setopt=tsflags=nodocs gcc gcc-c++
+fi
 dnf clean -y all
 rm -rf /var/cache/dnf/*
-update-alternatives \
-  --install /usr/bin/cc cc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 999
-update-alternatives \
-  --install /usr/bin/c++ c++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ 999
-update-alternatives \
-  --install /usr/bin/gcc gcc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 100 \
-  --slave /usr/bin/g++ g++ /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/g++ \
-  --slave /usr/bin/cpp cpp /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/cpp \
-  --slave /usr/bin/gcov gcov /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov \
-  --slave /usr/bin/gcov-dump gcov-dump /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-dump-${GCC_VERSION} \
-  --slave /usr/bin/gcov-tool gcov-tool /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcov-tool-${GCC_VERSION}
-update-alternatives --auto cc
-update-alternatives --auto c++
-update-alternatives --auto gcc
 EOF
 # Set the compiler environment variables to point to the GCC binaries.
 ENV CC=/usr/bin/gcc
