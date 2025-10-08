@@ -80,7 +80,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN  }}
       - name: Login to Red Hat Registry
-        if: ${{ github.event_name == 'push' }}
+        # We have to login even to pull base images from Red Hat registry.
         uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
         with:
           registry: ${{ env.REDHAT_REGISTRY }}
