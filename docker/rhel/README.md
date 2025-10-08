@@ -7,25 +7,6 @@ Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
 below.
 
-### Logging into the Red Hat registry
-
-To be able to read the Universal Base Images from the Red Hat registry, a
-personal access  token is needed, which you can get by registering for a
-Developer account [here](https://developers.redhat.com) and then creating a
-service account [here](https://access.redhat.com/terms-based-registry).
-
-Once created, click on the service account to view its details, and then
-navigate to the "Docker Login" tab to get the username and password. A command
-is shown that will log you into the Red Hat registry, which looks like this:
-
-```shell
-REDHAT_REGISTRY=registry.redhat.io
-REDHAT_USER=<your-rhel-username>
-REDHAT_TOKEN=<your-rhel-password>
-echo ${REDHAT_TOKEN} | \
-docker login ${REDHAT_REGISTRY} -u "${REDHAT_USER}" --password-stdin
-```
-
 ### Logging into the GitHub registry
 
 To be able to push a Docker image to the GitHub registry, a personal access
