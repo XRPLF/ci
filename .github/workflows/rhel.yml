@@ -26,7 +26,7 @@ defaults:
 env:
   PUSH: ${{ github.event_name == 'push' }}
   CONTAINER_REGISTRY: ghcr.io
-  REDHAT_REGISTRY: registry.redhat.io
+  REDHAT_REGISTRY: registry.access.redhat.com
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
