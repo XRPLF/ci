@@ -26,7 +26,6 @@ defaults:
 env:
   PUSH: ${{ github.event_name == 'push' }}
   CONTAINER_REGISTRY: ghcr.io
-  REDHAT_REGISTRY: registry.access.redhat.com
   BUILDKIT_PROGRESS: plain
   CONAN_VERSION: 2.19.1
   GCOVR_VERSION: 8.3
@@ -79,13 +78,6 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN  }}
-      - name: Login to Red Hat Registry
-        if: ${{ github.event_name == 'push' }}
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
-        with:
-          registry: ${{ env.REDHAT_REGISTRY }}
-          username: ${{ secrets.REDHAT_USER }}
-          password: ${{ secrets.REDHAT_TOKEN }}
       - name: Prepare environment
         run: |
           # Convert the repository name to lowercase as the organization name is
