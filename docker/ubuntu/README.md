@@ -7,37 +7,19 @@ Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
 below.
 
-### Logging into the GitHub registry
-
-To be able to push a Docker image to the GitHub registry, a personal access
-token is needed, see instructions [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
-In summary, if you do not have a suitable personal access token, generate one
-[here](https://github.com/settings/tokens/new?scopes=write:packages).
-
-```shell
-CONTAINER_REGISTRY=ghcr.io
-GITHUB_USER=<your-github-username>
-GITHUB_TOKEN=<your-github-personal-access-token>
-echo ${GITHUB_TOKEN} | \
-docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
-```
-
-### Building and pushing the Docker image
+### Building the Docker image
 
 The same Dockerfile can be used to build an image for Ubuntu 22.04 and 24.04 or
 future versions by specifying the `UBUNTU_VERSION` build argument. There are
 additional arguments to specify as well, namely `GCC_VERSION` for the GCC flavor
 and `CLANG_VERSION` for the Clang flavor.
 
-Build image for `gcc` supports packaging.
-
-In order to build an image, run the commands below from the root directory of
-the repository.
+Only the build image for `gcc` supports packaging.
 
 #### Building the Docker image for GCC
 
-Ensure you've run the login command above to authenticate with the Docker
-registry.
+In order to build the image for GCC, run the commands below from the root
+directory of the repository.
 
 ```shell
 UBUNTU_VERSION=noble
@@ -46,7 +28,7 @@ CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=3.31.6
 MOLD_VERSION=2.40.4
-CONTAINER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc-${GCC_VERSION}
+CONTAINER_IMAGE=ghcr.io/xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
   --file docker/ubuntu/Dockerfile \
@@ -59,13 +41,13 @@ docker buildx build . \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
-  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+  --tag ${CONTAINER_IMAGE}
 ```
 
 #### Building the Docker image for Clang
 
-Ensure you've run the login command above to authenticate with the Docker
-registry.
+In order to build the image for Clang, run the commands below from the root
+directory of the repository.
 
 ```shell
 UBUNTU_VERSION=noble
@@ -74,7 +56,7 @@ CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=3.31.6
 MOLD_VERSION=2.40.4
-CONTAINER_IMAGE=xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang-${CLANG_VERSION}
+CONTAINER_IMAGE=ghcr.io/xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \
   --file docker/ubuntu/Dockerfile \
@@ -87,17 +69,17 @@ docker buildx build . \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
-  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+  --tag ${CONTAINER_IMAGE}
 ```
 
-#### Running the Docker image
+### Running the Docker image
 
 If you want to run the image locally using a cloned `rippled` repository, you
 can do so with the following command:
 
 ```shell
 CODEBASE=<path to the rippled repository>
-docker run --user $(id -u):$(id -g) --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+docker run --user $(id -u):$(id -g) --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_IMAGE}
 ```
 
 Note, the above command will assume the identity of the current user in the
@@ -138,11 +120,37 @@ cmake --build . -j ${PARALLELISM}
 ./rippled --unittest --unittest-jobs ${PARALLELISM}
 ```
 
-#### Pushing the Docker image to the GitHub registry
+### Pushing the Docker image
 
-If you want to push the image to the GitHub registry, you can do so with the
-following command:
+#### Logging into the GitHub registry
+
+To be able to push a Docker image to the GitHub registry, a personal access
+token is needed, see instructions [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
+In summary, if you do not have a suitable personal access token, generate one
+[here](https://github.com/settings/tokens/new?scopes=write:packages).
 
 ```shell
-docker push ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+GITHUB_USER=<your-github-username>
+GITHUB_TOKEN=<your-github-personal-access-token>
+echo ${GITHUB_TOKEN} | docker login ghcr.io -u "${GITHUB_USER}" --password-stdin
 ```
+
+#### Pushing to the GitHub registry
+
+To push the image to the GitHub registry, you can do so with the following
+command, whereby we append your username to not overwrite existing images:
+
+```shell
+docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE}-sha-${GITHUB_USER}
+docker push ${CONTAINER_IMAGE}-sha-${GITHUB_USER}
+```
+
+This way you can test the image in the `rippled` repository by modifying the
+`image_sha` entry in `.github/scripts/strategy-matrix/linux.json` for the
+relevant configuration, and then creating a pull request.
+
+#### Note on macOS
+
+If you are using macOS and wish to push an image to the GitHub registry for use
+in GitHub Actions, you will need to append `--platform linux/amd64` to the
+`docker buildx build` commands above.
