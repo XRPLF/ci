@@ -106,7 +106,7 @@ cd /rippled
 # Remove any existing data from previous builds on the host machine.
 rm -rf CMakeCache.txt CMakeFiles build || true
 # Install dependencies via Conan.
-conan remote add --index=0 xrplf https://conan.ripplex.io
+conan remote add --force --index 0 xrplf https://conan.ripplex.io
 conan install . --build missing --settings:all build_type=${BUILD_TYPE} \
   --options:host '&:tests=True' --options:host '&:xrpld=True'
 # Configure the build with CMake.
