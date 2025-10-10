@@ -1,6 +1,14 @@
+# We want to use the subscription-free Red Hat UBI images, but those only
+# provide a subset of the packages available in the full Red Hat Enterprise
+# Linux (RHEL) distribution. To get some of the packages we need, we use those
+# provided by the Rocky Linux project, which is a community-developed operating
+# system designed to be a 100% bug-for-bug compatible alternative to RHEL.
+ARG RHEL_VERSION
+FROM rockylinux/rockylinux:${RHEL_VERSION} AS rocky
+RUN dnf -y install rpm-sign rpmdevtools
+
 # ====================== BASE IMAGE ======================
 ARG RHEL_VERSION
-
 FROM registry.access.redhat.com/ubi${RHEL_VERSION}/ubi:latest AS base
 
 # Use Bash as the default shell for RUN commands, using the options
@@ -8,11 +16,21 @@ FROM registry.access.redhat.com/ubi${RHEL_VERSION}/ubi:latest AS base
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
+# This is not inherited from the base image.
+ARG RHEL_VERSION
+
+# Copy rpm binaries from the Rocky Linux image.
+COPY --from=rocky /usr/bin/rpm* /usr/bin/
+
 # Install tools that are shared by all stages.
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-pkgs+=(binutils-gold)     # Required build tool.
+if [ "${RHEL_VERSION}" -eq "8" ]; then
+  pkgs+=(binutils)        # Required build tool.
+else
+  pkgs+=(binutils-gold)   # Required build tool.
+fi
 pkgs+=(file)              # Required packaging tool.
 pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
@@ -22,15 +40,23 @@ pkgs+=(libatomic)         # Required by mold linker.
 pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)       # Required build tool.
 pkgs+=(perl-Digest-SHA)   # Required to compile OpenSSL.
-pkgs+=(perl-File-Compare) # Required to compile OpenSSL.
-pkgs+=(perl-File-Copy)    # Required to compile OpenSSL.
-pkgs+=(perl-FindBin)      # Required to compile OpenSSL.
+if [ "${RHEL_VERSION}" -ge "9" ]; then
+  # Required to compile OpenSSL. Unnecessary in RHEL 8, as these modules are
+  # included in the base image.
+  pkgs+=(perl-File-Compare)
+  pkgs+=(perl-File-Copy)
+  pkgs+=(perl-FindBin)
+fi
 pkgs+=(perl-IPC-Cmd)      # Required to compile OpenSSL.
 pkgs+=(perl-Time-Piece)   # Required to compile OpenSSL.
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
-pkgs+=(rpmdevtools)       # Required packaging tool.
+if [ "${RHEL_VERSION}" -ge "9" ]; then
+  # Required packaging tool. Unavailable in the RHEL 8 UBI, but it was copied
+  # from the Rocky Linux image in an earlier step.
+  pkgs+=(rpmdevtools)
+fi
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
 dnf update -y
@@ -91,10 +117,12 @@ ARG RHEL_VERSION
 # where typically you would run `scl enable gcc-toolset-X` to open another Bash
 # shell with the GCC toolset enabled. To avoid having to do so, we delete the
 # default GCC packages first, and then reference the GCC toolset binaries
-# directly. Note: we only do so for RHEL 9, as no toolsets are available for
-# RHEL 10 at the moment, and the default GCC 14 is sufficient.
+# directly. Note: we only do so for RHEL 8 and 9, as no toolsets are available
+# for RHEL 10 at the moment, and the default GCC 14 is sufficient.
 RUN <<EOF
-if [ "${RHEL_VERSION}" -eq "9" ]; then
+if [ "${RHEL_VERSION}" -eq "10" ]; then
+  dnf install -y --setopt=tsflags=nodocs gcc gcc-c++
+else
   dnf remove -y gcc gcc-c++
   dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
   update-alternatives \
@@ -111,8 +139,6 @@ if [ "${RHEL_VERSION}" -eq "9" ]; then
   update-alternatives --auto cc
   update-alternatives --auto c++
   update-alternatives --auto gcc
-else
-  dnf install -y --setopt=tsflags=nodocs gcc gcc-c++
 fi
 dnf clean -y all
 rm -rf /var/cache/dnf/*

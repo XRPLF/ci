@@ -25,8 +25,9 @@ jobs:
           - debian-bullseye
           - debian-bookworm
           - gcc
-          - rhel-9.4
-          - rhel-9.6
+          - rhel-8
+          - rhel-9
+          - rhel-10
           - tools-rippled-clang-format
           - tools-rippled-documentation
           - tools-rippled-pre-commit
