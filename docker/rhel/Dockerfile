@@ -1,6 +1,14 @@
+# We want to use the subscription-free Red Hat UBI images, but those only
+# provide a subset of the packages available in the full Red Hat Enterprise
+# Linux (RHEL) distribution. To get some of the packages we need, we use those
+# provided by the Rocky Linux project, which is a community-developed operating
+# system designed to be a 100% bug-for-bug compatible alternative to RHEL.
+ARG RHEL_VERSION
+FROM rockylinux/rockylinux:${RHEL_VERSION} AS rocky
+RUN dnf -y install rpm-sign rpmdevtools
+
 # ====================== BASE IMAGE ======================
 ARG RHEL_VERSION
-
 FROM registry.access.redhat.com/ubi${RHEL_VERSION}/ubi:latest AS base
 
 # Use Bash as the default shell for RUN commands, using the options
@@ -10,6 +18,9 @@ ENTRYPOINT ["/bin/bash"]
 
 # This is not inherited from the base image.
 ARG RHEL_VERSION
+
+# Copy rpm binaries from the Rocky Linux image.
+COPY --from=rocky /usr/bin/rpm* /usr/bin/
 
 # Install tools that are shared by all stages.
 RUN <<EOF
@@ -30,7 +41,7 @@ pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)       # Required build tool.
 pkgs+=(perl-Digest-SHA)   # Required to compile OpenSSL.
 if [ "${RHEL_VERSION}" -ge "9" ]; then
-  # Required to compile OpenSSL. Unnecessary on RHEL 8, as these modules are
+  # Required to compile OpenSSL. Unnecessary in RHEL 8, as these modules are
   # included in the base image.
   pkgs+=(perl-File-Compare)
   pkgs+=(perl-File-Copy)
@@ -42,8 +53,8 @@ pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
 if [ "${RHEL_VERSION}" -ge "9" ]; then
-  # On RHEL 8, the rpmdevtools package is not available in the default repos,
-  # but as we will not be using it we skip its installation.
+  # Required packaging tool. Unavailable in the RHEL 8 UBI, but it was copied
+  # from the Rocky Linux image in an earlier step.
   pkgs+=(rpmdevtools)
 fi
 pkgs+=(vim)               # Text editor.
