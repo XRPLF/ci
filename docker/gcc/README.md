@@ -71,6 +71,14 @@ docker push ${CONTAINER_IMAGE}-${GITHUB_USER}
 However, there should be no need to push the GCC image manually, as it is only
 used as a base image for other images in this repository.
 
+Note, if you or the CI pipeline are pushing an image for the first time, it will
+be private by default. You will need to go to the
+[packages page](https://github.com/orgs/XRPLF/packages), select the relevant
+package, then "Package settings", and after clicking the "Change visibility"
+button make it "Public". In addition, on that same page, under "Manage Actions
+access" click the "Add repository" button, select the `ci` repository, and grant
+it "Admin" access.
+
 #### Note on macOS
 
 If you are using macOS and wish to push an image to the GitHub registry for use
