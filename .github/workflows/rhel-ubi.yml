@@ -99,7 +99,7 @@ jobs:
             RHEL_ARCH=${{ matrix.architecture.name }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
-          file: docker/rhel/Dockerfile
+          file: docker/rhel-ubi/Dockerfile
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}
           platforms: ${{ matrix.architecture.platform }}
           provenance: mode=max
