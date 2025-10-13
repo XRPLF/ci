@@ -1,26 +1,14 @@
-# We want to use the subscription-free Red Hat UBI images, but those only
-# provide a subset of the packages available in the full Red Hat Enterprise
-# Linux (RHEL) distribution. To get some of the packages we need, we use those
-# provided by the Rocky Linux project, which is a community-developed operating
-# system designed to be a 100% bug-for-bug compatible alternative to RHEL.
-ARG RHEL_VERSION
-FROM rockylinux/rockylinux:${RHEL_VERSION} AS rocky
-RUN dnf -y install rpm-sign rpmdevtools
-
 # ====================== BASE IMAGE ======================
 ARG RHEL_VERSION
-FROM registry.access.redhat.com/ubi${RHEL_VERSION}/ubi:latest AS base
+FROM ghcr.io/xrplf/ci/rhel-${RHEL_VERSION}:ubi AS base
+
+# This is not inherited from the base image.
+ARG RHEL_VERSION
 
 # Use Bash as the default shell for RUN commands, using the options
 # `set -o errexit -o pipefail`, and as the entrypoint.
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ENTRYPOINT ["/bin/bash"]
-
-# This is not inherited from the base image.
-ARG RHEL_VERSION
-
-# Copy rpm binaries from the Rocky Linux image.
-COPY --from=rocky /usr/bin/rpm* /usr/bin/
 
 # Install tools that are shared by all stages.
 RUN <<EOF
@@ -52,11 +40,8 @@ pkgs+=(perl-Time-Piece)   # Required to compile OpenSSL.
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
-if [ "${RHEL_VERSION}" -ge "9" ]; then
-  # Required packaging tool. Unavailable in the RHEL 8 UBI, but it was copied
-  # from the Rocky Linux image in an earlier step.
-  pkgs+=(rpmdevtools)
-fi
+pkgs+=(rpm-sign)          # Required packaging tool.
+pkgs+=(rpmdevtools)       # Required packaging tool.
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
 dnf update -y

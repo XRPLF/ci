@@ -1,17 +1,17 @@
-name: RHEL
+name: RHEL UBI
 
 on:
   pull_request:
     paths:
-      - .github/workflows/rhel.yml
-      - docker/rhel/Dockerfile
+      - .github/workflows/rhel-ubi.yml
+      - docker/rhel-ubi/Dockerfile
       - test
   push:
     branches:
       - main
     paths:
-      - .github/workflows/rhel.yml
-      - docker/rhel/Dockerfile
+      - .github/workflows/rhel-ubi.yml
+      - docker/rhel-ubi/Dockerfile
       - test
   workflow_dispatch:
 
@@ -27,14 +27,12 @@ env:
   PUSH: ${{ github.event_name == 'push' }}
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
-  CONAN_VERSION: 2.19.1
-  GCOVR_VERSION: 8.3
-  CMAKE_VERSION: 4.1.0
-  MOLD_VERSION: 2.40.4
 
 jobs:
-  # Build the Docker image for Red Hat Enterprise Linux using different versions
-  # of GCC
+  # Build the Docker image for the Red Hat Enterprise Linux image based on their
+  # free Universal Binary Image, which contains a subset of feature. We modify
+  # this image by adding back a package repository that contains dependencies we
+  # need.
   # Note, the `os` part of matrix must be kept in sync with the `merge` job below
   build:
     strategy:
@@ -42,33 +40,14 @@ jobs:
         architecture:
           - platform: linux/amd64
             runner: ubuntu-24.04
+            name: x86_64
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
+            name: aarch64
         os:
           - release: 8
-            compiler_name: gcc
-            compiler_version: 14
           - release: 9
-            compiler_name: gcc
-            compiler_version: 12
-          - release: 9
-            compiler_name: gcc
-            compiler_version: 13
-          - release: 9
-            compiler_name: gcc
-            compiler_version: 14
           - release: 10
-            compiler_name: gcc
-            compiler_version: 14
-          - release: 8
-            compiler_name: clang
-            compiler_version: "any"
-          - release: 9
-            compiler_name: clang
-            compiler_version: "any"
-          - release: 10
-            compiler_name: clang
-            compiler_version: "any"
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -103,8 +82,8 @@ jobs:
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
-            type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}
-            type=sha,prefix=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-sha-
+            type=raw,value=ubi
+            type=sha,prefix=ubi-sha-
           labels: |
             org.opencontainers.image.authors=For inquiries, please use https://${{ github.repository }}/issues
             org.opencontainers.image.documentation=https://${{ github.repository }}
@@ -117,11 +96,7 @@ jobs:
           build-args: |
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
             BUILDKIT_INLINE_CACHE=1
-            CONAN_VERSION=${{ env.CONAN_VERSION }}
-            GCC_VERSION=${{ matrix.os.compiler_version }}
-            GCOVR_VERSION=${{ env.GCOVR_VERSION }}
-            CMAKE_VERSION=${{ env.CMAKE_VERSION }}
-            MOLD_VERSION=${{ env.MOLD_VERSION }}
+            RHEL_ARCH=${{ matrix.architecture.name }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/rhel/Dockerfile
@@ -130,8 +105,10 @@ jobs:
           provenance: mode=max
           push: ${{ env.PUSH }}
           sbom: true
+          secrets: |
+            "RHEL_KEY=${{ secrets.RHEL_KEY }}"
+            "RHEL_ORG=${{ secrets.RHEL_ORG }}"
           labels: ${{ steps.meta.outputs.labels }}
-          target: ${{ matrix.os.compiler_name }}
       - name: Export digest
         if: ${{ env.PUSH }}
         run: |
@@ -153,29 +130,8 @@ jobs:
       matrix:
         os:
           - release: 8
-            compiler_name: gcc
-            compiler_version: 14
           - release: 9
-            compiler_name: gcc
-            compiler_version: 12
-          - release: 9
-            compiler_name: gcc
-            compiler_version: 13
-          - release: 9
-            compiler_name: gcc
-            compiler_version: 14
           - release: 10
-            compiler_name: gcc
-            compiler_version: 14
-          - release: 8
-            compiler_name: clang
-            compiler_version: "any"
-          - release: 9
-            compiler_name: clang
-            compiler_version: "any"
-          - release: 10
-            compiler_name: clang
-            compiler_version: "any"
     runs-on: ubuntu-24.04
     needs:
       - build
@@ -212,8 +168,8 @@ jobs:
         with:
           images: ${{ env.CONTAINER_IMAGE }}
           tags: |
-            type=raw,value=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}
-            type=sha,prefix=${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-sha-
+            type=raw,value=ubi
+            type=sha,prefix=ubi-sha-
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
