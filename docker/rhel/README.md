@@ -23,8 +23,8 @@ In order to build the image for GCC, run the commands below from the root
 directory of the repository.
 
 ```shell
-RHEL_VERSION=8
-GCC_VERSION=14
+RHEL_VERSION=9
+GCC_VERSION=12
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
