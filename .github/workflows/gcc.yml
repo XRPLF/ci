@@ -38,6 +38,14 @@ jobs:
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
         os:
+          - release: buster
+            compiler_version: 12
+          - release: buster
+            compiler_version: 13
+          - release: buster
+            compiler_version: 14
+          - release: buster
+            compiler_version: 15
           - release: bullseye
             compiler_version: 12
           - release: bullseye
@@ -120,6 +128,14 @@ jobs:
     strategy:
       matrix:
         os:
+          - release: buster
+            compiler_version: 12
+          - release: buster
+            compiler_version: 13
+          - release: buster
+            compiler_version: 14
+          - release: buster
+            compiler_version: 15
           - release: bullseye
             compiler_version: 12
           - release: bullseye

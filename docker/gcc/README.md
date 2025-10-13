@@ -38,9 +38,10 @@ docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
 
 Dockerfiles provided in this directory can be used to build an image for different GCC versions
 by specifying it as part of the the extension of a Dockerfile, e.g. `Dockerfile.12-bullseye`.
+Supported Debian releases are:
 
-Even though in principle this repository can support different Debian releases,
-currently only Dockerfiles for Debian Bullseye are provided.
+* Buster
+* Bullseye
 
 #### Building the Docker image
 
