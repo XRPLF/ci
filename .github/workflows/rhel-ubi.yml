@@ -5,14 +5,12 @@ on:
     paths:
       - .github/workflows/rhel-ubi.yml
       - docker/rhel-ubi/Dockerfile
-      - test
   push:
     branches:
       - main
     paths:
       - .github/workflows/rhel-ubi.yml
       - docker/rhel-ubi/Dockerfile
-      - test
   workflow_dispatch:
 
 concurrency:
@@ -99,7 +97,7 @@ jobs:
             RHEL_ARCH=${{ matrix.architecture.name }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
-          file: docker/rhel/Dockerfile
+          file: docker/rhel-ubi/Dockerfile
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}
           platforms: ${{ matrix.architecture.platform }}
           provenance: mode=max
@@ -119,7 +117,7 @@ jobs:
         if: ${{ env.PUSH }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-${{ env.PLATFORM_PAIR }}
+          name: digests-${{ matrix.os.release }}-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -144,7 +142,7 @@ jobs:
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           path: /tmp/digests
-          pattern: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-*
+          pattern: digests-${{ matrix.os.release }}-*
           merge-multiple: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
