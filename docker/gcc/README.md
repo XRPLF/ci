@@ -19,7 +19,33 @@ Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
 below.
 
-### Logging into the GitHub registry
+### Building the Docker image
+
+Dockerfiles provided in this directory can be used to build an image for
+different GCC versions by specifying it as part of the extension of a
+Dockerfile, e.g. `Dockerfile.12-bullseye`.
+
+Even though in principle this repository can support different Debian releases,
+currently only Dockerfiles for Debian Bullseye are provided.
+
+In order to build an image, run the commands below from the root directory of
+the repository.
+
+```shell
+GCC_VERSION=12
+DEBIAN_VERSION=bullseye
+CONTAINER_IMAGE=ghcr.io/xrplf/ci/gcc:${GCC_VERSION}-${DEBIAN_VERSION}
+
+docker buildx build . \
+  --file docker/gcc/Dockerfile.${GCC_VERSION}-${DEBIAN_VERSION} \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --tag ${CONTAINER_IMAGE}
+```
+
+### Pushing the Docker image
+
+#### Logging into the GitHub registry
 
 To be able to push a Docker image to the GitHub registry, a personal access
 token is needed, see instructions [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
@@ -27,46 +53,34 @@ In summary, if you do not have a suitable personal access token, generate one
 [here](https://github.com/settings/tokens/new?scopes=write:packages).
 
 ```shell
-CONTAINER_REGISTRY=ghcr.io
 GITHUB_USER=<your-github-username>
 GITHUB_TOKEN=<your-github-personal-access-token>
-echo ${GITHUB_TOKEN} | \
-docker login ${CONTAINER_REGISTRY} -u "${GITHUB_USER}" --password-stdin
+echo ${GITHUB_TOKEN} | docker login ghcr.io -u "${GITHUB_USER}" --password-stdin
 ```
 
-### Building and pushing the Docker image
+#### Pushing to the GitHub registry
 
-Dockerfiles provided in this directory can be used to build an image for different GCC versions
-by specifying it as part of the the extension of a Dockerfile, e.g. `Dockerfile.12-bullseye`.
-
-Even though in principle this repository can support different Debian releases,
-currently only Dockerfiles for Debian Bullseye are provided.
-
-#### Building the Docker image
-
-In order to build an image, run the commands below from the root directory of
-the repository.
-
-Ensure you've run the login command above to authenticate with the Docker
-registry.
+To push the image to the GitHub registry, you can do so with the following
+command, whereby we append your username to not overwrite existing images:
 
 ```shell
-GCC_VERSION=12
-DEBIAN_VERSION=bullseye
-CONTAINER_IMAGE=xrplf/ci/gcc:${GCC_VERSION}-${DEBIAN_VERSION}
-
-docker buildx build . \
-  --file docker/gcc/Dockerfile.${GCC_VERSION}-${DEBIAN_VERSION} \
-  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --tag ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
+docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE}-${GITHUB_USER}
+docker push ${CONTAINER_IMAGE}-${GITHUB_USER}
 ```
 
-#### Pushing the Docker image to the GitHub registry
+However, there should be no need to push the GCC image manually, as it is only
+used as a base image for other images in this repository.
 
-If you want to push the image to the GitHub registry, you can do so with the
-following command:
+Note, if you or the CI pipeline are pushing an image for the first time, it will
+be private by default. You will need to go to the
+[packages page](https://github.com/orgs/XRPLF/packages), select the relevant
+package, then "Package settings", and after clicking the "Change visibility"
+button make it "Public". In addition, on that same page, under "Manage Actions
+access" click the "Add repository" button, select the `ci` repository, and grant
+it "Admin" access.
 
-```shell
-docker push ${CONTAINER_REGISTRY}/${CONTAINER_IMAGE}
-```
+#### Note on macOS
+
+If you are using macOS and wish to push an image to the GitHub registry for use
+in GitHub Actions, you will need to append `--platform linux/amd64` to the
+`docker buildx build` commands above.
