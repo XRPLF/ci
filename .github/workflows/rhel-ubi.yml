@@ -1,0 +1,182 @@
+name: RHEL UBI
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/rhel-ubi.yml
+      - docker/rhel-ubi/Dockerfile
+      - test
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/rhel-ubi.yml
+      - docker/rhel-ubi/Dockerfile
+      - test
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PUSH: ${{ github.event_name == 'push' }}
+  CONTAINER_REGISTRY: ghcr.io
+  BUILDKIT_PROGRESS: plain
+
+jobs:
+  # Build the Docker image for the Red Hat Enterprise Linux image based on their
+  # free Universal Binary Image, which contains a subset of feature. We modify
+  # this image by adding back a package repository that contains dependencies we
+  # need.
+  # Note, the `os` part of matrix must be kept in sync with the `merge` job below
+  build:
+    strategy:
+      matrix:
+        architecture:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            name: x86_64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            name: aarch64
+        os:
+          - release: 8
+          - release: 9
+          - release: 10
+    runs-on: ${{ matrix.architecture.runner }}
+    permissions:
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      - name: Login to GitHub Registry
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Prepare environment
+        run: |
+          # Convert the repository name to lowercase as the organization name is
+          # uppercase, which is not permitted by the Docker registry. It's 2025 and GitHub
+          # still does not provide convenient action expression syntax for lowercase.
+          GITHUB_REPO=${{ github.repository }}
+          CONTAINER_REPO=${GITHUB_REPO@L}
+          echo "CONTAINER_REPOSITORY=${CONTAINER_REPO}/rhel-${{ matrix.os.release }}" >> $GITHUB_ENV
+          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/rhel-${{ matrix.os.release }}" >> $GITHUB_ENV
+          PLATFORM=${{ matrix.architecture.platform }}
+          echo "PLATFORM_PAIR=${PLATFORM//\//-}" >> $GITHUB_ENV
+      - name: Prepare container metadata
+        id: meta
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,manifest-descriptor
+        with:
+          images: ${{ env.CONTAINER_IMAGE }}
+          tags: |
+            type=raw,value=ubi
+            type=sha,prefix=ubi-sha-
+          labels: |
+            org.opencontainers.image.authors=For inquiries, please use https://${{ github.repository }}/issues
+            org.opencontainers.image.documentation=https://${{ github.repository }}
+            org.opencontainers.image.vendor=XRPLF
+            org.opencontainers.image.title=${{ env.CONTAINER_REPOSITORY }}
+      - name: Build and push the Docker image
+        id: build
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          build-args: |
+            BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
+            BUILDKIT_INLINE_CACHE=1
+            RHEL_ARCH=${{ matrix.architecture.name }}
+            RHEL_VERSION=${{ matrix.os.release }}
+          context: .
+          file: docker/rhel/Dockerfile
+          outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}
+          platforms: ${{ matrix.architecture.platform }}
+          provenance: mode=max
+          push: ${{ env.PUSH }}
+          sbom: true
+          secrets: |
+            "RHEL_KEY=${{ secrets.RHEL_KEY }}"
+            "RHEL_ORG=${{ secrets.RHEL_ORG }}"
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Export digest
+        if: ${{ env.PUSH }}
+        run: |
+          mkdir -p /tmp/digests
+          DIGEST="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${DIGEST#sha256:}"
+      - name: Upload digest
+        if: ${{ env.PUSH }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-${{ env.PLATFORM_PAIR }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    if: ${{ github.event_name == 'push' }}
+    strategy:
+      matrix:
+        os:
+          - release: 8
+          - release: 9
+          - release: 10
+    runs-on: ubuntu-24.04
+    needs:
+      - build
+    permissions:
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Download digests
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.os.release }}-${{ matrix.os.compiler_name }}-${{ matrix.os.compiler_version }}-*
+          merge-multiple: true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      - name: Login to GitHub Registry
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Prepare environment
+        run: |
+          GITHUB_REPO=${{ github.repository }}
+          CONTAINER_REPO=${GITHUB_REPO@L}
+          echo "CONTAINER_IMAGE=${CONTAINER_REGISTRY}/${CONTAINER_REPO}/rhel-${{ matrix.os.release }}" >> $GITHUB_ENV
+      - name: Prepare container metadata
+        id: meta
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
+        with:
+          images: ${{ env.CONTAINER_IMAGE }}
+          tags: |
+            type=raw,value=ubi
+            type=sha,prefix=ubi-sha-
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          eval "docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(jq -cr '.annotations | map("--annotation \"" + . + "\"") | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.CONTAINER_IMAGE }}@sha256:%s ' *)"
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.CONTAINER_IMAGE }}:${{ steps.meta.outputs.version }}
