@@ -7,6 +7,31 @@ Although the images will be built by a CI pipeline in this repository, if
 necessary a maintainer can build them manually by following the instructions
 below.
 
+### Obtaining Red Hat credentials
+
+Our image is based on the Universal Base Image (UBI) provided by Red Hat, which
+is freely available. However, they only contain a subset of RHEL content, and
+for our purposes some content is missing. To add the RHEL repo containing these
+missing packages, we need to register the image using Red Hat's subscription
+manager. We can then install the packages, and finally unregister the image
+again to prevent misuse of our credentials. External contributors can obtain
+their own "activation key" free of charge from Red Hat, see below.
+
+To obtain an activation key, you need to register for a Developer account
+[here](https://developers.redhat.com), and then you can create an activation key
+[here](https://console.redhat.com/insights/connector/activation-keys). On the
+"Select Workload" page you can choose "Latest release", which will work for all
+the RHEL versions we currently support. On the page linked above you will also
+find your organization ID.
+
+Once you have both the activation key and the organization ID, run the following
+commands to store them as environment variables in your terminal session:
+
+```shell
+export RHEL_KEY=<value-of-rhel-key>
+export RHEL_ORG=<value-of-rhel-org>
+```
+
 ### Building the Docker image
 
 The same Dockerfile can be used to build an image for RHEL 9 or RHEL 10 and
@@ -23,6 +48,7 @@ In order to build the image for GCC, run the commands below from the root
 directory of the repository.
 
 ```shell
+RHEL_ARCH=<x86_64 or aarch64>
 RHEL_VERSION=9
 GCC_VERSION=12
 CONAN_VERSION=2.19.1
@@ -41,7 +67,10 @@ docker buildx build . \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
+  --build-arg RHEL_ARCH=${RHEL_ARCH} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
+  --secret id=RHEL_KEY,env=RHEL_KEY \
+  --secret id=RHEL_ORG,env=RHEL_ORG \
   --tag ${CONTAINER_IMAGE}
 ```
 
@@ -51,6 +80,7 @@ In order to build the image for Clang, run the commands below from the root
 directory of the repository.
 
 ```shell
+RHEL_ARCH=<x86_64 or aarch64>
 RHEL_VERSION=10
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
@@ -67,7 +97,10 @@ docker buildx build . \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
+  --build-arg RHEL_ARCH=${RHEL_ARCH} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
+  --secret id=RHEL_KEY,env=RHEL_KEY \
+  --secret id=RHEL_ORG,env=RHEL_ORG \
   --tag ${CONTAINER_IMAGE}
 ```
 

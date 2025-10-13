@@ -1,14 +1,23 @@
 # ====================== BASE IMAGE ======================
-ARG RHEL_VERSION
-FROM ghcr.io/xrplf/ci/rhel-${RHEL_VERSION}:ubi AS base
 
-# This is not inherited from the base image.
 ARG RHEL_VERSION
+FROM registry.access.redhat.com/ubi${RHEL_VERSION}/ubi:latest AS base
 
 # Use Bash as the default shell for RUN commands, using the options
 # `set -o errexit -o pipefail`, and as the entrypoint.
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ENTRYPOINT ["/bin/bash"]
+
+# This is not inherited from the base image.
+ARG RHEL_VERSION
+
+# Enable the repository containing packages we need that are missing from the
+# UBI image. The RHEL architecture should be either 'x86_64' or 'aarch64'.
+ARG RHEL_ARCH
+RUN --mount=type=secret,id=RHEL_KEY,env=RHEL_KEY \
+    --mount=type=secret,id=RHEL_ORG,env=RHEL_ORG \
+    subscription-manager register --activationkey="${RHEL_KEY}" --org="${RHEL_ORG}" && \
+    subscription-manager repos --enable=rhel-${RHEL_VERSION}-for-${RHEL_ARCH}-appstream-rpms
 
 # Install tools that are shared by all stages.
 RUN <<EOF
@@ -49,6 +58,10 @@ dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
+
+# Unregister from the subscription manager to avoid the credentials to be used \
+# by consumers of this image.
+RUN subscription-manager unregister && subscription-manager clean
 
 # Add symlinks to point to the latest Python versions. The /usr/local/bin
 # directory is in the PATH before the /usr/bin directory, so the new Python
