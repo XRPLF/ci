@@ -1,5 +1,4 @@
 # ====================== BASE IMAGE ======================
-
 ARG RHEL_VERSION
 FROM registry.access.redhat.com/ubi${RHEL_VERSION}/ubi:latest AS base
 
@@ -59,7 +58,7 @@ dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 
-# Unregister from the subscription manager to avoid the credentials to be used \
+# Unregister from the subscription manager to avoid the credentials to be used
 # by consumers of this image.
 RUN subscription-manager unregister && subscription-manager clean
 
