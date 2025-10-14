@@ -9,10 +9,11 @@ ENTRYPOINT ["/bin/bash"]
 
 # This is not inherited from the base image.
 ARG RHEL_VERSION
+# The RHEL architecture should be either 'x86_64' or 'aarch64'.
+ARG RHEL_ARCH
 
 # Enable the repository containing packages we need that are missing from the
-# UBI image. The RHEL architecture should be either 'x86_64' or 'aarch64'.
-ARG RHEL_ARCH
+# UBI image.
 RUN --mount=type=secret,id=RHEL_KEY,env=RHEL_KEY \
     --mount=type=secret,id=RHEL_ORG,env=RHEL_ORG \
     subscription-manager register --activationkey="${RHEL_KEY}" --org="${RHEL_ORG}" && \
@@ -35,16 +36,7 @@ pkgs+=(jq)                # JSON manipulation.
 pkgs+=(libatomic)         # Required by mold linker.
 pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)       # Required build tool.
-pkgs+=(perl-Digest-SHA)   # Required to compile OpenSSL.
-if [ "${RHEL_VERSION}" -ge "9" ]; then
-  # Required to compile OpenSSL. Unnecessary in RHEL 8, as these modules are
-  # included in the base image.
-  pkgs+=(perl-File-Compare)
-  pkgs+=(perl-File-Copy)
-  pkgs+=(perl-FindBin)
-fi
-pkgs+=(perl-IPC-Cmd)      # Required to compile OpenSSL.
-pkgs+=(perl-Time-Piece)   # Required to compile OpenSSL.
+pkgs+=(perl)              # Required to compile certain dependencies.
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
