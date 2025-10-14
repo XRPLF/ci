@@ -36,7 +36,19 @@ pkgs+=(jq)                # JSON manipulation.
 pkgs+=(libatomic)         # Required by mold linker.
 pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
 pkgs+=(ninja-build)       # Required build tool.
-pkgs+=(perl)              # Required to compile certain dependencies.
+pkgs+=(perl-Digest-SHA)   # Required to compile dependencies.
+pkgs+=(perl-IPC-Cmd)      # Required to compile dependencies.
+pkgs+=(perl-open)         # Required to compile dependencies.
+pkgs+=(perl-threads)      # Required to compile dependencies.
+pkgs+=(perl-Thread-Queue) # Required to compile dependencies.
+pkgs+=(perl-Time-Piece)   # Required to compile dependencies.
+if [ "${RHEL_VERSION}" -ge "9" ]; then
+  # Required to compile dependencies. Unnecessary in RHEL 8, as these modules
+  # are included in the base image.
+  pkgs+=(perl-File-Compare)
+  pkgs+=(perl-File-Copy)
+  pkgs+=(perl-FindBin)
+fi
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
