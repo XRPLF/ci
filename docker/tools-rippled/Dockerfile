@@ -136,7 +136,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Install tools to sign the .deb and .rpm installers containing our binary.
 RUN <<EOF
 apt-get update
-apt-get install -y --no-install-recommends rpm-sign
+apt-get install -y --no-install-recommends rpm
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
