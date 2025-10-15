@@ -7,6 +7,9 @@ FROM registry.access.redhat.com/ubi${RHEL_VERSION}/ubi:latest AS base
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 ENTRYPOINT ["/bin/bash"]
 
+# This is not inherited from the base image.
+ARG RHEL_VERSION
+
 # Install tools that are shared by all stages.
 RUN <<EOF
 pkgs=()
