@@ -54,6 +54,14 @@ FROM base AS pre-commit
 # This is not inherited from base image.
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Install additional dependencies.
+RUN <<EOF
+apt-get update
+apt-get install -y --no-install-recommends libatomic1
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+EOF
+
 # Install pre-commit.
 ARG PRE_COMMIT_VERSION
 RUN pip install --no-cache \
