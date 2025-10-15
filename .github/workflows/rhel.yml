@@ -42,10 +42,8 @@ jobs:
         architecture:
           - platform: linux/amd64
             runner: ubuntu-24.04
-            name: x86_64
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
-            name: aarch64
         os:
           - release: 8
             compiler_name: gcc
@@ -124,7 +122,6 @@ jobs:
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             MOLD_VERSION=${{ env.MOLD_VERSION }}
-            RHEL_ARCH=${{ matrix.architecture.name }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/rhel/Dockerfile
@@ -133,9 +130,6 @@ jobs:
           provenance: mode=max
           push: ${{ env.PUSH }}
           sbom: true
-          secrets: |
-            "RHEL_KEY=${{ secrets.RHEL_KEY }}"
-            "RHEL_ORG=${{ secrets.RHEL_ORG }}"
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.os.compiler_name }}
       - name: Export digest
