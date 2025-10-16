@@ -69,6 +69,24 @@ docker buildx build . \
   --tag ${CONTAINER_IMAGE}
 ```
 
+#### Building the Docker image for signing
+
+In order to build an image, run the commands below from the root directory of
+the repository.
+
+```shell
+UBUNTU_VERSION=noble
+CONTAINER_IMAGE=ghcr.io/xrplf/ci/tools-rippled-signing:latest
+
+docker buildx build . \
+  --file docker/tools-rippled/Dockerfile \
+  --target signing \
+  --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
+  --tag ${CONTAINER_IMAGE}
+```
+
 ### Pushing the Docker image
 
 #### Logging into the GitHub registry

@@ -113,8 +113,30 @@ ENV CXX=/usr/bin/g++
 ARG DOXYGEN_VERSION
 ARG GRAPHVIZ_VERSION
 RUN <<EOF
+pkgs=()
+pkgs+=(doxygen=${DOXYGEN_VERSION})
+pkgs+=(graphviz=${GRAPHVIZ_VERSION})
 apt-get update
-apt-get install -y doxygen=${DOXYGEN_VERSION} graphviz=${GRAPHVIZ_VERSION}
+apt-get install -y --no-install-recommends "${pkgs[@]}"
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+EOF
+
+ENV HOME=/root
+WORKDIR ${HOME}
+
+# ====================== SIGNING IMAGE ======================
+# Note, we do not install a compiler here.
+
+FROM base AS signing
+
+# This is not inherited from base image.
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install tools to sign the .deb and .rpm installers containing our binary.
+RUN <<EOF
+apt-get update
+apt-get install -y --no-install-recommends rpm
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF

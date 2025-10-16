@@ -44,6 +44,7 @@ jobs:
         tool:
           - documentation
           - pre-commit
+          - signing
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -128,6 +129,7 @@ jobs:
         tool:
           - documentation
           - pre-commit
+          - signing
     runs-on: ubuntu-24.04
     needs:
       - build
