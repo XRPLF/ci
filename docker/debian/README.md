@@ -37,7 +37,7 @@ directory of the repository.
 
 ```shell
 DEBIAN_VERSION=bookworm
-GCC_VERSION=13
+GCC_VERSION=12
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
