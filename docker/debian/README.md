@@ -37,7 +37,7 @@ directory of the repository.
 
 ```shell
 DEBIAN_VERSION=bookworm
-GCC_VERSION=12
+GCC_VERSION=13
 CONAN_VERSION=2.19.1
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
@@ -139,6 +139,26 @@ the same host.
 If you see an error such as `bash: /root/.bashrc: Permission denied` and the
 prompt shows `I have no name!`, then exit the container and run it again without
 the `--user $(id -u):$(id -g)` option, or run it in rootless mode.
+
+#### Caching Conan dependencies
+
+You can further customize the `docker run` command by adding a volume mount for
+holding the Conan cache (the "p" directory), e.g.:
+
+```shell
+CONAN_CACHE=/tmp/.conan2/p
+mkdir -p ${CONAN_CACHE}
+docker run --user $(id -u):$(id -g) --rm -it \
+  -v ${CODEBASE}:/rippled \
+  -v ${CONAN_CACHE}:/root/.conan2/p \
+  ${CONTAINER_IMAGE}
+```
+
+This avoids that you need to build the dependencies each time you run the image.
+We recommend keeping the Conan cache directory separate from the one used by the
+host machine.
+
+#### Building the binary
 
 Once inside the container you can run the following commands to build `rippled`:
 
