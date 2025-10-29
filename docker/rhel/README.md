@@ -9,7 +9,7 @@ below.
 
 ### Building the Docker image
 
-The same Dockerfile can be used to build an image for RHEL 9 or RHEL 10 and
+The same Dockerfile can be used to build an image for RHEL8, RHEL9, RHEL10 and
 future versions by specifying the `RHEL_VERSION` build argument. There is an
 additional argument to specify as well, namely `GCC_VERSION` for the GCC flavor;
 in the RHEL images we cannot choose the Clang version to install, so the Clang
