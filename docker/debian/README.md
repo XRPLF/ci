@@ -121,7 +121,9 @@ can do so with the following command:
 
 ```shell
 CODEBASE=<path to the rippled repository>
-docker run --user $(id -u):$(id -g) --rm -it -v ${CODEBASE}:/rippled ${CONTAINER_IMAGE}
+docker run --user $(id -u):$(id -g) --rm -it \
+  --mount type=bind,source=${CODEBASE},target=/rippled \
+  ${CONTAINER_IMAGE}
 ```
 
 Note, the above command will assume the identity of the current user in the
@@ -139,6 +141,22 @@ the same host.
 If you see an error such as `bash: /root/.bashrc: Permission denied` and the
 prompt shows `I have no name!`, then exit the container and run it again without
 the `--user $(id -u):$(id -g)` option, or run it in rootless mode.
+
+#### Caching Conan dependencies
+
+You can further customize the `docker run` command by adding a volume mount for
+holding the Conan cache (the "p" directory), e.g.:
+
+```shell
+docker run --user $(id -u):$(id -g) --rm -it \
+  --mount type=bind,source=${CODEBASE},target=/rippled \
+  --mount type=volume,source=conan,target=/root/.conan2/p \
+  ${CONTAINER_IMAGE}
+```
+
+This avoids the need to build the dependencies each time you run the image.
+
+#### Building the binary
 
 Once inside the container you can run the following commands to build `rippled`:
 
