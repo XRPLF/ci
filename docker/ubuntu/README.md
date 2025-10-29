@@ -112,7 +112,7 @@ docker run --user $(id -u):$(id -g) --rm -it \
   ${CONTAINER_IMAGE}
 ```
 
-This avoids that you need to build the dependencies each time you run the image.
+This avoids the need to build the dependencies each time you run the image.
 
 #### Building the binary
 
