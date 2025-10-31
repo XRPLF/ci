@@ -26,6 +26,7 @@ pkgs+=(gnupg2)            # Dependency for tools requiring signing or encrypting
 pkgs+=(jq)                # JSON manipulation.
 pkgs+=(libatomic)         # Required by mold linker.
 pkgs+=(libstdc++-static)  # Required to statically link libraries into rippled.
+pkgs+=(net-tools)         # Dependency for debugging network issues.
 pkgs+=(ninja-build)       # Required build tool.
 pkgs+=(perl-Digest-SHA)   # Required to compile dependencies.
 pkgs+=(perl-IPC-Cmd)      # Required to compile dependencies.
