@@ -50,6 +50,7 @@ pkgs+=(gpg-agent)       # Dependency for tools requiring signing or encrypting/d
 pkgs+=(jq)              # JSON manipulation.
 pkgs+=(libatomic1)      # Required by mold linker.
 pkgs+=(libc6-dev)       # Required build tool.
+pkgs+=(net-tools)       # Dependency for debugging network issues.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(python3-venv)    # Python environment management tool.
 pkgs+=(python3-pip)     # Package manager for Python applications.
