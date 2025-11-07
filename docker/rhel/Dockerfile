@@ -111,7 +111,13 @@ if [ "${RHEL_VERSION}" -eq "10" ]; then
   dnf install -y --setopt=tsflags=nodocs gcc gcc-c++
 else
   dnf remove -y gcc gcc-c++
-  dnf install -y --setopt=tsflags=nodocs gcc-toolset-${GCC_VERSION}-gcc gcc-toolset-${GCC_VERSION}-gcc-c++
+  dnf install -y --setopt=tsflags=nodocs \
+    gcc-toolset-${GCC_VERSION}-gcc \
+    gcc-toolset-${GCC_VERSION}-gcc-c++ \
+    gcc-toolset-${GCC_VERSION}-libasan-devel \
+    gcc-toolset-${GCC_VERSION}-liblsan-devel \
+    gcc-toolset-${GCC_VERSION}-libtsan-devel \
+    gcc-toolset-${GCC_VERSION}-libubsan-devel
   update-alternatives \
     --install /usr/bin/cc cc /opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin/gcc 999
   update-alternatives \

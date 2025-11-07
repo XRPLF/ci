@@ -174,6 +174,7 @@ RUN <<EOF
 apt-get update
 apt-get install -y --no-install-recommends \
   clang-${CLANG_VERSION} \
+  libclang-rt-${CLANG_VERSION}-dev \
   llvm-${CLANG_VERSION} \
   gcc \
   g++
