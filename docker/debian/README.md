@@ -38,7 +38,7 @@ directory of the repository.
 ```shell
 DEBIAN_VERSION=bookworm
 GCC_VERSION=12
-CONAN_VERSION=2.19.1
+CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
@@ -64,7 +64,7 @@ In order to build a GCC image for Bullseye, you also need to explicitly set
 ```shell
 DEBIAN_VERSION=bullseye
 GCC_VERSION=12
-CONAN_VERSION=2.19.1
+CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
@@ -94,7 +94,7 @@ directory of the repository.
 ```shell
 DEBIAN_VERSION=bookworm
 CLANG_VERSION=17
-CONAN_VERSION=2.19.1
+CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4

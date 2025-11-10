@@ -27,7 +27,7 @@ env:
   PUSH: ${{ github.event_name == 'push' }}
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
-  CONAN_VERSION: 2.19.1
+  CONAN_VERSION: 2.22.2
   GCOVR_VERSION: 8.3
   CMAKE_VERSION: 4.1.0
   MOLD_VERSION: 2.40.4
