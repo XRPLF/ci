@@ -197,7 +197,7 @@ ARG DEBIAN_VERSION
 ARG CLANG_VERSION
 RUN <<EOF
 apt-get update
-apt-get install -y --no-install-recommends gcc g++
+apt-get install -y --no-install-recommends gcc g++ libstdc++6
 curl --no-progress-meter https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg
 printf "%s\n%s\n" \
   "deb [signed-by=/etc/apt/keyrings/llvm.gpg] https://apt.llvm.org/${DEBIAN_VERSION}/ llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} main" \
