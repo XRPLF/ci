@@ -40,6 +40,7 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(binutils-gold)   # Required build tool.
+pkgs+=(cargo)           # Package manager for Rust applications.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
@@ -54,6 +55,7 @@ pkgs+=(net-tools)       # Dependency for debugging network issues.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(python3-venv)    # Python environment management tool.
 pkgs+=(python3-pip)     # Package manager for Python applications.
+pkgs+=(rustc)           # Rust compiler.
 pkgs+=(vim)             # Text editor.
 pkgs+=(wget)            # Required build tool.
 apt-get update

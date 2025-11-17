@@ -191,6 +191,14 @@ cd ..
 rm -rf test
 EOF
 
+# Add rust installation. Native rust package conflicts with gcc
+RUN <<EOF
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+. ~/.bashrc
+rustc -V
+cargo -V
+EOF
+
 # ===================== CLANG IMAGE =====================
 FROM base AS clang
 
@@ -265,4 +273,12 @@ cp -r /test test
 cd test && ./run.sh clang
 cd ..
 rm -rf test
+EOF
+
+# Add rust installation. Native rust package conflicts with gcc
+RUN <<EOF
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+. ~/.bashrc
+rustc -V
+cargo -V
 EOF
