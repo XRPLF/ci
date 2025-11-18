@@ -52,6 +52,17 @@ dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 
+# Install ccache, which is an optional build tool for caching build artifacts.
+# Unlike Debian and Ubuntu, we cannot install it via the package manager in the
+# UBI image.
+RUN <<EOF
+ARCH=$(uname -m)
+CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | jq -r '.name')
+wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
+tar xf ccache.tar.xz --strip-components=1 -C /usr/local/bin ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache
+rm ccache.tar.xz
+EOF
+
 # Add symlinks to point to the latest Python versions. The /usr/local/bin
 # directory is in the PATH before the /usr/bin directory, so the new Python
 # versions will be used by default.
@@ -66,8 +77,6 @@ ln -sf /usr/bin/pip3.12 /usr/local/bin/pip
 mkdir -p /usr/local/lib
 ln -sf /usr/lib/python3.12 /usr/local/lib/python3.12
 EOF
-
-RUN ld.gold --version
 
 # Install Python-based tools and cmake.
 ARG CONAN_VERSION
@@ -90,7 +99,17 @@ ARCH=$(uname -m)
 wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
 tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
+EOF
+
+# Print versions.
+RUN <<EOF
+ccache --version
+cmake --version
+conan --version
+gcovr --version
+ld.gold --version
 mold --version
+python3 --version
 EOF
 
 # ====================== GCC IMAGE ======================
