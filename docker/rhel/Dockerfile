@@ -16,6 +16,8 @@ ARG RHEL_VERSION
 RUN <<EOF
 dnf install -y --setopt=tsflags=nodocs https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL_VERSION}.noarch.rpm
 dnf upgrade -y
+dnf clean -y all
+rm -rf /var/cache/dnf/*
 EOF
 
 # Install tools that are shared by all stages.
