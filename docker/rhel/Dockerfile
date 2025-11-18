@@ -10,6 +10,14 @@ ENTRYPOINT ["/bin/bash"]
 # This is not inherited from the base image.
 ARG RHEL_VERSION
 
+# Install the Fedora Extra Packages for Enterprise Linux (EPEL) repository,
+# which provides additional packages for RHEL and CentOS Stream, some of which
+# we want to install.
+RUN <<EOF
+dnf install -y --setopt=tsflags=nodocs https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL_VERSION}.noarch.rpm
+dnf upgrade -y
+EOF
+
 # Install tools that are shared by all stages.
 RUN <<EOF
 pkgs=()
@@ -19,6 +27,7 @@ if [ "${RHEL_VERSION}" -eq "8" ]; then
 else
   pkgs+=(binutils-gold)   # Required build tool.
 fi
+pkgs+=(ccache)            # Optional build tool for caching build artifacts.
 pkgs+=(file)              # Required packaging tool.
 pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
