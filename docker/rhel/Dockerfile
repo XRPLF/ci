@@ -53,14 +53,16 @@ rm -rf /var/cache/dnf/*
 EOF
 
 # Install ccache, which is an optional build tool for caching build artifacts.
-# Unlike Debian and Ubuntu, we cannot install it via the package manager in the
-# UBI image.
+# We have to enable the Fedora Extra Packages for Enterprise Linux (EPEL)
+# repository to install ccache. EPEL provides additional packages for RHEL and
+# CentOS Stream.
 RUN <<EOF
-ARCH=$(uname -m)
-CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | jq -r '.name')
-wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
-tar xf ccache.tar.xz --strip-components=1 -C /usr/local/bin ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache
-rm ccache.tar.xz
+dnf install -y --setopt=tsflags=nodocs https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL_VERSION}.noarch.rpm
+dnf upgrade -y
+dnf update -y
+dnf install -y --allowerasing --setopt=tsflags=nodocs ccache
+dnf clean -y all
+rm -rf /var/cache/dnf/*
 EOF
 
 # Add symlinks to point to the latest Python versions. The /usr/local/bin
