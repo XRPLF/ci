@@ -15,7 +15,6 @@ ARG RHEL_VERSION
 # we want to install.
 RUN <<EOF
 dnf install -y --setopt=tsflags=nodocs https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL_VERSION}.noarch.rpm
-dnf upgrade -y
 dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
