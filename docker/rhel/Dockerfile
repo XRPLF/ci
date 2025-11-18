@@ -61,19 +61,6 @@ dnf clean -y all
 rm -rf /var/cache/dnf/*
 EOF
 
-# Install ccache, which is an optional build tool for caching build artifacts.
-# We have to enable the Fedora Extra Packages for Enterprise Linux (EPEL)
-# repository to install ccache. EPEL provides additional packages for RHEL and
-# CentOS Stream.
-RUN <<EOF
-dnf install -y --setopt=tsflags=nodocs https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL_VERSION}.noarch.rpm
-dnf upgrade -y
-dnf update -y
-dnf install -y --allowerasing --setopt=tsflags=nodocs ccache
-dnf clean -y all
-rm -rf /var/cache/dnf/*
-EOF
-
 # Add symlinks to point to the latest Python versions. The /usr/local/bin
 # directory is in the PATH before the /usr/bin directory, so the new Python
 # versions will be used by default.
