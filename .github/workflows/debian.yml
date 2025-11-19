@@ -31,6 +31,7 @@ env:
   GCOVR_VERSION: 8.3
   CMAKE_VERSION: 4.1.0
   MOLD_VERSION: 2.40.4
+  RUST_VERSION: 1.91.1
   FALLBACK_GCC: 12
   FALLBACK_CLANG: 16
 
@@ -154,6 +155,7 @@ jobs:
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             MOLD_VERSION=${{ env.MOLD_VERSION }}
+            RUST_VERSION=${{ env.RUST_VERSION }}
             DEBIAN_VERSION=${{ matrix.os.release }}
             BASE_IMAGE=${{ env.CONTAINER_IMAGE_GCC && format('{0}:{1}-{2}', env.CONTAINER_IMAGE_GCC, matrix.os.compiler_version, matrix.os.release) || format('gcc:{0}-{1}', matrix.os.compiler_version, matrix.os.release) }}
           context: .

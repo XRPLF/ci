@@ -29,6 +29,7 @@ CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
+RUST_VERSION=1.91.1
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/rhel-${RHEL_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -41,6 +42,7 @@ docker buildx build . \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
+  --build-arg RUST_VERSION=${RUST_VERSION} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --tag ${CONTAINER_IMAGE}
 ```
@@ -56,6 +58,7 @@ CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
 CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
+RUST_VERSION=1.91.1
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/rhel-${RHEL_VERSION}:clang-any
 
 docker buildx build . \
@@ -67,6 +70,7 @@ docker buildx build . \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
+  --build-arg RUST_VERSION=${RUST_VERSION} \
   --build-arg RHEL_VERSION=${RHEL_VERSION} \
   --tag ${CONTAINER_IMAGE}
 ```

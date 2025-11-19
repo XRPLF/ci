@@ -31,6 +31,7 @@ env:
   GCOVR_VERSION: 8.3
   CMAKE_VERSION: 4.1.0
   MOLD_VERSION: 2.40.4
+  RUST_VERSION: 1.91.1
 
 jobs:
   # Build the Docker image for Red Hat Enterprise Linux using different versions
@@ -122,6 +123,7 @@ jobs:
             GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             CMAKE_VERSION=${{ env.CMAKE_VERSION }}
             MOLD_VERSION=${{ env.MOLD_VERSION }}
+            RUST_VERSION=${{ env.RUST_VERSION }}
             RHEL_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/rhel/Dockerfile
