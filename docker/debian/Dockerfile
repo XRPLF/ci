@@ -40,7 +40,6 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(binutils-gold)   # Required build tool.
-pkgs+=(cargo)           # Package manager for Rust applications.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
@@ -55,7 +54,6 @@ pkgs+=(net-tools)       # Dependency for debugging network issues.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(python3-venv)    # Python environment management tool.
 pkgs+=(python3-pip)     # Package manager for Python applications.
-pkgs+=(rustc)           # Rust compiler.
 pkgs+=(vim)             # Text editor.
 pkgs+=(wget)            # Required build tool.
 apt-get update
@@ -88,6 +86,15 @@ wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VER
 tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
 mold --version
+EOF
+
+# Install rust.
+RUN <<EOF
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=1.91.1
+. ~/.bashrc
+. ~/.cargo/env
+rustc -V
+cargo -V
 EOF
 
 # ====================== GCC IMAGE ======================
