@@ -10,6 +10,15 @@ ENTRYPOINT ["/bin/bash"]
 # This is not inherited from the base image.
 ARG RHEL_VERSION
 
+# Install the Fedora Extra Packages for Enterprise Linux (EPEL) repository,
+# which provides additional packages for RHEL and CentOS Stream, some of which
+# we want to install.
+RUN <<EOF
+dnf install -y --setopt=tsflags=nodocs https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL_VERSION}.noarch.rpm
+dnf clean -y all
+rm -rf /var/cache/dnf/*
+EOF
+
 # Install tools that are shared by all stages.
 RUN <<EOF
 pkgs=()
@@ -19,6 +28,7 @@ if [ "${RHEL_VERSION}" -eq "8" ]; then
 else
   pkgs+=(binutils-gold)   # Required build tool.
 fi
+pkgs+=(ccache)            # Optional build tool for caching build artifacts.
 pkgs+=(file)              # Required packaging tool.
 pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
@@ -44,6 +54,7 @@ fi
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
+pkgs+=(unzip)             # Dependency for tools requiring unzipping files.
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
 dnf update -y
@@ -67,8 +78,6 @@ mkdir -p /usr/local/lib
 ln -sf /usr/lib/python3.12 /usr/local/lib/python3.12
 EOF
 
-RUN ld.gold --version
-
 # Install Python-based tools and cmake.
 ARG CONAN_VERSION
 ARG GCOVR_VERSION
@@ -90,7 +99,27 @@ ARCH=$(uname -m)
 wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
 tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
+EOF
+
+# Install AWS CLI for uploading build artifacts to S3.
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O awscli.zip https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip
+unzip awscli.zip
+./aws/install
+rm -rf awscli.zip aws
+EOF
+
+# Print versions.
+RUN <<EOF
+aws --version
+ccache --version
+cmake --version
+conan --version
+gcovr --version
+ld.gold --version
 mold --version
+python3 --version
 EOF
 
 # Install rust.

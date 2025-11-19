@@ -40,6 +40,7 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(binutils-gold)   # Required build tool.
+pkgs+=(ccache)          # Optional build tool for caching build artifacts.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
@@ -54,6 +55,7 @@ pkgs+=(net-tools)       # Dependency for debugging network issues.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(python3-venv)    # Python environment management tool.
 pkgs+=(python3-pip)     # Package manager for Python applications.
+pkgs+=(unzip)           # Dependency for tools requiring unzipping files.
 pkgs+=(vim)             # Text editor.
 pkgs+=(wget)            # Required build tool.
 apt-get update
@@ -61,8 +63,6 @@ apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
-
-RUN ld.gold --version
 
 # Install Python-based tools and cmake.
 ARG CONAN_VERSION
@@ -85,7 +85,27 @@ ARCH=$(uname -m)
 wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
 tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
+EOF
+
+# Install AWS CLI for uploading build artifacts to S3.
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O awscli.zip https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip
+unzip awscli.zip
+./aws/install
+rm -rf awscli.zip aws
+EOF
+
+# Print versions.
+RUN <<EOF
+aws --version
+ccache --version
+cmake --version
+conan --version
+gcovr --version
+ld.gold --version
 mold --version
+python3 --version
 EOF
 
 # Install rust.
