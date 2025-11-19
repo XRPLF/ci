@@ -27,6 +27,7 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(binutils-gold)   # Required build tool.
+pkgs+=(ccache)          # Optional build tool for caching build artifacts.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(file)            # Required packaging tool.
@@ -47,8 +48,6 @@ apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
-
-RUN ld.gold --version
 
 # Install Python-based tools and cmake.
 ARG CONAN_VERSION
@@ -71,7 +70,17 @@ ARCH=$(uname -m)
 wget -O mold.tar.gz https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-${ARCH}-linux.tar.gz
 tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
+EOF
+
+# Print versions.
+RUN <<EOF
+ccache --version
+cmake --version
+conan --version
+gcovr --version
+ld.gold --version
 mold --version
+python3 --version
 EOF
 
 # ====================== GCC IMAGE ======================
