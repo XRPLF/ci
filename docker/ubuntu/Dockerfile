@@ -41,6 +41,7 @@ pkgs+=(net-tools)       # Dependency for debugging network issues.
 pkgs+=(ninja-build)     # Required build tool.
 pkgs+=(python3-venv)    # Python environment management tool.
 pkgs+=(python3-pip)     # Package manager for Python applications.
+pkgs+=(unzip)           # Dependency for tools requiring unzipping files.
 pkgs+=(vim)             # Text editor.
 pkgs+=(wget)            # Required build tool.
 apt-get update
@@ -72,8 +73,18 @@ tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
 EOF
 
+# Install AWS CLI for uploading build artifacts to S3.
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O awscli.zip https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip
+unzip awscli.zip
+./aws/install
+rm -rf awscli.zip aws
+EOF
+
 # Print versions.
 RUN <<EOF
+aws --version
 ccache --version
 cmake --version
 conan --version
