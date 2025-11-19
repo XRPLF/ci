@@ -54,6 +54,7 @@ fi
 pkgs+=(python3.12)        # Required build tool.
 pkgs+=(python3.12-pip)    # Package manager for Python applications.
 pkgs+=(rpm-build)         # Required packaging tool.
+pkgs+=(unzip)             # Dependency for tools requiring unzipping files.
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
 dnf update -y
@@ -100,8 +101,18 @@ tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
 EOF
 
+# Install AWS CLI for uploading build artifacts to S3.
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O awscli.zip https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip
+unzip awscli.zip
+./aws/install
+rm -rf awscli.zip aws
+EOF
+
 # Print versions.
 RUN <<EOF
+aws --version
 ccache --version
 cmake --version
 conan --version
