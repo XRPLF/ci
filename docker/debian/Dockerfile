@@ -97,8 +97,9 @@ rm -rf awscli.zip aws
 EOF
 
 # Install rust.
+ARG RUST_VERSION
 RUN <<EOF
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=1.91.1
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=${RUST_VERSION}
 EOF
 
 # Print versions.
