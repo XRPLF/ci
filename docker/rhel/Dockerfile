@@ -110,6 +110,11 @@ unzip awscli.zip
 rm -rf awscli.zip aws
 EOF
 
+# Install rust.
+RUN <<EOF
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=1.91.1
+EOF
+
 # Print versions.
 RUN <<EOF
 aws --version
@@ -120,15 +125,10 @@ gcovr --version
 ld.gold --version
 mold --version
 python3 --version
-EOF
-
-# Install rust.
-RUN <<EOF
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=1.91.1
 . ~/.bashrc
 . ~/.cargo/env
-rustc -V
-cargo -V
+rustc --version
+cargo --version
 EOF
 
 # ====================== GCC IMAGE ======================
