@@ -84,9 +84,10 @@ EOF
 
 # Install rust.
 ARG RUST_VERSION
-RUN <<EOF
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=${RUST_VERSION}
-EOF
+ENV CARGO_HOME="/opt/rust/.cargo"
+ENV RUSTUP_HOME="/opt/rust/.rustup"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=${RUST_VERSION}
+ENV PATH="$CARGO_HOME/bin:$PATH"
 
 # Print versions.
 RUN <<EOF
@@ -98,8 +99,6 @@ gcovr --version
 ld.gold --version
 mold --version
 python3 --version
-. ~/.bashrc
-. ~/.cargo/env
 rustc --version
 cargo --version
 EOF
