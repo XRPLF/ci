@@ -73,15 +73,6 @@ tar -xzf mold.tar.gz --strip-components=1 -C /usr/local
 rm mold.tar.gz
 EOF
 
-# Install AWS CLI for uploading build artifacts to S3.
-RUN <<EOF
-ARCH=$(uname -m)
-wget -O awscli.zip https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip
-unzip awscli.zip
-./aws/install
-rm -rf awscli.zip aws
-EOF
-
 # Install rust.
 ARG RUST_VERSION
 ENV CARGO_HOME="/opt/rust/.cargo"
@@ -91,7 +82,6 @@ ENV PATH="$CARGO_HOME/bin:$PATH"
 
 # Print versions.
 RUN <<EOF
-aws --version
 ccache --version
 cmake --version
 conan --version
