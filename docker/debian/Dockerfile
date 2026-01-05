@@ -76,16 +76,25 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
-# Install ccache.
+# Install ccache. Note that the ccache version from the package manager is
+# installed for Debian Bullseye, as the latest version requires a newer GLIBC
+# version, and older compatible releases are x86-64 only.
 ARG CCACHE_VERSION
 
 RUN <<EOF
-ARCH=$(uname -m)
-wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
-tar -xf ccache.tar.xz
-cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
-rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
-rm ccache.tar.xz
+if [[ "${DEBIAN_VERSION}" == "bullseye" ]]; then
+  apt-get update
+  apt-get install -y --no-install-recommends ccache
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+else
+  ARCH=$(uname -m)
+  wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
+  tar -xf ccache.tar.xz
+  cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
+  rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
+  rm ccache.tar.xz
+fi
 EOF
 
 # Install mold.
