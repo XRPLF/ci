@@ -28,7 +28,6 @@ if [ "${RHEL_VERSION}" -eq "8" ]; then
 else
   pkgs+=(binutils-gold)   # Required build tool.
 fi
-pkgs+=(ccache)            # Optional build tool for caching build artifacts.
 pkgs+=(file)              # Required packaging tool.
 pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
@@ -91,7 +90,19 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
-# Install mold https://github.com/rui314/mold
+# Install ccache.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
+tar -xf ccache.tar.xz
+cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
+rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
+rm ccache.tar.xz
+EOF
+
+# Install mold.
 ARG MOLD_VERSION
 
 RUN <<EOF

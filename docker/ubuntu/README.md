@@ -24,9 +24,10 @@ directory of the repository.
 ```shell
 UBUNTU_VERSION=noble
 GCC_VERSION=14
+CCACHE_VERSION=4.12.2
+CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
-CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
 RUST_VERSION=1.91.1
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc-${GCC_VERSION}
@@ -36,13 +37,14 @@ docker buildx build . \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg RUST_VERSION=${RUST_VERSION} \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_IMAGE}
 ```
 
@@ -54,9 +56,10 @@ directory of the repository.
 ```shell
 UBUNTU_VERSION=noble
 CLANG_VERSION=18
+CCACHE_VERSION=4.12.2
+CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
-CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
 RUST_VERSION=1.91.1
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang-${CLANG_VERSION}
@@ -66,13 +69,14 @@ docker buildx build . \
   --target clang \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --build-arg CLANG_VERSION=${CLANG_VERSION} \
+  --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
-  --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg RUST_VERSION=${RUST_VERSION} \
-  --build-arg UBUNTU_VERSION=${UBUNTU_VERSION} \
   --tag ${CONTAINER_IMAGE}
 ```
 

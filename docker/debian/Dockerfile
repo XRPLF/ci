@@ -40,7 +40,6 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(binutils-gold)   # Required build tool.
-pkgs+=(ccache)          # Optional build tool for caching build artifacts.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
@@ -77,7 +76,19 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
-# Install mold https://github.com/rui314/mold
+# Install ccache.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+ARCH=$(uname -m)
+wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
+tar -xf ccache.tar.xz
+cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
+rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
+rm ccache.tar.xz
+EOF
+
+# Install mold.
 ARG MOLD_VERSION
 
 RUN <<EOF
