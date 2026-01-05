@@ -23,7 +23,7 @@ EOF
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-if [ "${RHEL_VERSION}" -eq "8" ]; then
+if [[ "${RHEL_VERSION}" == "8" ]]; then
   pkgs+=(binutils)        # Required build tool.
 else
   pkgs+=(binutils-gold)   # Required build tool.
@@ -96,7 +96,7 @@ RUN pip install --no-cache \
 ARG CCACHE_VERSION
 
 RUN <<EOF
-if [ "${RHEL_VERSION}" -eq "8" ]; then
+if [[ "${RHEL_VERSION}" == "8" ]]; then
   dnf update -y
   dnf install -y --allowerasing --setopt=tsflags=nodocs ccache
   dnf clean -y all

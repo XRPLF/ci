@@ -15,6 +15,9 @@ FROM ${BASE_IMAGE} AS gcc-src
 # ====================== BASE IMAGE ======================
 FROM debian:${DEBIAN_VERSION} AS base
 
+# This is not inherited from the base image.
+ARG DEBIAN_VERSION
+
 # Use Bash as the default shell for RUN commands, using the options
 # `set -o errexit -o pipefail`, and as the entrypoint.
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]

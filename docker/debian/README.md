@@ -51,11 +51,12 @@ docker buildx build . \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg RUST_VERSION=${RUST_VERSION} \
   --tag ${CONTAINER_IMAGE}
