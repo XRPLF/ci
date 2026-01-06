@@ -191,12 +191,14 @@ git clone https://github.com/ccache/ccache
 cd ccache
 git checkout v${CCACHE_VERSION}
 
-# Build, install, and clean up.
+# Build, install, and clean up. Note that the gold linker on RHEL 8 does not
+# support the --dependency-file flag, so we use the regular linker instead.
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=Release \
-      -D CMAKE_LINKER=/usr/bin/ld.bfd \
-      -D ENABLE_TESTING=OFF ..
+if [[ "${RHEL_VERSION}" -eq "8" ]]; then
+  LINKER_OPTION='-D USE_FASTER_LINKER=OFF'
+fi
+cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ${LINKER_OPTION} ..
 make
 make install
 cd ../..
@@ -291,13 +293,14 @@ git clone https://github.com/ccache/ccache
 cd ccache
 git checkout v${CCACHE_VERSION}
 
-# Build, install, and clean up.
+# Build, install, and clean up. Note that the gold linker on RHEL 8 does not
+# support the --dependency-file flag, so we use the regular linker instead.
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=Release \
-      -D CMAKE_LINKER=/usr/bin/ld.bfd \
-      -D ENABLE_TESTING=OFF ..
-make
+if [[ "${RHEL_VERSION}" -eq "8" ]]; then
+  LINKER_OPTION='-D USE_FASTER_LINKER=OFF'
+fi
+cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ${LINKER_OPTION} ..
 make install
 cd ../..
 rm -rf ccache
