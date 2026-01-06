@@ -155,7 +155,7 @@ git checkout v${CCACHE_VERSION}
 # Build, install, and clean up.
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF
+cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ..
 make
 make install
 cd ../..
@@ -265,7 +265,7 @@ git checkout v${CCACHE_VERSION}
 # Build, install, and clean up.
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF
+cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ..
 make
 make install
 cd ../..
