@@ -59,7 +59,7 @@ directory of the repository.
 
 ```shell
 # The version of the distro to use.
-RHEL_VERSION=8
+RHEL_VERSION=10
 # The versions of the tools to use.
 CCACHE_VERSION=4.12.2
 CMAKE_VERSION=4.1.0
