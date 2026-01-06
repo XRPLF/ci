@@ -23,8 +23,11 @@ In order to build the image for GCC, run the commands below from the root
 directory of the repository.
 
 ```shell
+# The version of the distro to use.
 RHEL_VERSION=9
+# The version of GCC to use.
 GCC_VERSION=12
+# The versions of the tools to use.
 CCACHE_VERSION=4.12.2
 CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
@@ -55,7 +58,9 @@ In order to build the image for Clang, run the commands below from the root
 directory of the repository.
 
 ```shell
+# The version of the distro to use.
 RHEL_VERSION=10
+# The versions of the tools to use.
 CCACHE_VERSION=4.12.2
 CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2

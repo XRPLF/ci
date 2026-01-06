@@ -62,18 +62,6 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
-# Install ccache.
-ARG CCACHE_VERSION
-
-RUN <<EOF
-ARCH=$(uname -m)
-wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
-tar -xf ccache.tar.xz
-cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
-rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
-rm ccache.tar.xz
-EOF
-
 # Install mold.
 ARG MOLD_VERSION
 
@@ -93,7 +81,6 @@ ENV PATH="$CARGO_HOME/bin:$PATH"
 
 # Print versions.
 RUN <<EOF
-ccache --version
 cmake --version
 conan --version
 gcovr --version
@@ -154,6 +141,28 @@ if [[ "${CXX_VER}" != "${GCC_VERSION}" ]]; then
   echo "ERROR: g++ -dumpversion gives '${CXX_VER}', which does not match expected version '${GCC_VERSION}'."
   exit 1
 fi
+EOF
+
+# Build ccache from source to avoid incompatible GLIBC versions.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+# Clone the repository and checkout the desired version.
+git clone https://github.com/ccache/ccache
+cd ccache
+git checkout v${CCACHE_VERSION}
+
+# Build, install, and clean up.
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ..
+make
+make install
+cd ../..
+rm -rf ccache
+
+# Verify the installation.
+ccache --version
 EOF
 
 # Set the Conan home directory, so the users of this image can find the default
@@ -242,6 +251,28 @@ if [[ "${CXX_VER}" != "${CLANG_VERSION}" ]]; then
   echo "ERROR: clang++ -dumpversion gives '${CXX_VER}', which does not match expected version '${CLANG_VERSION}'."
   exit 1
 fi
+EOF
+
+# Build ccache from source to avoid incompatible GLIBC versions.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+# Clone the repository and checkout the desired version.
+git clone https://github.com/ccache/ccache
+cd ccache
+git checkout v${CCACHE_VERSION}
+
+# Build, install, and clean up.
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ..
+make
+make install
+cd ../..
+rm -rf ccache
+
+# Verify the installation.
+ccache --version
 EOF
 
 # Set the Conan home directory, so the users of this image can find the default
