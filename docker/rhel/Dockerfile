@@ -186,23 +186,22 @@ EOF
 ARG CCACHE_VERSION
 
 RUN <<EOF
-# Clone the repository and checkout the desired version.
-git clone https://github.com/ccache/ccache
-cd ccache
-git checkout v${CCACHE_VERSION}
+wget -O ccache.tar.gz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.gz
+tar -xzf ccache.tar.gz
+rm ccache.tar.gz
+cd ccache-${CCACHE_VERSION}
 
-# Build, install, and clean up. Note that the gold linker on RHEL 8 does not
-# support the --dependency-file flag, so we use the regular linker instead.
+# Build, install, and clean up.
 mkdir build
 cd build
 if [[ "${RHEL_VERSION}" -eq "8" ]]; then
   LINKER_OPTION='-D USE_FASTER_LINKER=OFF'
 fi
-cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ${LINKER_OPTION} ..
-make
+cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ${LINKER_OPTION} ..
+make -j
 make install
 cd ../..
-rm -rf ccache
+rm -rf ccache-${CCACHE_VERSION}
 
 # Verify the installation.
 ccache --version
@@ -288,22 +287,22 @@ EOF
 ARG CCACHE_VERSION
 
 RUN <<EOF
-# Clone the repository and checkout the desired version.
-git clone https://github.com/ccache/ccache
-cd ccache
-git checkout v${CCACHE_VERSION}
+wget -O ccache.tar.gz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.gz
+tar -xzf ccache.tar.gz
+rm ccache.tar.gz
+cd ccache-${CCACHE_VERSION}
 
-# Build, install, and clean up. Note that the gold linker on RHEL 8 does not
-# support the --dependency-file flag, so we use the regular linker instead.
+# Build, install, and clean up.
 mkdir build
 cd build
 if [[ "${RHEL_VERSION}" -eq "8" ]]; then
   LINKER_OPTION='-D USE_FASTER_LINKER=OFF'
 fi
-cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ${LINKER_OPTION} ..
+cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ${LINKER_OPTION} ..
+make -j
 make install
 cd ../..
-rm -rf ccache
+rm -rf ccache-${CCACHE_VERSION}
 
 # Verify the installation.
 ccache --version

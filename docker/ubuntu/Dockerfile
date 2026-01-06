@@ -147,19 +147,19 @@ EOF
 ARG CCACHE_VERSION
 
 RUN <<EOF
-# Clone the repository and checkout the desired version.
-git clone https://github.com/ccache/ccache
-cd ccache
-git checkout v${CCACHE_VERSION}
+wget -O ccache.tar.gz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.gz
+tar -xzf ccache.tar.gz
+rm ccache.tar.gz
+cd ccache-${CCACHE_VERSION}
 
 # Build, install, and clean up.
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ..
-make
+cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ..
+make -j
 make install
 cd ../..
-rm -rf ccache
+rm -rf ccache-${CCACHE_VERSION}
 
 # Verify the installation.
 ccache --version
@@ -257,19 +257,19 @@ EOF
 ARG CCACHE_VERSION
 
 RUN <<EOF
-# Clone the repository and checkout the desired version.
-git clone https://github.com/ccache/ccache
-cd ccache
-git checkout v${CCACHE_VERSION}
+wget -O ccache.tar.gz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.gz
+tar -xzf ccache.tar.gz
+rm ccache.tar.gz
+cd ccache-${CCACHE_VERSION}
 
 # Build, install, and clean up.
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_TESTING=OFF ..
-make
+cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ..
+make -j
 make install
 cd ../..
-rm -rf ccache
+rm -rf ccache-${CCACHE_VERSION}
 
 # Verify the installation.
 ccache --version
