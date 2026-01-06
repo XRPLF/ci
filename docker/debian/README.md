@@ -38,9 +38,10 @@ directory of the repository.
 ```shell
 DEBIAN_VERSION=bookworm
 GCC_VERSION=12
+CCACHE_VERSION=4.12.2
+CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
-CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
 RUST_VERSION=1.91.1
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
@@ -50,11 +51,12 @@ docker buildx build . \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg RUST_VERSION=${RUST_VERSION} \
   --tag ${CONTAINER_IMAGE}
@@ -66,12 +68,13 @@ In order to build a GCC image for Bullseye, you also need to explicitly set
 ```shell
 DEBIAN_VERSION=bullseye
 GCC_VERSION=12
+BASE_IMAGE=ghcr.io/xrplf/ci/gcc:${GCC_VERSION}-bullseye
+CCACHE_VERSION=4.12.2
+CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
-CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
 RUST_VERSION=1.91.1
-BASE_IMAGE=ghcr.io/xrplf/ci/gcc:12-bullseye
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/debian-${DEBIAN_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -79,14 +82,15 @@ docker buildx build . \
   --target gcc \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
   --build-arg GCC_VERSION=${GCC_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg BASE_IMAGE=${BASE_IMAGE} \
+  --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg RUST_VERSION=${RUST_VERSION} \
-  --build-arg BASE_IMAGE=${BASE_IMAGE} \
   --tag ${CONTAINER_IMAGE}
 ```
 
@@ -98,9 +102,10 @@ directory of the repository.
 ```shell
 DEBIAN_VERSION=bookworm
 CLANG_VERSION=17
+CCACHE_VERSION=4.12.2
+CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
-CMAKE_VERSION=4.1.0
 MOLD_VERSION=2.40.4
 RUST_VERSION=1.91.1
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/debian-${DEBIAN_VERSION}:clang-${CLANG_VERSION}
@@ -110,11 +115,12 @@ docker buildx build . \
   --target clang \
   --build-arg BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
-  --build-arg CLANG_VERSION=${CLANG_VERSION} \
-  --build-arg CONAN_VERSION=${CONAN_VERSION} \
   --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} \
-  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
+  --build-arg CLANG_VERSION=${CLANG_VERSION} \
+  --build-arg CCACHE_VERSION=${CCACHE_VERSION} \
   --build-arg CMAKE_VERSION=${CMAKE_VERSION} \
+  --build-arg CONAN_VERSION=${CONAN_VERSION} \
+  --build-arg GCOVR_VERSION=${GCOVR_VERSION} \
   --build-arg MOLD_VERSION=${MOLD_VERSION} \
   --build-arg RUST_VERSION=${RUST_VERSION} \
   --tag ${CONTAINER_IMAGE}

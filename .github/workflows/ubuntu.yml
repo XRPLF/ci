@@ -27,13 +27,14 @@ env:
   PUSH: ${{ github.event_name == 'push' }}
   CONTAINER_REGISTRY: ghcr.io
   BUILDKIT_PROGRESS: plain
-  CONAN_VERSION: 2.22.2
-  GCOVR_VERSION: 8.3
-  CMAKE_VERSION: 4.1.0
-  MOLD_VERSION: 2.40.4
-  RUST_VERSION: 1.91.1
   FALLBACK_GCC: 12
   FALLBACK_CLANG: 16
+  CCACHE_VERSION: 4.12.2
+  CMAKE_VERSION: 4.1.0
+  CONAN_VERSION: 2.22.2
+  GCOVR_VERSION: 8.3
+  MOLD_VERSION: 2.40.4
+  RUST_VERSION: 1.91.1
 
 jobs:
   # Build the Docker image for Ubuntu using different versions of GCC and Clang.
@@ -120,14 +121,15 @@ jobs:
           build-args: |
             BUILDKIT_DOCKERFILE_CHECK=skip=InvalidDefaultArgInFrom
             BUILDKIT_INLINE_CACHE=1
+            UBUNTU_VERSION=${{ matrix.os.release }}
             CLANG_VERSION=${{ matrix.os.compiler_name == 'clang' && matrix.os.compiler_version || env.FALLBACK_CLANG }}
-            CONAN_VERSION=${{ env.CONAN_VERSION }}
             GCC_VERSION=${{ matrix.os.compiler_name == 'gcc' && matrix.os.compiler_version || env.FALLBACK_GCC }}
-            GCOVR_VERSION=${{ env.GCOVR_VERSION }}
+            CCACHE_VERSION=${{ env.CCACHE_VERSION }}
             CMAKE_VERSION=${{ env.CMAKE_VERSION }}
+            CONAN_VERSION=${{ env.CONAN_VERSION }}
+            GCOVR_VERSION=${{ env.GCOVR_VERSION }}
             MOLD_VERSION=${{ env.MOLD_VERSION }}
             RUST_VERSION=${{ env.RUST_VERSION }}
-            UBUNTU_VERSION=${{ matrix.os.release }}
           context: .
           file: docker/ubuntu/Dockerfile
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}

@@ -15,6 +15,9 @@ FROM ${BASE_IMAGE} AS gcc-src
 # ====================== BASE IMAGE ======================
 FROM debian:${DEBIAN_VERSION} AS base
 
+# This is not inherited from the base image.
+ARG DEBIAN_VERSION
+
 # Use Bash as the default shell for RUN commands, using the options
 # `set -o errexit -o pipefail`, and as the entrypoint.
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
@@ -40,7 +43,6 @@ RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates) # Enable TLS verification for HTTPS connections by providing trusted root certificates.
 pkgs+=(binutils-gold)   # Required build tool.
-pkgs+=(ccache)          # Optional build tool for caching build artifacts.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
@@ -77,7 +79,28 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
-# Install mold https://github.com/rui314/mold
+# Install ccache. Note that the ccache version from the package manager is
+# installed for Debian Bullseye, as the latest version requires a newer GLIBC
+# version, and older compatible releases are x86-64 only.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+if [[ "${DEBIAN_VERSION}" == "bullseye" ]]; then
+  apt-get update
+  apt-get install -y --no-install-recommends ccache
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+else
+  ARCH=$(uname -m)
+  wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
+  tar -xf ccache.tar.xz
+  cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
+  rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
+  rm ccache.tar.xz
+fi
+EOF
+
+# Install mold.
 ARG MOLD_VERSION
 
 RUN <<EOF

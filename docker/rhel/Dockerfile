@@ -23,12 +23,11 @@ EOF
 RUN <<EOF
 pkgs=()
 pkgs+=(ca-certificates)   # Enable TLS verification for HTTPS connections by providing trusted root certificates.
-if [ "${RHEL_VERSION}" -eq "8" ]; then
+if [[ "${RHEL_VERSION}" == "8" ]]; then
   pkgs+=(binutils)        # Required build tool.
 else
   pkgs+=(binutils-gold)   # Required build tool.
 fi
-pkgs+=(ccache)            # Optional build tool for caching build artifacts.
 pkgs+=(file)              # Required packaging tool.
 pkgs+=(git)               # Required build tool.
 pkgs+=(gpg)               # Dependency for tools requiring signing or encrypting/decrypting.
@@ -91,7 +90,28 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
-# Install mold https://github.com/rui314/mold
+# Install ccache. Note that the ccache version from the package manager is
+# installed for RHEL 8, as the latest version requires a newer GLIBC version,
+# and older compatible releases are x86-64 only.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+if [[ "${RHEL_VERSION}" == "8" ]]; then
+  dnf update -y
+  dnf install -y --allowerasing --setopt=tsflags=nodocs ccache
+  dnf clean -y all
+  rm -rf /var/cache/dnf/*
+else
+  ARCH=$(uname -m)
+  wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
+  tar -xf ccache.tar.xz
+  cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
+  rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
+  rm ccache.tar.xz
+fi
+EOF
+
+# Install mold.
 ARG MOLD_VERSION
 
 RUN <<EOF
