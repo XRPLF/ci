@@ -198,8 +198,7 @@ if [[ "${RHEL_VERSION}" -eq "8" ]]; then
   LINKER_OPTION='-D USE_FASTER_LINKER=OFF'
 fi
 cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ${LINKER_OPTION} ..
-make -j
-make install
+make -j install
 cd ../..
 rm -rf ccache-${CCACHE_VERSION}
 
@@ -299,8 +298,7 @@ if [[ "${RHEL_VERSION}" -eq "8" ]]; then
   LINKER_OPTION='-D USE_FASTER_LINKER=OFF'
 fi
 cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ${LINKER_OPTION} ..
-make -j
-make install
+make -j install
 cd ../..
 rm -rf ccache-${CCACHE_VERSION}
 

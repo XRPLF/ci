@@ -156,8 +156,7 @@ cd ccache-${CCACHE_VERSION}
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ..
-make -j
-make install
+make -j install
 cd ../..
 rm -rf ccache-${CCACHE_VERSION}
 
@@ -266,8 +265,7 @@ cd ccache-${CCACHE_VERSION}
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ..
-make -j
-make install
+make -j install
 cd ../..
 rm -rf ccache-${CCACHE_VERSION}
 
