@@ -22,14 +22,18 @@ In order to build the image for GCC, run the commands below from the root
 directory of the repository.
 
 ```shell
+# The version of the distro to use.
 UBUNTU_VERSION=noble
+# The version of GCC to use.
 GCC_VERSION=14
+# The versions of the tools to use.
 CCACHE_VERSION=4.12.2
 CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
 MOLD_VERSION=2.40.4
 RUST_VERSION=1.91.1
+# The name of the image to build.
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/ubuntu-${UBUNTU_VERSION}:gcc-${GCC_VERSION}
 
 docker buildx build . \
@@ -54,14 +58,18 @@ In order to build the image for Clang, run the commands below from the root
 directory of the repository.
 
 ```shell
+# The version of the distro to use.
 UBUNTU_VERSION=noble
+# The version of Clang to use.
 CLANG_VERSION=18
+# The versions of the tools to use.
 CCACHE_VERSION=4.12.2
 CMAKE_VERSION=4.1.0
 CONAN_VERSION=2.22.2
 GCOVR_VERSION=8.3
 MOLD_VERSION=2.40.4
 RUST_VERSION=1.91.1
+# The name of the image to build.
 CONTAINER_IMAGE=ghcr.io/xrplf/ci/ubuntu-${UBUNTU_VERSION}:clang-${CLANG_VERSION}
 
 docker buildx build . \

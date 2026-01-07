@@ -79,27 +79,6 @@ RUN pip install --no-cache \
   gcovr==${GCOVR_VERSION} \
   cmake==${CMAKE_VERSION}
 
-# Install ccache. Note that the ccache version from the package manager is
-# installed for Debian Bullseye, as the latest version requires a newer GLIBC
-# version, and older compatible releases are x86-64 only.
-ARG CCACHE_VERSION
-
-RUN <<EOF
-if [[ "${DEBIAN_VERSION}" == "bullseye" ]]; then
-  apt-get update
-  apt-get install -y --no-install-recommends ccache
-  apt-get clean
-  rm -rf /var/lib/apt/lists/*
-else
-  ARCH=$(uname -m)
-  wget -O ccache.tar.xz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-${ARCH}.tar.xz
-  tar -xf ccache.tar.xz
-  cp ccache-${CCACHE_VERSION}-linux-${ARCH}/ccache /usr/local/bin
-  rm -r ccache-${CCACHE_VERSION}-linux-${ARCH}
-  rm ccache.tar.xz
-fi
-EOF
-
 # Install mold.
 ARG MOLD_VERSION
 
@@ -119,7 +98,6 @@ ENV PATH="$CARGO_HOME/bin:$PATH"
 
 # Print versions.
 RUN <<EOF
-ccache --version
 cmake --version
 conan --version
 gcovr --version
@@ -190,6 +168,27 @@ if [[ "${CXX_VER}" != "${GCC_VERSION}" ]]; then
   echo "ERROR: g++ -dumpversion gives '${CXX_VER}', which does not match expected version '${GCC_VERSION}'."
   exit 1
 fi
+EOF
+
+# Build ccache from source to avoid incompatible GLIBC versions.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+wget -O ccache.tar.gz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.gz
+tar -xzf ccache.tar.gz
+rm ccache.tar.gz
+cd ccache-${CCACHE_VERSION}
+
+# Build, install, and clean up.
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ..
+make -j install
+cd ../..
+rm -rf ccache-${CCACHE_VERSION}
+
+# Verify the installation.
+ccache --version
 EOF
 
 # Set the Conan home directory, so the users of this image can find the default
@@ -283,6 +282,27 @@ if [[ "${CXX_VER}" != "${CLANG_VERSION}" ]]; then
   echo "ERROR: clang++ -dumpversion gives '${CXX_VER}', which does not match expected version '${CLANG_VERSION}'."
   exit 1
 fi
+EOF
+
+# Build ccache from source to avoid incompatible GLIBC versions.
+ARG CCACHE_VERSION
+
+RUN <<EOF
+wget -O ccache.tar.gz https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.gz
+tar -xzf ccache.tar.gz
+rm ccache.tar.gz
+cd ccache-${CCACHE_VERSION}
+
+# Build, install, and clean up.
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF ..
+make -j install
+cd ../..
+rm -rf ccache-${CCACHE_VERSION}
+
+# Verify the installation.
+ccache --version
 EOF
 
 # Set the Conan home directory, so the users of this image can find the default
