@@ -228,7 +228,7 @@ RUN <<EOF
 printf "%s\n" \
   "Acquire::AllowInsecureRepositories \"true\";" \
   "Acquire::AllowWeakRepositories \"true\";" \
-  | tee /etc/apt/apt.conf.d/99allow-weak
+  | tee /etc/apt/apt.conf.d/99llvmallow-weak
 apt-get update
 apt-get install -y --no-install-recommends --allow-unauthenticated \
   clang-${CLANG_VERSION} \
