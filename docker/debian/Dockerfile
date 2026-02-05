@@ -193,21 +193,16 @@ ccache --version
 EOF
 
 # Install nix
-RUN <<EOF
-sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
-
-# Source the nix daemon script to make nix available in the current shell.
-. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-
-# Verify the installation.
-nix --version
-EOF
+RUN sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
 
 # Add nix to PATH and set NIX environment variables so nix is available in all
 # shells including non-interactive shells (e.g., GitHub Actions).
 ENV PATH="/nix/var/nix/profiles/default/bin:${PATH}"
 ENV NIX_PROFILES="/nix/var/nix/profiles/default"
 ENV NIX_SSL_CERT_FILE="/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt"
+
+# Verify the nix installation.
+RUN nix --version
 
 # Set the Conan home directory, so the users of this image can find the default
 # profile.
