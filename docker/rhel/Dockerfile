@@ -312,8 +312,11 @@ EOF
 RUN <<EOF
 sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
 
-# Verify the installation. Should be run from a new shell.
-bash -c 'nix --version'
+# Source the nix daemon script to make nix available in the current shell.
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
+# Verify the installation.
+nix --version
 EOF
 
 # Set the Conan home directory, so the users of this image can find the default
@@ -350,3 +353,4 @@ cd test && ./run.sh clang
 cd ..
 rm -rf test
 EOF
+
