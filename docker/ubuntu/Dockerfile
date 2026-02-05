@@ -176,6 +176,12 @@ sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon 
 nix --version
 EOF
 
+# Add nix to PATH and set NIX environment variables so nix is available in all
+# shells including non-interactive shells (e.g., GitHub Actions).
+ENV PATH="/nix/var/nix/profiles/default/bin:${PATH}"
+ENV NIX_PROFILES="/nix/var/nix/profiles/default"
+ENV NIX_SSL_CERT_FILE="/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt"
+
 # Set the Conan home directory, so the users of this image can find the default
 # profile.
 ENV HOME=/root
@@ -221,8 +227,15 @@ ARG UBUNTU_VERSION
 # Install Clang. Some build dependencies require GCC to be also available.
 ARG CLANG_VERSION
 RUN <<EOF
+# As of 2026-02-01, newer distros reject GPG keys using SHA1 signatures as insecure.
+# Some LLVM/Clang repository GPG keys may still use SHA1. We configure apt to allow
+# weak signatures and use --allow-unauthenticated as a workaround for trusted repositories.
+printf "%s\n" \
+  "Acquire::AllowInsecureRepositories \"true\";" \
+  "Acquire::AllowWeakRepositories \"true\";" \
+  | tee /etc/apt/apt.conf.d/99allow-weak
 apt-get update
-apt-get install -y --no-install-recommends \
+apt-get install -y --no-install-recommends --allow-unauthenticated \
   clang-${CLANG_VERSION} \
   libclang-rt-${CLANG_VERSION}-dev \
   llvm-${CLANG_VERSION} \
@@ -285,6 +298,23 @@ rm -rf ccache-${CCACHE_VERSION}
 ccache --version
 EOF
 
+# Install nix
+RUN <<EOF
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
+
+# Source the nix daemon script to make nix available in the current shell.
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
+# Verify the installation.
+nix --version
+EOF
+
+# Add nix to PATH and set NIX environment variables so nix is available in all
+# shells including non-interactive shells (e.g., GitHub Actions).
+ENV PATH="/nix/var/nix/profiles/default/bin:${PATH}"
+ENV NIX_PROFILES="/nix/var/nix/profiles/default"
+ENV NIX_SSL_CERT_FILE="/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt"
+
 # Set the Conan home directory, so the users of this image can find the default
 # profile.
 ENV HOME=/root
@@ -319,4 +349,12 @@ cd test && ./run.sh clang
 cd ..
 rm -rf test
 EOF
+
+
+
+
+
+
+
+
 
