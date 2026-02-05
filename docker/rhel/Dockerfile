@@ -56,6 +56,8 @@ pkgs+=(rpm-build)         # Required packaging tool.
 pkgs+=(unzip)             # Dependency for tools requiring unzipping files.
 pkgs+=(vim)               # Text editor.
 pkgs+=(wget)              # Required build tool.
+pkgs+=(curl)              # Required to install nix
+pkgs+=(xz)                # Required to install nix
 dnf update -y
 dnf install -y --allowerasing --setopt=tsflags=nodocs "${pkgs[@]}"
 dnf clean -y all
@@ -304,6 +306,14 @@ rm -rf ccache-${CCACHE_VERSION}
 
 # Verify the installation.
 ccache --version
+EOF
+
+# Install nix
+RUN <<EOF
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+
+# Verify the installation. Should be run from a new shell.
+bash -c 'nix --version'
 EOF
 
 # Set the Conan home directory, so the users of this image can find the default

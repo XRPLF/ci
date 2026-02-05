@@ -46,6 +46,7 @@ pkgs+=(binutils-gold)   # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
+pkgs+=(xz-utils)        # Required to install nix
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -189,6 +190,14 @@ rm -rf ccache-${CCACHE_VERSION}
 
 # Verify the installation.
 ccache --version
+EOF
+
+# Install nix
+RUN <<EOF
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+
+# Verify the installation. Should be run from a new shell.
+bash -c 'nix --version'
 EOF
 
 # Set the Conan home directory, so the users of this image can find the default
