@@ -46,7 +46,6 @@ pkgs+=(binutils-gold)   # Required build tool.
 pkgs+=(curl)            # Dependency for tools requiring downloading data.
 pkgs+=(dpkg-dev)        # Required packaging tool.
 pkgs+=(debhelper)       # Required packaging tool.
-pkgs+=(xz-utils)        # Required to install nix
 pkgs+=(file)            # Required packaging tool.
 pkgs+=(git)             # Required build tool.
 pkgs+=(gpg)             # Dependency for tools requiring signing or encrypting/decrypting.
@@ -61,6 +60,7 @@ pkgs+=(python3-pip)     # Package manager for Python applications.
 pkgs+=(unzip)           # Dependency for tools requiring unzipping files.
 pkgs+=(vim)             # Text editor.
 pkgs+=(wget)            # Required build tool.
+pkgs+=(xz-utils)        # Required to install nix
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
@@ -194,7 +194,7 @@ EOF
 
 # Install nix
 RUN <<EOF
-sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
 
 # Verify the installation. Should be run from a new shell.
 bash -c 'nix --version'
