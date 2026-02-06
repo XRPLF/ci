@@ -43,6 +43,7 @@ pkgs+=(python3-pip)     # Package manager for Python applications.
 pkgs+=(unzip)           # Dependency for tools requiring unzipping files.
 pkgs+=(vim)             # Text editor.
 pkgs+=(wget)            # Required build tool.
+pkgs+=(xz-utils)        # Required to install nix
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
@@ -79,6 +80,15 @@ ENV RUSTUP_HOME="/opt/rust/.rustup"
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  --default-toolchain=${RUST_VERSION}
 ENV PATH="$CARGO_HOME/bin:$PATH"
 
+# Install nix
+RUN sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
+
+# Add nix to PATH and set NIX environment variables so nix is available in all
+# shells including non-interactive shells (e.g., GitHub Actions).
+ENV PATH="/nix/var/nix/profiles/default/bin:${PATH}"
+ENV NIX_PROFILES="/nix/var/nix/profiles/default"
+ENV NIX_SSL_CERT_FILE="/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt"
+
 # Print versions.
 RUN <<EOF
 cmake --version
@@ -89,6 +99,7 @@ mold --version
 python3 --version
 rustc --version
 cargo --version
+nix --version
 EOF
 
 # ====================== GCC IMAGE ======================
@@ -209,8 +220,15 @@ ARG UBUNTU_VERSION
 # Install Clang. Some build dependencies require GCC to be also available.
 ARG CLANG_VERSION
 RUN <<EOF
+# As of 2026-02-01, newer distros reject GPG keys using SHA1 signatures as insecure.
+# Some LLVM/Clang repository GPG keys may still use SHA1. We configure apt to allow
+# weak signatures and use --allow-unauthenticated as a workaround for trusted repositories.
+printf "%s\n" \
+  "Acquire::AllowInsecureRepositories \"true\";" \
+  "Acquire::AllowWeakRepositories \"true\";" \
+  | tee /etc/apt/apt.conf.d/99llvm-allow-weak
 apt-get update
-apt-get install -y --no-install-recommends \
+apt-get install -y --no-install-recommends --allow-unauthenticated \
   clang-${CLANG_VERSION} \
   libclang-rt-${CLANG_VERSION}-dev \
   llvm-${CLANG_VERSION} \
