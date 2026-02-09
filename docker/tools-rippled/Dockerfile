@@ -35,6 +35,7 @@ pkgs+=(python3-venv)    # Python environment management tool.
 pkgs+=(python3-pip)     # Package manager for Python applications.
 pkgs+=(wget)            # Required build tool.
 pkgs+=(vim)             # Text editor.
+pkgs+=(xz-utils)        # Required to install nix
 apt-get update
 apt-get install -y --no-install-recommends "${pkgs[@]}"
 apt-get clean
@@ -53,6 +54,18 @@ FROM base AS pre-commit
 
 # This is not inherited from base image.
 ARG DEBIAN_FRONTEND=noninteractive
+
+# Install nix
+RUN sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
+
+# Add nix to PATH and set NIX environment variables so nix is available in all
+# shells including non-interactive shells (e.g., GitHub Actions).
+ENV PATH="/nix/var/nix/profiles/default/bin:${PATH}"
+ENV NIX_PROFILES="/nix/var/nix/profiles/default"
+ENV NIX_SSL_CERT_FILE="/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt"
+
+# Verify nix installation
+RUN nix --version
 
 # Install additional dependencies.
 RUN <<EOF
