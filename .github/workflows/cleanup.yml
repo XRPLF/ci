@@ -24,11 +24,11 @@ jobs:
         image:
           - debian-bullseye
           - debian-bookworm
+          - debian-trixie
           - gcc
           - rhel-8
           - rhel-9
           - rhel-10
-          - tools-rippled-clang-format
           - tools-rippled-documentation
           - tools-rippled-pre-commit
           - tools-rippled-prettier
