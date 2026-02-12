@@ -98,6 +98,7 @@ jobs:
             DOXYGEN_VERSION=${{ env.DOXYGEN_VERSION }}
             GCC_VERSION=${{ env.GCC_VERSION }}
             GRAPHVIZ_VERSION=${{ env.GRAPHVIZ_VERSION }}
+            LLVM_VERSION=${{ env.LLVM_VERSION }}
             PRE_COMMIT_VERSION=${{ env.PRE_COMMIT_VERSION }}
           context: docker/tools-rippled
           outputs: type=image,name=${{ env.CONTAINER_IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}
@@ -127,6 +128,7 @@ jobs:
     strategy:
       matrix:
         tool:
+          - clang-tidy
           - documentation
           - pre-commit
           - signing
