@@ -236,6 +236,13 @@ if [[ "${CLANG_VERSION}" -gt 20 ]]; then
   DISTRO_CODENAME=$(lsb_release -cs)
   echo "deb http://apt.llvm.org/${DISTRO_CODENAME}/ llvm-toolchain-${DISTRO_CODENAME}-${CLANG_VERSION} main" \
     | tee /etc/apt/sources.list.d/llvm.list
+  apt-get update
+  apt-get install -y --no-install-recommends --allow-unauthenticated \
+    clang-tidy-${CLANG_VERSION}
+  update-alternatives \
+    --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-${CLANG_VERSION} 100
+  update-alternatives \
+    --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-${CLANG_VERSION} 100
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 fi
@@ -245,7 +252,6 @@ apt-get install -y --no-install-recommends --allow-unauthenticated \
   clang-${CLANG_VERSION} \
   libclang-rt-${CLANG_VERSION}-dev \
   llvm-${CLANG_VERSION} \
-  clang-tidy-${CLANG_VERSION} \
   gcc \
   g++
 apt-get clean
@@ -259,10 +265,6 @@ update-alternatives \
   --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION}
 update-alternatives \
   --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${CLANG_VERSION} 100
-update-alternatives \
-  --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-${CLANG_VERSION} 100
-update-alternatives \
-  --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-${CLANG_VERSION} 100
 update-alternatives --auto cc
 update-alternatives --auto c++
 update-alternatives --auto clang
