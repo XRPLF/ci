@@ -228,7 +228,7 @@ printf "%s\n" \
   "Acquire::AllowWeakRepositories \"true\";" \
   | tee /etc/apt/apt.conf.d/99llvm-allow-weak
 
-# Add LLVM repository for versions above 20
+# Add LLVM repository for versions above 20 because it is not available in the default repo
 if [[ "${CLANG_VERSION}" -gt 20 ]]; then
   apt-get update
   apt-get install -y --no-install-recommends lsb-release software-properties-common gnupg
