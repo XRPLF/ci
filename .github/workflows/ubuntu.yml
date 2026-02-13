@@ -73,6 +73,9 @@ jobs:
           - release: noble
             compiler_name: clang
             compiler_version: 20
+          - release: noble
+            compiler_name: clang
+            compiler_version: 21
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -183,6 +186,9 @@ jobs:
           - release: noble
             compiler_name: clang
             compiler_version: 20
+          - release: noble
+            compiler_name: clang
+            compiler_version: 21
     runs-on: ubuntu-24.04
     needs:
       - build
