@@ -267,6 +267,14 @@ apt-get install -t llvm-toolchain-${DEBIAN_VERSION}-${CLANG_VERSION} -y --no-ins
   clang-${CLANG_VERSION} \
   libclang-rt-${CLANG_VERSION}-dev \
   llvm-${CLANG_VERSION}
+if [[ "${CLANG_VERSION}" -eq 21 ]]; then
+  apt-get install -y --no-install-recommends --allow-unauthenticated \
+    clang-tidy-${CLANG_VERSION}
+  update-alternatives \
+    --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-${CLANG_VERSION} 100
+  update-alternatives \
+    --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-${CLANG_VERSION} 100
+fi
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 update-alternatives \
