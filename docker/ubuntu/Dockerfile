@@ -228,6 +228,16 @@ printf "%s\n" \
   "Acquire::AllowWeakRepositories \"true\";" \
   | tee /etc/apt/apt.conf.d/99llvm-allow-weak
 
+# Add LLVM repository for versions above 20 because it is not available in the default repo
+if [[ "${CLANG_VERSION}" -gt 20 ]]; then
+  apt-get update
+  apt-get install -y --no-install-recommends lsb-release software-properties-common gnupg
+  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+  DISTRO_CODENAME=$(lsb_release -cs)
+  echo "deb http://apt.llvm.org/${DISTRO_CODENAME}/ llvm-toolchain-${DISTRO_CODENAME}-${CLANG_VERSION} main" \
+    | tee /etc/apt/sources.list.d/llvm.list
+fi
+
 apt-get update
 apt-get install -y --no-install-recommends --allow-unauthenticated \
   clang-${CLANG_VERSION} \
