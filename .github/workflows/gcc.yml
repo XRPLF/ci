@@ -46,6 +46,8 @@ jobs:
             compiler_version: 14
           - release: bullseye
             compiler_version: 15
+          - release: bullseye
+            compiler_version: 16
     runs-on: ${{ matrix.architecture.runner }}
     permissions:
       packages: write
@@ -128,6 +130,8 @@ jobs:
             compiler_version: 14
           - release: bullseye
             compiler_version: 15
+          - release: bullseye
+            compiler_version: 16
     runs-on: ubuntu-24.04
     needs:
       - build
