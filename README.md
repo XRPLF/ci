@@ -1,3 +1,7 @@
+**Note:** This repository has been archived, and the container images are no longer used for
+building the XRPLF projects described below. Instead, images based on NixOS are used, which
+are built within the respective repositories.
+
 # CI
 
 Containers for use by CI pipelines in XRPLF projects.
